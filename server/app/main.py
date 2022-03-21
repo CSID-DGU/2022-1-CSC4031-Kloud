@@ -17,6 +17,3 @@ templates = Jinja2Templates(directory=str(BASE_DIR/"templates"))
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "title":"Kloud"})
-
-
-
