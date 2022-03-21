@@ -10,9 +10,11 @@ const Router = () => {
     <BrowserRouter>
       <Switch>
         <Route path="/" exact>
-          {isLoggedIn ? <Login /> : <Home />}
+          {isLoggedIn ? <Home /> : <Login />}
         </Route>
       </Switch>
     </BrowserRouter>
   );
 };
+
+export default Router;
