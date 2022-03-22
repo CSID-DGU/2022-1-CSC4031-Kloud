@@ -1,4 +1,4 @@
-const BASE_URL = "localhost:8000";
+const BASE_URL = "http://localhost:8000";
 
 export function login(access_key_public: String, access_key_secret: String) {
   let loginData = {
