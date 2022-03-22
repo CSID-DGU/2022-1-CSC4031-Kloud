@@ -30,17 +30,6 @@ class LogInReq(BaseModel):
     access_key_secret: str
 
 
-class Req(BaseModel):
-    req_type: str
-    req_data: object
-
-
-class ReqForm(BaseModel):
-    id: str
-    request: Req
-
-
-
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return
@@ -49,8 +38,8 @@ async def root():
 @app.post("/login")
 async def login(login_form: LogInReq):
     aws_session = boto3.Session(
-        aws_access_key_id=LogInReq.access_key_public,
-        aws_secret_access_key=LogInReq.access_key_secret,
+        aws_access_key_id=login_form.access_key_public,
+        aws_secret_access_key=login_form.access_key_secret,
     )
     return aws_session.get_available_services()  # 응답 예시로 이용 가능한 서비스 목록 출력
 
