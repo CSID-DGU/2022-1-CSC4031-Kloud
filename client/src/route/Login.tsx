@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "../api";
+import { v1 } from "uuid";
+import { useSetRecoilState } from "recoil";
+import { userIdAtom } from "../atoms";
 
 interface IForm {
   public_key: string;
@@ -8,10 +11,15 @@ interface IForm {
 }
 
 const Login = () => {
+  // User Id 생성
+  const userId = v1();
+  const setUserId = useSetRecoilState(userIdAtom);
+
   const [publicKey, setPublicKey] = useState("");
   const [secret, setSecret] = useState("");
   const { register, handleSubmit, reset } = useForm<IForm>();
   useEffect(() => {
+    setUserId(() => userId);
     (async () => {
       console.log(await login(publicKey, secret));
     })();
