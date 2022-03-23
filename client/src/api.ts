@@ -4,6 +4,7 @@ export async function login(
   access_key_public: String,
   access_key_secret: String
 ) {
+  console.log(JSON.stringify({ access_key_public, access_key_secret }));
   let loginData = {
     method: "POST",
     body: JSON.stringify({ access_key_public, access_key_secret }),
@@ -11,7 +12,6 @@ export async function login(
       "Content-Type": "application/json",
     },
   };
-  console.log(access_key_public + "999999");
   return access_key_public
     ? await fetch(`${BASE_URL}/login`, loginData).then((response) =>
         response.json()

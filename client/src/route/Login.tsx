@@ -15,7 +15,7 @@ const Login = () => {
     (async () => {
       console.log(await login(publicKey, secret));
     })();
-  }, [publicKey]);
+  }, [secret]);
   const onValid = ({ public_key, secret_key }: IForm) => {
     setPublicKey(public_key);
     setSecret(secret_key);
