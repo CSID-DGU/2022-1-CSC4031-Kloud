@@ -4,7 +4,7 @@ export async function login(
   access_key_public: String,
   access_key_secret: String
 ) {
-  console.log(JSON.stringify({ access_key_public, access_key_secret }));
+  // console.log(JSON.stringify({ access_key_public, access_key_secret }));
   let loginData = {
     method: "POST",
     body: JSON.stringify({ access_key_public, access_key_secret }),
