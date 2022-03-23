@@ -1,5 +1,8 @@
 import Router from "./Router";
 import { createGlobalStyle } from "styled-components";
+import { v1 } from "uuid";
+import { useSetRecoilState } from "recoil";
+import { userIdAtom } from "./atoms";
 
 const GlobalStyle = createGlobalStyle`
 html, body, div, span, applet, object, iframe,
@@ -58,6 +61,10 @@ a{
 `;
 
 function App() {
+  const userId = v1();
+  const setUserId = useSetRecoilState(userIdAtom);
+  setUserId(() => userId);
+
   return (
     <>
       <GlobalStyle />
