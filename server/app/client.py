@@ -32,7 +32,9 @@ class KloudClient:
 
             for dic in response:
                 primary_key = dic[identifier]
+                dic['resource_id'] = primary_key
                 self._resources[primary_key] = dic
+
 
     @staticmethod
     def cut_useless_metadata(data: dict) -> dict:
