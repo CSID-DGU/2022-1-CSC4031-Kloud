@@ -49,7 +49,9 @@ async def login(login_form: LogInReq):
             clients[login_form.access_key_public] = kloud_client  # todo 현재 KloudClient 객체를 딕셔너리에 저장함. 추후 변동 가능
             return "login_success"
     except botocore.exceptions.ClientError:
-        raise HTTPException(status_code=401, detail="login_failed")  # todo 추후 상세한 에러 내용 담아서 수정
+        raise HTTPException(status_code=401, detail="login_failed")
+    except botocore.exceptions.InvalidRegionError:
+        raise HTTPException(status_code=400, detail="invalid_region")
 
 
 @app.get("/available_regions")  # 가능한 aws 지역 목록, 가장 기본적이고 보편적인 서비스인 ec2를 기본값으로 요청.
@@ -57,7 +59,7 @@ async def get_available_regions():
     return await sdk_handle.get_available_regions()
 
 
-class InfraInfoReq(BaseModel):  # 보안 확인
+class InfraInfoReq(BaseModel):  # 보안 확인 필요
     id: str
 
 
@@ -69,3 +71,16 @@ async def infra_info(req: InfraInfoReq):
         raise HTTPException(status_code=404, detail="kloud_client_not_found")
     return await client.get_current_infra_dict()
 
+
+class LogOutReq(BaseModel):
+    id: str
+
+
+@app.post("/logout")
+async def logout(logout_form: LogOutReq):
+    try:
+        clients.pop(logout_form.id)
+    except KeyError:
+        pass
+    finally:
+        return "logout_success"
