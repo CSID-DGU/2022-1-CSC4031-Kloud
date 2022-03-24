@@ -1,5 +1,13 @@
 import boto3
-identifiers = ['InternetGatewayId', 'VpcId', 'InternetGateways', 'LocalGateways', 'NetworkInterfaces']
+
+RESOURCE_IDENTIFIERS = {'VpcId': 'vpc',
+                        'SubnetId': 'subnet',
+                        'NetworkInterfaceId': 'network_interface',
+                        'InternetGatewayId': 'igw',
+                        'NatGatewayId': 'ngw',
+                        'InstanceId': 'ec2',  # todo ec2 이외에도 InstanceId인 경우 있는지 확인할 것
+                        'DBInstanceIdentifier': 'rds'
+                        }
 
 
 class KloudClient:
@@ -33,8 +41,8 @@ class KloudClient:
             for dic in response:
                 primary_key = dic[identifier]
                 dic['resource_id'] = primary_key
+                dic['resource_type'] = RESOURCE_IDENTIFIERS[identifier]
                 self._resources[primary_key] = dic
-
 
     @staticmethod
     def cut_useless_metadata(data: dict) -> dict:
