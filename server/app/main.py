@@ -57,7 +57,7 @@ async def get_available_regions():
     return await sdk_handle.get_available_regions()
 
 
-class InfraInfoReq(BaseModel):  # 보안 확인
+class InfraInfoReq(BaseModel):  # 보안 확인 필요
     id: str
 
 
@@ -69,3 +69,16 @@ async def infra_info(req: InfraInfoReq):
         raise HTTPException(status_code=404, detail="kloud_client_not_found")
     return await client.get_current_infra_dict()
 
+
+class LogOutReq(BaseModel):
+    id: str
+
+
+@app.post("/logout")
+async def logout(logout_form: LogOutReq):
+    try:
+        clients.pop(logout_form.id)
+    except KeyError:
+        pass
+    finally:
+        return "logout_success"
