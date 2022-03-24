@@ -1,3 +1,4 @@
+import axios from "axios";
 const BASE_URL = "http://localhost:8000";
 
 export async function login(
@@ -13,9 +14,30 @@ export async function login(
       "Content-Type": "application/json",
     },
   };
-  return access_key_public
-    ? await fetch(`${BASE_URL}/login`, loginData).then((response) =>
-        response.json()
-      )
-    : null;
+  const tmp = JSON.stringify({ access_key_public, access_key_secret, region });
+
+  if (access_key_public) {
+    const response = axios({
+      method: "POST",
+      url: `${BASE_URL}/login`,
+      data: {
+        access_key_public: access_key_public,
+        access_key_secret: access_key_secret,
+        region: region,
+      },
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new Error(error);
+      });
+  }
+  // return access_key_public
+  //   ? await fetch(`${BASE_URL}/login`, loginData).then((response) =>
+  //       response.json()
+  //     )
+  //   : null;
+  return null;
 }

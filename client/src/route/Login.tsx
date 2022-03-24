@@ -49,7 +49,7 @@ const Login = () => {
     (async () => {
       console.log(await login(publicKey, secret, region));
     })();
-  }, [secret]);
+  }, [region]);
   const onValid = ({ public_key, secret_key, region }: IForm) => {
     setPublicKey(public_key);
     setSecret(secret_key);
