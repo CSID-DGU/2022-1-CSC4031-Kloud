@@ -72,6 +72,20 @@ async def infra_info(req: InfraInfoReq):
     return await client.get_current_infra_dict()
 
 
+class ResourceInfoReq(BaseModel):
+    id: str
+    resource_id: str
+
+
+@app.post("/infra_specific_info")
+async def resource_info(req: ResourceInfoReq):
+    try:
+        client: KloudClient = clients[req.id]
+    except KeyError:
+        raise HTTPException(status_code=404, detail="kloud_client_not_found")
+    return await client.get_resource_info(resource_id=req.resource_id)
+
+
 class LogOutReq(BaseModel):
     id: str
 
