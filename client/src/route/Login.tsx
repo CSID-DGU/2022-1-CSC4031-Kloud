@@ -8,6 +8,7 @@ import styled from "styled-components";
 interface IForm {
   public_key: string;
   secret_key: string;
+  region: string;
 }
 const Container = styled.div`
   display: flex;
@@ -36,6 +37,7 @@ const Login = () => {
   const setUserId = useSetRecoilState(userIdAtom);
   const [publicKey, setPublicKey] = useState("");
   const [secret, setSecret] = useState("");
+  const [region, setRegion] = useState("");
   const {
     register,
     handleSubmit,
@@ -45,13 +47,14 @@ const Login = () => {
 
   useEffect(() => {
     (async () => {
-      console.log(await login(publicKey, secret));
+      console.log(await login(publicKey, secret, region));
     })();
-  }, [secret]);
-  const onValid = ({ public_key, secret_key }: IForm) => {
+  }, [region]);
+  const onValid = ({ public_key, secret_key, region }: IForm) => {
     setPublicKey(public_key);
     setSecret(secret_key);
     setUserId(publicKey);
+    setRegion(region);
     reset();
   };
 
@@ -72,6 +75,13 @@ const Login = () => {
           placeholder="secret_key"
         />
         <ErrorMessage>{errors?.secret_key?.message}</ErrorMessage>
+        <KeyInput
+          {...register("region", {
+            required: "필수 입력 항목입니다.",
+          })}
+          placeholder="region"
+        />
+        <ErrorMessage>{errors?.region?.message}</ErrorMessage>
         <LoginButton>로그인</LoginButton>
       </LoginForm>
     </Container>
