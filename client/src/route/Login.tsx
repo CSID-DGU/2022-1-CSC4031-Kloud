@@ -37,6 +37,7 @@ const Login = () => {
   const setUserId = useSetRecoilState(userIdAtom);
   const [publicKey, setPublicKey] = useState("");
   const [secret, setSecret] = useState("");
+  const [region, setRegion] = useState("");
   const {
     register,
     handleSubmit,
@@ -46,13 +47,14 @@ const Login = () => {
 
   useEffect(() => {
     (async () => {
-      console.log(await login(publicKey, secret));
+      console.log(await login(publicKey, secret, region));
     })();
   }, [secret]);
-  const onValid = ({ public_key, secret_key }: IForm) => {
+  const onValid = ({ public_key, secret_key, region }: IForm) => {
     setPublicKey(public_key);
     setSecret(secret_key);
     setUserId(publicKey);
+    setRegion(region);
     reset();
   };
 
