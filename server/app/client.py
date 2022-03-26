@@ -1,4 +1,5 @@
 import boto3
+from datetime import datetime, timedelta
 
 RESOURCE_IDENTIFIERS = {'VpcId': 'vpc',
                         'SubnetId': 'subnet',
@@ -8,6 +9,9 @@ RESOURCE_IDENTIFIERS = {'VpcId': 'vpc',
                         'InstanceId': 'ec2',  # todo ec2 이외에도 InstanceId인 경우 있는지 확인할 것
                         'DBInstanceIdentifier': 'rds'
                         }
+
+GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENTITY", "LINKED_ACCOUNT", "OPERATION",
+                      "PLATFORM", "PURCHASE_TYPE", "SERVICE", "TENANCY", "RECORD_TYPE", "USAGE_TYPE"]
 
 
 class KloudClient:
@@ -55,3 +59,19 @@ class KloudClient:
     async def get_current_infra_dict(self) -> dict:
         await self._update_resource_dict()
         return self._resources
+
+    async def get_cost_history(self, time_period: dict, granularity: str) -> dict:
+        res = self._ce_client.get_cost_and_usage(TimePeriod=time_period,
+                                                 Granularity=granularity,
+                                                 Metrics=['UnblendedCost', 'UsageQuantity'],
+                                                 GroupBy=[{'Type': 'DIMENSION', 'Key': 'SERVICE'},
+                                                          {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}])
+        return res['GroupDefinitions']
+
+    async def get_default_cost_history(self) -> dict:
+        tp = {
+            'Start': str(datetime.date(datetime.now() - timedelta(days=90))),
+            'End': str(datetime.date(datetime.now()))
+        }
+        granularity = 'DAILY'
+        return await self.get_cost_history(time_period=tp, granularity=granularity)

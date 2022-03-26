@@ -76,6 +76,15 @@ async def infra_info(req: InfraInfoReq):
     return await client.get_current_infra_dict()
 
 
+@app.post("/cost_history_default")
+async def cost_history_default(req: InfraInfoReq):
+    client_id = await get_user_id(req.access_token)
+    try:
+        client: KloudClient = clients[client_id]
+    except KeyError:
+        raise HTTPException(status_code=404, detail="kloud_client_not_found")
+    return await client.get_default_cost_history()
+
 # class ResourceInfoReq(BaseModel):
 #     id: str
 #     resource_id: str
