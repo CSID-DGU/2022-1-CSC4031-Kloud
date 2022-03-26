@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "../api";
 import { useSetRecoilState } from "recoil";
-import { userIdAtom } from "../atoms";
+import { userIdAtom, isLoggedInAtom } from "../atoms";
 import styled from "styled-components";
 
 interface IForm {
@@ -35,6 +35,7 @@ const ErrorMessage = styled.span`
 
 const Login = () => {
   const setUserId = useSetRecoilState(userIdAtom);
+  const setIsLoggedIn = useSetRecoilState(isLoggedInAtom);
   const [publicKey, setPublicKey] = useState("");
   const [secret, setSecret] = useState("");
   const [region, setRegion] = useState("");
@@ -47,7 +48,13 @@ const Login = () => {
 
   useEffect(() => {
     (async () => {
-      console.log(await login(publicKey, secret, region));
+      const response = await login(publicKey, secret, region);
+      if (response !== null) {
+        const loginResponse = response?.data;
+        if (loginResponse == "login_success") {
+          setIsLoggedIn(true);
+        }
+      }
     })();
   }, [region]);
   const onValid = ({ public_key, secret_key, region }: IForm) => {
