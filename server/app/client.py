@@ -51,7 +51,7 @@ class KloudClient:
                 self._resources[primary_key] = dic
 
     @staticmethod
-    def cut_useless_metadata(data: dict) -> dict:
+    def cut_useless_metadata(data: dict) -> dict:  # todo 예외 있는지 확인
         processed = dict()
         for k, v in data.items():
             processed = v
@@ -68,7 +68,7 @@ class KloudClient:
                                                  Metrics=['UnblendedCost', 'UsageQuantity'],
                                                  GroupBy=[{'Type': 'DIMENSION', 'Key': 'SERVICE'},
                                                           {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}])
-        return res['GroupDefinitions']
+        return res
 
     async def get_default_cost_history(self) -> dict:
         tp = {
