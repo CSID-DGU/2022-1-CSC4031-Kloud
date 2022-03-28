@@ -1,5 +1,5 @@
 import botocore.exceptions
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from .client import KloudClient
@@ -67,20 +67,18 @@ class InfraInfoReq(BaseModel):  # 보안 확인 필요
 
 
 @app.post("/infra_info")
-async def infra_info(req: InfraInfoReq):
-    client_id = await get_user_id(req.access_token)
+async def infra_info(user_id=Depends(get_user_id)):
     try:
-        client: KloudClient = clients[client_id]
+        client: KloudClient = clients[user_id]
     except KeyError:
         raise HTTPException(status_code=404, detail="kloud_client_not_found")
     return await client.get_current_infra_dict()
 
 
 @app.post("/cost_history_default")
-async def cost_history_default(req: InfraInfoReq):
-    client_id = await get_user_id(req.access_token)
+async def cost_history_default(user_id=Depends(get_user_id)):
     try:
-        client: KloudClient = clients[client_id]
+        client: KloudClient = clients[user_id]
     except KeyError:
         raise HTTPException(status_code=404, detail="kloud_client_not_found")
     return await client.get_default_cost_history()
@@ -104,8 +102,7 @@ class KloudLogoutForm(BaseModel):
 
 
 @app.post("/logout")
-async def logout(logout_form: KloudLogoutForm):  # todo token revoke 목록
-    user_id = await get_user_id(logout_form.access_token)
+async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
     try:
         clients.pop(user_id)
     except KeyError:
