@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from .client import KloudClient
+from .response_exceptions import UserNotInDBException
 from pathlib import Path
 from . import sdk_handle
 from .auth import create_access_token, get_user_id
@@ -14,6 +15,14 @@ app = FastAPI()
 aws_info = boto3.Session()
 
 clients = dict()  # 수정 필요
+
+
+def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:  # 수정 필요
+    try:
+        return clients[user_id]
+    except KeyError:
+        raise UserNotInDBException
+
 
 ##### CORS #####
 # 개발 편의를 위해 모든 origin 허용. 배포시 수정 필요
@@ -31,6 +40,7 @@ app.add_middleware(
 
 
 ##### CORS #####
+
 
 class KloudLoginForm(BaseModel):
     access_key_public: str
@@ -62,26 +72,15 @@ async def get_available_regions():
     return await sdk_handle.get_available_regions()
 
 
-class InfraInfoReq(BaseModel):  # 보안 확인 필요
-    access_token: str
-
-
 @app.post("/infra_info")
-async def infra_info(user_id=Depends(get_user_id)):
-    try:
-        client: KloudClient = clients[user_id]
-    except KeyError:
-        raise HTTPException(status_code=404, detail="kloud_client_not_found")
-    return await client.get_current_infra_dict()
+async def infra_info(user_client=Depends(get_user_client)):
+    return await user_client.get_current_infra_dict()
 
 
 @app.post("/cost_history_default")
-async def cost_history_default(user_id=Depends(get_user_id)):
-    try:
-        client: KloudClient = clients[user_id]
-    except KeyError:
-        raise HTTPException(status_code=404, detail="kloud_client_not_found")
-    return await client.get_default_cost_history()
+async def cost_history_default(user_client=Depends(get_user_client)):
+    return await user_client.get_default_cost_history()
+
 
 # class ResourceInfoReq(BaseModel):
 #     id: str
@@ -95,10 +94,6 @@ async def cost_history_default(user_id=Depends(get_user_id)):
 #     except KeyError:
 #         raise HTTPException(status_code=404, detail="kloud_client_not_found")
 #     return await client.get_resource_info(resource_id=req.resource_id)
-
-
-class KloudLogoutForm(BaseModel):
-    access_token: str
 
 
 @app.post("/logout")
