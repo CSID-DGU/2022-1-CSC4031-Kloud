@@ -40,8 +40,10 @@ class KloudClient:
             response: dict = self.cut_useless_metadata(describing_method())
 
             if identifier == 'InstanceId':  # ec2 인스턴스일 경우
-                response = response[0]['Instances']
-
+                try:
+                    response = response[0]['Instances']
+                except IndexError:  # ec2 인스턴스가 없을 경우
+                    pass
             for dic in response:
                 primary_key = dic[identifier]
                 dic['resource_id'] = primary_key
