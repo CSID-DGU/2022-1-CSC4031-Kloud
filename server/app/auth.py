@@ -22,9 +22,9 @@ async def create_access_token(data: dict, expires_delta: Optional[timedelta] = N
     return encoded_jwt
 
 
-async def get_user_id(token: str):
+async def get_user_id(access_token: str):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("user_id")
         if user_id is None:
             raise credentials_exception
