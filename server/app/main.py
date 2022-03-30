@@ -48,6 +48,10 @@ class KloudLoginForm(BaseModel):
     region: str
 
 
+async def add_user_client(user_id: str, user_client: KloudClient) -> None:  # todo 현재 KloudClient 객체를 딕셔너리에 저장함. 추후 변동 가능
+    clients[user_id] = user_client
+
+
 @app.post("/login")
 async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
     try:
@@ -57,8 +61,8 @@ async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인,
         if await sdk_handle.is_valid_session(session_instance):
             kloud_client = KloudClient(access_key_id=login_form.access_key_public,
                                        session_instance=session_instance)
-            clients[login_form.access_key_public] = kloud_client  # todo 현재 KloudClient 객체를 딕셔너리에 저장함. 추후 변동 가능
-            token = await create_access_token(data={"user_id": login_form.access_key_public})
+            await add_user_client(login_form.access_key_public, kloud_client)
+            token = await create_access_token(login_form.access_key_public)
             return {"access_token": token}
 
     except botocore.exceptions.ClientError:
