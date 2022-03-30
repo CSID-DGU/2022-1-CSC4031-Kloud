@@ -2,7 +2,7 @@ import { atom } from "recoil";
 
 export const isLoggedInAtom = atom({
   key: "isLoggedIn",
-  default: false,
+  default: localStorage.getItem("access_token") ? true : false,
 });
 
 export const userIdAtom = atom({
