@@ -38,3 +38,13 @@ export async function login(
   //     )
   //   : null;
 }
+
+export async function getInfra() {
+  return axios({
+    method: "POST",
+    url: `${BASE_URL}/infra_info`,
+    data: {
+      access_token: localStorage.getItem("access_token"),
+    },
+  });
+}
