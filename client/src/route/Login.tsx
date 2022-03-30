@@ -48,12 +48,16 @@ const Login = () => {
 
   useEffect(() => {
     (async () => {
-      const response = await login(publicKey, secret, region);
+      let response = null;
+      if (region) {
+        // region 까지 들어오면 요청 날림
+        response = await login(publicKey, secret, region);
+      }
+      // 로그인 성공 / 실패 처리 나누기 필요
       if (response !== null) {
         const loginResponse = response?.data;
-        if (loginResponse == "login_success") {
-          setIsLoggedIn(true);
-        }
+        localStorage.setItem("access_token", loginResponse.access_token);
+        setIsLoggedIn(true);
       }
     })();
   }, [region]);
