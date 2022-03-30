@@ -6,6 +6,7 @@ import { isLoggedInAtom } from "./atoms";
 
 const Router = () => {
   const isLoggedIn = useRecoilValue(isLoggedInAtom);
+  console.log(isLoggedIn);
   return (
     <BrowserRouter>
       <Switch>
