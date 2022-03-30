@@ -1,4 +1,5 @@
 import axios from "axios";
+import { isInterfaceDeclaration } from "typescript";
 const BASE_URL = "http://localhost:8000";
 
 export async function login(
@@ -15,7 +16,7 @@ export async function login(
   // };
 
   if (access_key_public) {
-    return axios({
+    return await axios({
       method: "POST",
       url: `${BASE_URL}/login`,
       data: {
@@ -39,12 +40,14 @@ export async function login(
   //   : null;
 }
 
-export async function getInfra() {
-  return axios({
+export function getInfra() {
+  const data = axios({
     method: "POST",
     url: `${BASE_URL}/infra_info`,
     data: {
       access_token: localStorage.getItem("access_token"),
     },
   });
+  const infra = { tmp: null };
+  return infra;
 }
