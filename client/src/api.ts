@@ -48,6 +48,5 @@ export function getInfra() {
       access_token: localStorage.getItem("access_token"),
     },
   });
-  const infra = { tmp: null };
-  return infra;
+  return data;
 }

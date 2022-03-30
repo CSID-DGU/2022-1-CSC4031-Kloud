@@ -6,10 +6,8 @@ interface IInfra {
   tmp: null;
 }
 const Home = () => {
-  const { isLoading, data } = useQuery<IInfra>("allInfra", getInfra);
-  (async () => {
-    console.log(await getInfra());
-  })();
+  const { isLoading, data } = useQuery<any>("allInfra", getInfra);
+  console.log(data);
   return <div>Home</div>;
 };
 
