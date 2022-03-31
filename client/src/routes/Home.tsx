@@ -1,6 +1,7 @@
 import { getInfra } from "../api";
 import styled from "styled-components";
 import { useQuery } from "react-query";
+import Header from "../components/Header";
 
 interface IInfra {
   tmp: null;
@@ -8,7 +9,11 @@ interface IInfra {
 const Home = () => {
   const { isLoading, data } = useQuery<any>("allInfra", getInfra);
   console.log(data);
-  return <div>Home</div>;
+  return (
+    <>
+      <Header></Header>
+    </>
+  );
 };
 
 export default Home;
