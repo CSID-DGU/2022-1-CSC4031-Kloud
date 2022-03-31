@@ -1,4 +1,5 @@
 import axios from "axios";
+
 const BASE_URL = "http://localhost:8000";
 
 export async function login(
@@ -15,7 +16,7 @@ export async function login(
   // };
 
   if (access_key_public) {
-    return axios({
+    return await axios({
       method: "POST",
       url: `${BASE_URL}/login`,
       data: {
@@ -37,4 +38,25 @@ export async function login(
   //       response.json()
   //     )
   //   : null;
+}
+
+export function getInfra() {
+  const data = axios({
+    method: "POST",
+    url: `${BASE_URL}/infra_info`,
+    data: {
+      access_token: localStorage.getItem("access_token"),
+    },
+  });
+  return data;
+}
+
+export function logOut() {
+  const data = axios({
+    method: "POST",
+    url: `${BASE_URL}/logout`,
+    data: {
+      access_token: localStorage.getItem("access_token"),
+    },
+  });
 }
