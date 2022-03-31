@@ -1,5 +1,9 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { logOut } from "../api";
+import { useSetRecoilState } from "recoil";
+import { isLoggedInAtom } from "../atoms";
+
 const HeaderContainer = styled.header`
   height: 7vh;
   display: flex;
@@ -19,13 +23,19 @@ const LogOut = styled.button`
   background-color: transparent;
 `;
 const Header = () => {
+  const setIsLoggedIn = useSetRecoilState(isLoggedInAtom);
+  const logOutOnClick = async () => {
+    setIsLoggedIn(false);
+    localStorage.removeItem("access_token");
+    await logOut();
+  };
   return (
     <HeaderContainer>
       <Logo>
         <Link to="/">KLOUD</Link>
       </Logo>
       <Nav>
-        <LogOut>LOGOUT</LogOut>
+        <LogOut onClick={logOutOnClick}>LOGOUT</LogOut>
       </Nav>
     </HeaderContainer>
   );

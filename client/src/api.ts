@@ -1,5 +1,5 @@
 import axios from "axios";
-import { isInterfaceDeclaration } from "typescript";
+
 const BASE_URL = "http://localhost:8000";
 
 export async function login(
@@ -49,4 +49,8 @@ export function getInfra() {
     },
   });
   return data;
+}
+
+export function logOut() {
+  return;
 }
