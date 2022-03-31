@@ -32,6 +32,24 @@ const LoginButton = styled.button`
 const ErrorMessage = styled.span`
   color: red;
 `;
+const SelectRegion = styled.select`
+  margin-bottom: 10px;
+`;
+const RegionOption = styled.option``;
+const regions = [
+  "ap-northeast-2",
+  "ap-northeast-3",
+  "ap-northeast-1",
+  "ap-southeast-1",
+  "ap-southeast-2",
+  "us-east-2",
+  "us-east-1",
+  "us-west-1",
+  "us-west-2",
+  "af-south-1",
+  "ap-east-1",
+  "ap-south-1",
+];
 
 const Login = () => {
   const setUserId = useSetRecoilState(userIdAtom);
@@ -86,12 +104,15 @@ const Login = () => {
           placeholder="secret_key"
         />
         <ErrorMessage>{errors?.secret_key?.message}</ErrorMessage>
-        <KeyInput
+        <SelectRegion
           {...register("region", {
             required: "필수 입력 항목입니다.",
           })}
-          placeholder="region"
-        />
+        >
+          {regions.map((region) => (
+            <RegionOption value={region}>{region}</RegionOption>
+          ))}
+        </SelectRegion>
         <ErrorMessage>{errors?.region?.message}</ErrorMessage>
         <LoginButton>로그인</LoginButton>
       </LoginForm>
