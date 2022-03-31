@@ -25,9 +25,9 @@ const LogOut = styled.button`
 const Header = () => {
   const setIsLoggedIn = useSetRecoilState(isLoggedInAtom);
   const logOutOnClick = async () => {
+    await logOut();
     setIsLoggedIn(false);
     localStorage.removeItem("access_token");
-    await logOut();
   };
   return (
     <HeaderContainer>

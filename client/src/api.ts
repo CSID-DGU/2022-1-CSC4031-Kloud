@@ -52,5 +52,11 @@ export function getInfra() {
 }
 
 export function logOut() {
-  return;
+  const data = axios({
+    method: "POST",
+    url: `${BASE_URL}/logout`,
+    data: {
+      access_token: localStorage.getItem("access_token"),
+    },
+  });
 }
