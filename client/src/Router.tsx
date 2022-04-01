@@ -1,6 +1,6 @@
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import Home from "./route/Home";
-import Login from "./route/Login";
+import Home from "./routes/Home";
+import Login from "./routes/Login";
 import { useRecoilValue } from "recoil";
 import { isLoggedInAtom } from "./atoms";
 
