@@ -86,6 +86,10 @@ async def cost_history_default(user_client=Depends(get_user_client)):
     return await user_client.get_default_cost_history()
 
 
+@app.post("/infra-tree")
+async def infra_tree(user_client=Depends(get_user_client)):
+    return await user_client.get_infra_tree()
+
 # class ResourceInfoReq(BaseModel):
 #     id: str
 #     resource_id: str

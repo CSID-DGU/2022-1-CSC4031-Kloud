@@ -13,6 +13,12 @@ RESOURCE_IDENTIFIERS = {'VpcId': 'vpc',
 GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENTITY", "LINKED_ACCOUNT", "OPERATION",
                       "PLATFORM", "PURCHASE_TYPE", "SERVICE", "TENANCY", "RECORD_TYPE", "USAGE_TYPE"]
 
+PARENT = {
+    'vpc': 'root',
+    'subnet': 'VpcId',
+    'ec2': 'SubnetId',
+}
+
 
 class KloudClient:
     def __init__(self, access_key_id: str, session_instance: boto3.Session, ):
@@ -77,3 +83,34 @@ class KloudClient:
         }
         granularity = 'DAILY'
         return await self.get_cost_history(time_period=tp, granularity=granularity)
+
+    async def get_infra_tree(self) -> dict:
+        await self.get_current_infra_dict()
+        return self.get_tree(self._resources)
+
+    @staticmethod
+    def get_parent(child: dict):
+        try:
+            resource_type = child['resource_type']
+            print(child.get(PARENT[resource_type]))
+            return child.get(PARENT[resource_type])
+        except KeyError:
+            pass
+
+    def get_tree(self, data: dict):
+        for key, val in data.items():
+            parent = self.get_parent(val)
+            try:
+                data[key]['parent'] = parent
+                if data[parent].get('children') is None:
+                    data[parent]['children'] = {}
+                if val['resource_type'] != 'vpc':
+                    data[parent]['children'][key] = val
+            except KeyError:
+                pass  # 부모가 None인 경우. 부모관계가 없는 resource
+
+        to_return = dict()
+        for k, v in data.items():
+            if v.get('resource_type') == 'vpc':
+                to_return[k] = v
+        return to_return
