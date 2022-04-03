@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from .client import KloudClient
 from .response_exceptions import UserNotInDBException
 from pathlib import Path
-from . import sdk_handle
+from . import common_functions
 from .auth import create_access_token, get_user_id
 import boto3
 
@@ -55,10 +55,10 @@ async def add_user_client(user_id: str, user_client: KloudClient) -> None:  # to
 @app.post("/login")
 async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
     try:
-        session_instance: boto3.Session = sdk_handle.create_session(access_key_id=login_form.access_key_public,
+        session_instance: boto3.Session = common_functions.create_session(access_key_id=login_form.access_key_public,
                                                                     secret_access_key=login_form.access_key_secret,
                                                                     region=login_form.region)
-        if await sdk_handle.is_valid_session(session_instance):
+        if await common_functions.is_valid_session(session_instance):
             kloud_client = KloudClient(access_key_id=login_form.access_key_public,
                                        session_instance=session_instance)
             await add_user_client(login_form.access_key_public, kloud_client)
@@ -71,37 +71,24 @@ async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인,
         raise HTTPException(status_code=400, detail="invalid_region")
 
 
-@app.get("/available_regions")  # 가능한 aws 지역 목록, 가장 기본적이고 보편적인 서비스인 ec2를 기본값으로 요청.
+@app.get("/available-regions")  # 가능한 aws 지역 목록, 가장 기본적이고 보편적인 서비스인 ec2를 기본값으로 요청.
 async def get_available_regions():
-    return await sdk_handle.get_available_regions()
+    return await common_functions.get_available_regions()
 
 
-@app.post("/infra_info")
+@app.post("/infra/info")
 async def infra_info(user_client=Depends(get_user_client)):
     return await user_client.get_current_infra_dict()
 
 
-@app.post("/cost_history_default")
+@app.post("/cost/history/default")
 async def cost_history_default(user_client=Depends(get_user_client)):
     return await user_client.get_default_cost_history()
 
 
-@app.post("/infra-tree")
+@app.post("/infra/tree")
 async def infra_tree(user_client=Depends(get_user_client)):
     return await user_client.get_infra_tree()
-
-# class ResourceInfoReq(BaseModel):
-#     id: str
-#     resource_id: str
-
-
-# @app.post("/infra_specific_info")
-# async def resource_info(req: ResourceInfoReq):
-#     try:
-#         client: KloudClient = clients[req.id]
-#     except KeyError:
-#         raise HTTPException(status_code=404, detail="kloud_client_not_found")
-#     return await client.get_resource_info(resource_id=req.resource_id)
 
 
 @app.post("/logout")
