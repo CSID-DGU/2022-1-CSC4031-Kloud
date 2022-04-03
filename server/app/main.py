@@ -24,6 +24,10 @@ def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:  # 수�
         raise UserNotInDBException
 
 
+async def add_user_client(user_id: str, user_client: KloudClient) -> None:  # todo 현재 KloudClient 객체를 딕셔너리에 저장함. 추후 변동 가능
+    clients[user_id] = user_client
+
+
 ##### CORS #####
 # 개발 편의를 위해 모든 origin 허용. 배포시 수정 필요
 
@@ -48,16 +52,12 @@ class KloudLoginForm(BaseModel):
     region: str
 
 
-async def add_user_client(user_id: str, user_client: KloudClient) -> None:  # todo 현재 KloudClient 객체를 딕셔너리에 저장함. 추후 변동 가능
-    clients[user_id] = user_client
-
-
 @app.post("/login")
 async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
     try:
         session_instance: boto3.Session = common_functions.create_session(access_key_id=login_form.access_key_public,
-                                                                    secret_access_key=login_form.access_key_secret,
-                                                                    region=login_form.region)
+                                                                          secret_access_key=login_form.access_key_secret,
+                                                                          region=login_form.region)
         if await common_functions.is_valid_session(session_instance):
             kloud_client = KloudClient(access_key_id=login_form.access_key_public,
                                        session_instance=session_instance)
