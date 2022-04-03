@@ -14,10 +14,11 @@ GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENT
                       "PLATFORM", "PURCHASE_TYPE", "SERVICE", "TENANCY", "RECORD_TYPE", "USAGE_TYPE"]
 
 PARENT = {
-    'vpc': 'root',
     'subnet': 'VpcId',
     'ec2': 'SubnetId',
 }
+
+POSSIBLE_ROOT_NODES = {'vpc', 'igw'}
 
 
 class KloudClient:
@@ -86,31 +87,38 @@ class KloudClient:
 
     async def get_infra_tree(self) -> dict:
         await self.get_current_infra_dict()
-        return self.get_tree(self._resources)
+        return self._get_tree(self._resources)
 
-    @staticmethod
-    def get_parent(child: dict):
+    def _get_parent(self, child: dict):
+        resource_type = child.get('resource_type')
+        if resource_type == 'vpc':
+            return self._get_vpc_parent(child.get('resource_id'))
         try:
             resource_type = child['resource_type']
-            print(child.get(PARENT[resource_type]))
             return child.get(PARENT[resource_type])
         except KeyError:
             pass
 
-    def get_tree(self, data: dict):
+    def _get_vpc_parent(self, vpc_id: str) -> str:
+        for key, val in self._resources.items():
+            if val['resource_type'] == 'igw':
+                for vpcs in val['Attachments']:
+                    if vpcs['VpcId'] == vpc_id:
+                        return key
+
+    def _get_tree(self, data: dict):
         for key, val in data.items():
-            parent = self.get_parent(val)
+            parent = self._get_parent(val)
             try:
                 data[key]['parent'] = parent
                 if data[parent].get('children') is None:
                     data[parent]['children'] = {}
-                if val['resource_type'] != 'vpc':
-                    data[parent]['children'][key] = val
+                data[parent]['children'][key] = val
             except KeyError:
                 pass  # 부모가 None인 경우. 부모관계가 없는 resource
 
         to_return = dict()
         for k, v in data.items():
-            if v.get('resource_type') == 'vpc':
+            if v.get('resource_type') in POSSIBLE_ROOT_NODES and v.get('parent') is None:
                 to_return[k] = v
         return to_return
