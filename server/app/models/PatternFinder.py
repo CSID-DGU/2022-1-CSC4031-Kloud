@@ -9,15 +9,26 @@ warnings.filterwarnings("ignore")
 class PatternFinder():
     def __init__(self,path,period=5):
         self.path = path
+        self.cost = []
         if self.path.split(".")[-1] == "csv":
             self.data = pd.read_csv(path)
         elif self.path.split(".")[-1] == "xlsx":
             self.data = pd.read_excel(path)
-        
-        self.period = period
-        self.data.drop(self.data.index[0],inplace=True)
-        self.data.index = self.data["Service"]
-        self.price = self.data["Total cost ($)"]
+        elif type(path) is dict:
+            data = path
+            for d in data["ResultsByTime"]:
+                c = 0
+                for d2 in d["Groups"]:
+                    c += float(d2['Metrics']['UnblendedCost']["Amount"])
+                self.cost.append([d["TimePeriod"]["Start"],c])
+            df = pd.DataFrame(self.cost)
+            df.columns = ['date', 'cost']
+            df.index = df["date"]
+        self.price = df["cost"]
+        # self.period = period
+        # self.data.drop(self.data.index[0],inplace=True)
+        # self.data.index = self.data["Service"]
+        # self.price = self.data["Total cost ($)"]
         
     # 데이터 불러오기
     def expose_data(self):
@@ -34,7 +45,11 @@ class PatternFinder():
         
         self.window_size = window_size
         cos_sims = cos_sims[cos_sims > threshold]
-        
+        if len(cos_sims) == 0:
+            # cosine_sim이 기준치보다 높은 경우가 안나왔을 경우
+            # 비교 기준 구간 수정 필요
+            # Threshold값 수정 필요
+            return None
         return cos_sims
         
     def __cosine_sims(self, moving_cnt, window_size):
@@ -57,7 +72,7 @@ class PatternFinder():
             sim_list.append(cos_similarity)
         return pd.Series(sim_list).sort_values(ascending=False)
     
-    
+    # 시각화
     def plot_pattern(self, idx, period = 5):
         # 파라미터 간격이 5 아니면 수정
         if period != self.period:
