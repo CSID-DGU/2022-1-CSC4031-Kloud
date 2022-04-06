@@ -12,7 +12,7 @@ class ProPhetPatternFinder:
             for d2 in d["Groups"]:
                 c += float(d2['Metrics']['UnblendedCost']["Amount"])
             self.cost.append([d["TimePeriod"]["Start"],c])
-        self.df = pd.DataFrame(cost)
+        self.df = pd.DataFrame(self.cost)
         self.data_df = self.df.rename(columns = {0:"ds",1:"y"})
     
     def show_plot(self):
@@ -21,19 +21,19 @@ class ProPhetPatternFinder:
     # defalut로 이후 10일 예측
     def model_fit(self,periods=10):
         try:
-            model = Prophet()
-            model.fit(self.data_df)
+            self.model = Prophet()
+            self.model.fit(self.data_df)
             # 앞으로 365일 뒤를 예측하겠다. 
-            future = model.make_future_dataframe(periods=periods)
+            future = self.model.make_future_dataframe(periods=periods)
             # 예측 데이터가 df형태로 들어옴
-            self.forecast = model.predict(future)
+            self.forecast = self.model.predict(future)
             return self.forecast
         except:
             return print("Fitting 실패")
     
     def show_expect_plot(self):
 #         fig1 = model.plot(self.forecast.iloc[150:])
-        fig2 = model.plot(self.forecast)
+        fig2 = self.model.plot(self.forecast)
     
     def expose_data(self):
         return self.forecast
@@ -43,14 +43,12 @@ class ProPhetPatternFinder:
     # 트랜드를 분석해보니 ~~경향을 가지더라
     # yearly하게 연간 가격 변동 그래프를 보면 이런 패턴이 있더라~~
     def component_plot(self):
-        fig3 = fig3 = model.plot_components(self.forecast)
+        fig3 = fig3 = self.model.plot_components(self.forecast)
 
 
-        
 with open('data.json', 'r') as f:
     data = json.load(f)
 f.close()
-    
 p = ProPhetPatternFinder(data)
 p.show_plot()
 p.model_fit(periods=10)
