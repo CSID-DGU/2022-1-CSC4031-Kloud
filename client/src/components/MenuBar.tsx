@@ -13,10 +13,15 @@ const Container = styled.div`
 `;
 
 const Menu = styled.p<{ isActive: boolean }>`
-  color: ${(props) => (props.isActive ? "yellow" : props.theme.bgColor)};
+  color: ${(props) => (props.isActive ? props.theme.bgColor : "white")};
   margin-bottom: 1rem;
   font-weight: bold;
   font-size: 1rem;
+  :hover {
+    color: ${(props) => props.theme.bgColor};
+  }
+  -webkit-transition: color 1s ease-in-out;
+  transition: color 1s ease-in-out;
 `;
 
 const MenuBar = () => {
