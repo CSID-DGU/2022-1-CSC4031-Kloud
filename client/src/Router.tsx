@@ -9,9 +9,7 @@ const Router = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/" exact>
-          {isLoggedIn ? <Home /> : <Login />}
-        </Route>
+        <Route path="/">{isLoggedIn ? <Home /> : <Login />}</Route>
       </Switch>
     </BrowserRouter>
   );

@@ -5,4 +5,6 @@ export const defaultTheme: DefaultTheme = {
   bgColor: "#040959",
   textColor: "#F9F9F9",
   accentColor: "#baac2f",
+  navHeight: "7vh",
+  menuHeight: "93vh",
 };

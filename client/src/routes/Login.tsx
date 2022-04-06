@@ -110,7 +110,9 @@ const Login = () => {
           })}
         >
           {regions.map((region) => (
-            <RegionOption value={region}>{region}</RegionOption>
+            <RegionOption key={region} value={region}>
+              {region}
+            </RegionOption>
           ))}
         </SelectRegion>
         <ErrorMessage>{errors?.region?.message}</ErrorMessage>

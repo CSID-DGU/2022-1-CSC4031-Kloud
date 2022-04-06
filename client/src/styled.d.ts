@@ -6,5 +6,7 @@ declare module "styled-components" {
     bgColor: string;
     textColor: string;
     accentColor: string;
+    navHeight: string;
+    menuHeight: string;
   }
 }
