@@ -14,8 +14,8 @@ const HeaderContainer = styled.header`
   padding: 1rem;
   width: 100%;
 `;
-const Logo = styled.a`
-  font-size: 20px;
+const Logo = styled.span`
+  font-size: 24px;
   color: ${(props) => props.theme.bgColor};
   font-weight: bolder;
 `;
@@ -34,9 +34,9 @@ const Header = () => {
   };
   return (
     <HeaderContainer>
-      <Logo>
-        <Link to="/">KLOUD</Link>
-      </Logo>
+      <Link to="/">
+        <Logo>KLOUD</Logo>
+      </Link>
       <Nav>
         <LogOut onClick={logOutOnClick}>LOGOUT</LogOut>
       </Nav>

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useRouteMatch } from "react-router-dom";
 
 const Container = styled.div`
   box-sizing: border-box;
@@ -12,21 +12,28 @@ const Container = styled.div`
   padding-top: 4rem;
 `;
 
-const Menu = styled.p`
-  color: ${(props) => props.theme.bgColor};
+const Menu = styled.p<{ isActive: boolean }>`
+  color: ${(props) => (props.isActive ? "yellow" : props.theme.bgColor)};
   margin-bottom: 1rem;
   font-weight: bold;
   font-size: 1rem;
 `;
 
 const MenuBar = () => {
+  const infraMatch = useRouteMatch("/");
+  const costMatch = useRouteMatch("/cost");
+
   return (
     <Container>
       <Link to={`/`}>
-        <Menu>Infrastructure</Menu>
+        <Menu isActive={infraMatch?.isExact ? true : false}>
+          Infrastructure
+        </Menu>
       </Link>
       <Link to={`/cost`}>
-        <Menu>Cost Management</Menu>
+        <Menu isActive={costMatch?.isExact ? true : false}>
+          Cost Management
+        </Menu>
       </Link>
     </Container>
   );
