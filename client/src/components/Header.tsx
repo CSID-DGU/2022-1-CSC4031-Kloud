@@ -12,6 +12,9 @@ const HeaderContainer = styled.header`
   border-bottom: 0.5px solid ${(props) => props.theme.accentColor};
   background-color: gray;
   padding: 1rem;
+  position: fixed;
+  top: 0;
+  width: 100%;
 `;
 const Logo = styled.a`
   font-size: 20px;
