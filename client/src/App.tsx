@@ -30,6 +30,9 @@ footer, header, hgroup, main, menu, nav, section {
 *[hidden] {
     display: none;
 }
+html{
+  height: 100%;
+}
 body {
   line-height: 1;
   background-color: ${(props) => props.theme.bgColor};

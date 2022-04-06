@@ -1,12 +1,14 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { logOut } from "../api";
-import { useSetRecoilState } from "recoil";
-import { isLoggedInAtom } from "../atoms";
 
-const Container = styled.div``;
+const Container = styled.div`
+  box-sizing: border-box;
+  background-color: #a1a1a2;
+  width: 15vw;
+  height: ${(props) => props.theme.menuHeight};
+`;
+
 const MenuBar = () => {
-  return <Container></Container>;
+  return <Container>asdf</Container>;
 };
 
 export default MenuBar;

@@ -5,25 +5,24 @@ import { useSetRecoilState } from "recoil";
 import { isLoggedInAtom } from "../atoms";
 
 const HeaderContainer = styled.header`
-  height: 7vh;
+  height: ${(props) => props.theme.navHeight};
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 0.5px solid ${(props) => props.theme.accentColor};
-  background-color: gray;
+  background-color: gainsboro;
   padding: 1rem;
-  position: fixed;
-  top: 0;
   width: 100%;
 `;
 const Logo = styled.a`
   font-size: 20px;
-  color: ${(props) => props.theme.textColor};
+  color: ${(props) => props.theme.bgColor};
+  font-weight: bolder;
 `;
 const Nav = styled.nav``;
 const LogOut = styled.button`
   font-size: 17px;
-  color: ${(props) => props.theme.textColor};
+  color: ${(props) => props.theme.bgColor};
   background-color: transparent;
 `;
 const Header = () => {
