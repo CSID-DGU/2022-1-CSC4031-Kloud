@@ -10,6 +10,7 @@ const HeaderContainer = styled.header`
   justify-content: space-between;
   align-items: center;
   border-bottom: 0.5px solid ${(props) => props.theme.accentColor};
+  background-color: gray;
   padding: 1rem;
 `;
 const Logo = styled.a`

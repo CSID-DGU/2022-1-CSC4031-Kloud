@@ -43,7 +43,7 @@ export async function login(
 export function getInfra() {
   const data = axios({
     method: "POST",
-    url: `${BASE_URL}/infra_info`,
+    url: `${BASE_URL}/infra/info`,
     data: {
       access_token: localStorage.getItem("access_token"),
     },
