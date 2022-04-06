@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useQuery } from "react-query";
 import Header from "../components/Header";
 import MenuBar from "../components/MenuBar";
+import { Switch, Route } from "react-router-dom";
 
 interface IInfra {
   tmp: null;
@@ -22,10 +23,13 @@ const Home = () => {
   console.log(data);
   return (
     <>
-      <Header></Header>
+      <Header />
       <Container>
         <MenuBar />
-        <Content></Content>
+        <Switch>
+          <Route path={`/`}></Route>
+          <Route path={`/cost`}></Route>
+        </Switch>
       </Container>
     </>
   );
