@@ -32,6 +32,8 @@ footer, header, hgroup, main, menu, nav, section {
 }
 html{
   height: 100%;
+  min-width: 1200px;
+  min-height: 600px;
 }
 body {
   line-height: 1;
