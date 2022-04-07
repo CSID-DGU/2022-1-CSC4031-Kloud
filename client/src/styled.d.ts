@@ -8,5 +8,6 @@ declare module "styled-components" {
     accentColor: string;
     navHeight: string;
     menuHeight: string;
+    menuWidth: string;
   }
 }

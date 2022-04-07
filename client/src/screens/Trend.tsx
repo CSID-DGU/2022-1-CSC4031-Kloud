@@ -3,14 +3,13 @@ import styled from "styled-components";
 const Container = styled.div``;
 const Tmp = styled.span`
   font-size: 100px;
-  color: gainsboro;
+  color: white;
 `;
-
-const Infra = () => {
+const Trend = () => {
   return (
     <Container>
-      <Tmp>Infra</Tmp>
+      <Tmp></Tmp>
     </Container>
   );
 };
-export default Infra;
+export default Trend;

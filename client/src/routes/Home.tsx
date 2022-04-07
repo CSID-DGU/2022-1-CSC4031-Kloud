@@ -14,10 +14,12 @@ interface IInfra {
 const Container = styled.div`
   display: flex;
   flex-direction: row;
+  width: 100vw;
   overflow: hidden;
 `;
-const Content = styled.div`
-  width: 85vw;
+const ContentBox = styled.div`
+  padding-left: ${(props) => props.theme.menuWidth};
+  width: 100%;
 `;
 
 const Home = () => {
@@ -28,14 +30,16 @@ const Home = () => {
       <Header />
       <Container>
         <MenuBar />
-        <Switch>
-          <Route path={`/`} exact>
-            <Infra />
-          </Route>
-          <Route path={`/cost`}>
-            <Cost />
-          </Route>
-        </Switch>
+        <ContentBox>
+          <Switch>
+            <Route path={`/`} exact>
+              <Infra />
+            </Route>
+            <Route path={`/cost`}>
+              <Cost />
+            </Route>
+          </Switch>
+        </ContentBox>
       </Container>
     </>
   );

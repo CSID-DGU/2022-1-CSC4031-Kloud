@@ -4,12 +4,14 @@ import { Link, useRouteMatch } from "react-router-dom";
 const Container = styled.div`
   box-sizing: border-box;
   background-color: #a1a1a2;
-  width: 215px;
+  width: ${(props) => props.theme.menuWidth};
   height: ${(props) => props.theme.menuHeight};
   display: flex;
   flex-direction: column;
   padding: 2rem;
   padding-top: 5rem;
+  position: fixed;
+  left: 0;
 `;
 
 const Menu = styled.p<{ isActive: boolean }>`
@@ -35,10 +37,8 @@ const MenuBar = () => {
           Infrastructure
         </Menu>
       </Link>
-      <Link to={`/cost`}>
-        <Menu isActive={costMatch?.isExact ? true : false}>
-          Cost Management
-        </Menu>
+      <Link to={`/cost/analysis`}>
+        <Menu isActive={costMatch ? true : false}>Cost Management</Menu>
       </Link>
     </Container>
   );
