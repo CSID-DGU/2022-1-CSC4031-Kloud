@@ -4,6 +4,8 @@ import { useQuery } from "react-query";
 import Header from "../components/Header";
 import MenuBar from "../components/MenuBar";
 import { Switch, Route } from "react-router-dom";
+import Cost from "../screens/Cost";
+import Infra from "../screens/Infra";
 
 interface IInfra {
   tmp: null;
@@ -27,8 +29,12 @@ const Home = () => {
       <Container>
         <MenuBar />
         <Switch>
-          <Route path={`/`}></Route>
-          <Route path={`/cost`}></Route>
+          <Route path={`/`} exact>
+            <Infra />
+          </Route>
+          <Route path={`/cost`}>
+            <Cost />
+          </Route>
         </Switch>
       </Container>
     </>
