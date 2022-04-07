@@ -22,8 +22,8 @@ const Menu = styled.p<{ isActive: boolean }>`
   :hover {
     color: yellow;
   }
-  -webkit-transition: color 1s ease-in-out;
-  transition: color 1s ease-in-out;
+  -webkit-transition: color 0.5s ease-in-out;
+  transition: color 0.5s ease-in-out;
 `;
 
 const MenuBar = () => {

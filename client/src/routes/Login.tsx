@@ -25,7 +25,7 @@ const LoginForm = styled.form`
 const KeyInput = styled.input`
   margin-bottom: 10px;
   background-color: gray;
-  color: ${(props) => props.theme.bgColor};
+  color: white;
   ::placeholder {
     color: ${(props) => props.theme.bgColor};
   }
