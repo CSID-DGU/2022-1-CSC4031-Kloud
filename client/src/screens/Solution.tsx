@@ -8,7 +8,7 @@ const Tmp = styled.span`
 const Solution = () => {
   return (
     <Container>
-      <Tmp></Tmp>
+      <Tmp>Solution</Tmp>
     </Container>
   );
 };

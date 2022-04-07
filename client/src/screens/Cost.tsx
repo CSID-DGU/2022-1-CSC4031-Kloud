@@ -1,5 +1,9 @@
 import styled from "styled-components";
 import { Link, useRouteMatch, Switch, Route } from "react-router-dom";
+import Solution from "./Solution";
+import Analysis from "./Analysis";
+import Trend from "./Trend";
+
 const Container = styled.div`
   height: 100%;
   width: 100%;
@@ -48,12 +52,18 @@ const Cost = () => {
             <NavItem isActive={solutionMatch ? true : false}>Solution</NavItem>
           </Link>
         </Nav>
-        <Switch>
-          <Route path={"/cost/analysis"}></Route>
-          <Route path={"/cost/trend"}></Route>
-          <Route path={"/cost/solution"}></Route>
-        </Switch>
       </CostHeader>
+      <Switch>
+        <Route path={"/cost/analysis"}>
+          <Analysis />
+        </Route>
+        <Route path={"/cost/trend"}>
+          <Trend />
+        </Route>
+        <Route path={"/cost/solution"}>
+          <Solution />
+        </Route>
+      </Switch>
     </Container>
   );
 };

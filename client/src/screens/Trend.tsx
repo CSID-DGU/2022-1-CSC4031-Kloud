@@ -8,7 +8,7 @@ const Tmp = styled.span`
 const Trend = () => {
   return (
     <Container>
-      <Tmp></Tmp>
+      <Tmp>Trend</Tmp>
     </Container>
   );
 };
