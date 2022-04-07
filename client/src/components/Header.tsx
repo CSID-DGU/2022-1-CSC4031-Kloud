@@ -24,6 +24,14 @@ const LogOut = styled.button`
   font-size: 17px;
   color: ${(props) => props.theme.bgColor};
   background-color: transparent;
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  :hover {
+    background-color: ${(props) => props.theme.bgColor};
+    color: white;
+  }
+  -webkit-transition: background-color 1s ease-in-out;
+  transition: background-color 1s ease-in-out;
 `;
 const Header = () => {
   const setIsLoggedIn = useSetRecoilState(isLoggedInAtom);
