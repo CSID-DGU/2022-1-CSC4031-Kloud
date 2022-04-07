@@ -24,6 +24,14 @@ const LoginForm = styled.form`
 `;
 const KeyInput = styled.input`
   margin-bottom: 10px;
+  background-color: gray;
+  color: ${(props) => props.theme.bgColor};
+  ::placeholder {
+    color: ${(props) => props.theme.bgColor};
+  }
+  :focus {
+    outline: none;
+  }
 `;
 const LoginButton = styled.button`
   height: 30px;
@@ -34,6 +42,7 @@ const ErrorMessage = styled.span`
 `;
 const SelectRegion = styled.select`
   margin-bottom: 10px;
+  background-color: gray;
 `;
 const RegionOption = styled.option``;
 const regions = [

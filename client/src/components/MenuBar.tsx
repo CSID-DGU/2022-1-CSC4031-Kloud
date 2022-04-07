@@ -9,16 +9,16 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 2rem;
-  padding-top: 4rem;
+  padding-top: 5rem;
 `;
 
 const Menu = styled.p<{ isActive: boolean }>`
-  color: ${(props) => (props.isActive ? props.theme.bgColor : "white")};
+  color: ${(props) => (props.isActive ? "yellow" : props.theme.bgColor)};
   margin-bottom: 1rem;
   font-weight: bold;
   font-size: 1rem;
   :hover {
-    color: ${(props) => props.theme.bgColor};
+    color: yellow;
   }
   -webkit-transition: color 1s ease-in-out;
   transition: color 1s ease-in-out;
