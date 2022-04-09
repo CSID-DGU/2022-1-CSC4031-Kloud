@@ -34,7 +34,7 @@ class ProPhetPatternFinder:
     def show_expect_plot(self):
         fig2 = self.model.plot(self.forecast)
     
-    def expose_data(self):
+    def expected_data(self):
         return self.forecast
 
     # 예측에 영향을 준 요소를 출력
@@ -43,5 +43,9 @@ class ProPhetPatternFinder:
     # yearly하게 연간 가격 변동 그래프를 보면 이런 패턴이 있더라~~
     def component_plot(self):
         fig3 = fig3 = self.model.plot_components(self.forecast)
+    
+    def real_data(self):
+        return self.data_df
+
 
 
