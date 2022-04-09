@@ -7,6 +7,10 @@ from .response_exceptions import UserNotInDBException
 from pathlib import Path
 from . import common_functions
 from .auth import create_access_token, get_user_id
+import pandas as pd
+from app.models.PatternFinder import PatternFinder
+from datetime import datetime, timedelta
+# from app.models import ProPhetPatternFinder
 import boto3
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -15,7 +19,6 @@ app = FastAPI()
 aws_info = boto3.Session()
 
 clients = dict()  # 수정 필요
-
 
 def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:  # 수정 필요
     try:
@@ -99,3 +102,29 @@ async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
         pass
     finally:
         return "logout_success"
+
+
+@app.post("/cost/trend/cos-sim")
+async def pattern_finder(user_client=Depends(get_user_client)):
+    data = await user_client.get_default_cost_history()
+    p = PatternFinder(data)
+    # 날짜는 수정이 가능함 원하는 날짜가 들어오게 만들면 될 듯
+    result = p.search('2022-02-02',"2022-03-20",threshold = 0.5)
+    # 패턴을 못찾은 경우 추후에 try,except로 수정해야할듯
+    if len(result) == 0:
+        print("threshold 혹은 date범위를 바꿔주어야함")
+        pass
+    base_norm = p.get_base_norm()
+    top_norm = p.get_target_norm()
+    answer = {}
+    base_norm_index = base_norm.index
+    for i in range(len(top_norm)):
+        if i < len(base_norm):
+            answer[base_norm_index[i]] = {"real_data":round(base_norm.iloc[i],6),"expected_data":round(top_norm.iloc[i],6)}
+        else:
+            temp_time = str(base_norm_index[-1]).split("-")
+            time = datetime(int(temp_time[0]), int(temp_time[1]), int(temp_time[2]))
+            now_time = time + timedelta(days=i-len(base_norm)+1)
+            now_time = str(now_time).split()[0]
+            answer[now_time] = {"expected_data":round(top_norm.iloc[i],6)}
+    return answer
