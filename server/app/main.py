@@ -118,7 +118,6 @@ async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
 
 
 @app.post("/cost/trend/cos-sim")
-
 def pattern_finder(user_client=Depends(get_user_client)):
     data = user_client.get_default_cost_history()
     p = PatternFinder(data)
@@ -146,8 +145,8 @@ def pattern_finder(user_client=Depends(get_user_client)):
 
 
 @app.post("/cost/trend/prophet")
-async def pattern_finder2(user_client=Depends(get_user_client)):
-    data = await user_client.get_default_cost_history()
+def pattern_finder2(user_client=Depends(get_user_client)):
+    data = user_client.get_default_cost_history()
     p = ProPhetPatternFinder(data = data)
     # 이후 5일 예측, default = 10
     periods = 5
