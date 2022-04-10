@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { useQuery } from "react-query";
 import Header from "../components/Header";
 import MenuBar from "../components/MenuBar";
+import Loader from "../components/Loader";
 import { Switch, Route } from "react-router-dom";
 import Cost from "../screens/Cost";
 import Infra from "../screens/Infra";
@@ -51,13 +52,16 @@ const Home = () => {
   console.log(isInfraLoading, isNestedInfraLoading, isCostHistoryLoading);
   return (
     <>
-      {isInfraLoading || isNestedInfraLoading || isCostHistoryLoading ? (
-        "Loading ... "
-      ) : (
-        <>
-          <Header />
-          <Container>
-            <MenuBar />
+      <Header />
+      <Container>
+        <MenuBar />
+        {isInfraLoading ||
+        isNestedInfraLoading ||
+        isCostHistoryLoading ||
+        true ? (
+          <Loader />
+        ) : (
+          <>
             <ContentBox>
               <Switch>
                 <Route path={`/`} exact>
@@ -68,9 +72,9 @@ const Home = () => {
                 </Route>
               </Switch>
             </ContentBox>
-          </Container>
-        </>
-      )}
+          </>
+        )}
+      </Container>
     </>
   );
 };
