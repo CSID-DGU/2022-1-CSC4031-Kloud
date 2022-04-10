@@ -1,3 +1,4 @@
+import Loader from "../components/Loader";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "../api";
@@ -63,6 +64,7 @@ const regions = [
 const Login = () => {
   const setUserId = useSetRecoilState(userIdAtom);
   const setIsLoggedIn = useSetRecoilState(isLoggedInAtom);
+  const [isLoading, setIsLoading] = useState(false);
   const [publicKey, setPublicKey] = useState("");
   const [secret, setSecret] = useState("");
   const [region, setRegion] = useState("");
@@ -77,6 +79,7 @@ const Login = () => {
     (async () => {
       let response = null;
       if (region) {
+        setIsLoading(true);
         // region 까지 들어오면 요청 날림
         response = await login(publicKey, secret, region);
       }
@@ -85,6 +88,7 @@ const Login = () => {
         const loginResponse = response?.data;
         localStorage.setItem("access_token", loginResponse.access_token);
         setIsLoggedIn(true);
+        setIsLoading(false);
       }
     })();
   }, [region]);
@@ -98,35 +102,41 @@ const Login = () => {
 
   return (
     <Container>
-      <LoginForm onSubmit={handleSubmit(onValid)}>
-        <KeyInput
-          {...register("public_key", {
-            required: "필수 입력 항목입니다.",
-          })}
-          placeholder="public_key"
-        />
-        <ErrorMessage>{errors?.public_key?.message}</ErrorMessage>
-        <KeyInput
-          {...register("secret_key", {
-            required: "필수 입력 항목입니다.",
-          })}
-          placeholder="secret_key"
-        />
-        <ErrorMessage>{errors?.secret_key?.message}</ErrorMessage>
-        <SelectRegion
-          {...register("region", {
-            required: "필수 입력 항목입니다.",
-          })}
-        >
-          {regions.map((region) => (
-            <RegionOption key={region} value={region}>
-              {region}
-            </RegionOption>
-          ))}
-        </SelectRegion>
-        <ErrorMessage>{errors?.region?.message}</ErrorMessage>
-        <LoginButton>로그인</LoginButton>
-      </LoginForm>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <LoginForm onSubmit={handleSubmit(onValid)}>
+            <KeyInput
+              {...register("public_key", {
+                required: "필수 입력 항목입니다.",
+              })}
+              placeholder="public_key"
+            />
+            <ErrorMessage>{errors?.public_key?.message}</ErrorMessage>
+            <KeyInput
+              {...register("secret_key", {
+                required: "필수 입력 항목입니다.",
+              })}
+              placeholder="secret_key"
+            />
+            <ErrorMessage>{errors?.secret_key?.message}</ErrorMessage>
+            <SelectRegion
+              {...register("region", {
+                required: "필수 입력 항목입니다.",
+              })}
+            >
+              {regions.map((region) => (
+                <RegionOption key={region} value={region}>
+                  {region}
+                </RegionOption>
+              ))}
+            </SelectRegion>
+            <ErrorMessage>{errors?.region?.message}</ErrorMessage>
+            <LoginButton>로그인</LoginButton>
+          </LoginForm>
+        </>
+      )}
     </Container>
   );
 };

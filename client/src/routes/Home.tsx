@@ -55,10 +55,7 @@ const Home = () => {
       <Header />
       <Container>
         <MenuBar />
-        {isInfraLoading ||
-        isNestedInfraLoading ||
-        isCostHistoryLoading ||
-        true ? (
+        {isInfraLoading || isNestedInfraLoading || isCostHistoryLoading ? (
           <Loader />
         ) : (
           <>
