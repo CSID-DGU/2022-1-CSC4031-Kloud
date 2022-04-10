@@ -1,4 +1,4 @@
-import { getInfra, getNestedInfra } from "../api";
+import { getCostHistory, getInfra, getNestedInfra } from "../api";
 import styled from "styled-components";
 import { useQuery } from "react-query";
 import Header from "../components/Header";
@@ -30,6 +30,10 @@ const Home = () => {
   const { isLoading: isNestedInfraLoading, data: nestedInfra } = useQuery<any>(
     "nestedInfra",
     getNestedInfra
+  );
+  const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
+    "costHistory",
+    getCostHistory
   );
   return (
     <>

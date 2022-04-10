@@ -40,6 +40,36 @@ export function getNestedInfra() {
   });
   return data;
 }
+export function getCostHistory() {
+  const data = axios({
+    method: "POST",
+    url: `${BASE_URL}/cost/history/default`,
+    data: {
+      access_token: localStorage.getItem("access_token"),
+    },
+  });
+  return data;
+}
+export function getSimilarityTrend() {
+  const data = axios({
+    method: "POST",
+    url: `${BASE_URL}/cost/trend/similarity`,
+    data: {
+      access_token: localStorage.getItem("access_token"),
+    },
+  });
+  return data;
+}
+export function getProphetTrend() {
+  const data = axios({
+    method: "POST",
+    url: `${BASE_URL}/cost/trend/prophet`,
+    data: {
+      access_token: localStorage.getItem("access_token"),
+    },
+  });
+  return data;
+}
 
 export function logOut() {
   const data = axios({
