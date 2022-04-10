@@ -18,8 +18,8 @@ class ProPhetPatternFinder:
     def show_plot(self):
         self.data_df.plot(x="ds", y="y",figsize=(16,8))
         
-    # defalut로 이후 10일 예측
-    def model_fit(self,periods=10):
+    # defalut로 이후 5일 예측
+    def model_fit(self,periods=5):
         try:
             self.model = Prophet()
             self.model.fit(self.data_df)
@@ -32,10 +32,9 @@ class ProPhetPatternFinder:
             return print("Fitting 실패")
     
     def show_expect_plot(self):
-#         fig1 = model.plot(self.forecast.iloc[150:])
         fig2 = self.model.plot(self.forecast)
     
-    def expose_data(self):
+    def expected_data(self):
         return self.forecast
 
     # 예측에 영향을 준 요소를 출력
@@ -44,15 +43,9 @@ class ProPhetPatternFinder:
     # yearly하게 연간 가격 변동 그래프를 보면 이런 패턴이 있더라~~
     def component_plot(self):
         fig3 = fig3 = self.model.plot_components(self.forecast)
+    
+    def real_data(self):
+        return self.data_df
 
-
-with open('data.json', 'r') as f:
-    data = json.load(f)
-f.close()
-p = ProPhetPatternFinder(data)
-p.show_plot()
-p.model_fit(periods=10)
-p.show_expect_plot()
-p.component_plot()
 
 
