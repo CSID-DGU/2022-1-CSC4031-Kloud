@@ -41,30 +41,36 @@ const Home = () => {
     "costHistory",
     getCostHistory
   );
-  const { isLoading: isSimilarityLoading, data: similarityTrend } =
-    useQuery<any>("similarity", getSimilarityTrend);
+  // const { isLoading: isSimilarityLoading, data: similarityTrend } =
+  //   useQuery<any>("similarity", getSimilarityTrend);
 
-  const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
-    "prophet",
-    getProphetTrend
-  );
-
+  // const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
+  //   "prophet",
+  //   getProphetTrend
+  // );
+  console.log(isInfraLoading, isNestedInfraLoading, isCostHistoryLoading);
   return (
     <>
-      <Header />
-      <Container>
-        <MenuBar />
-        <ContentBox>
-          <Switch>
-            <Route path={`/`} exact>
-              <Infra />
-            </Route>
-            <Route path={`/cost`}>
-              <Cost />
-            </Route>
-          </Switch>
-        </ContentBox>
-      </Container>
+      {isInfraLoading || isNestedInfraLoading || isCostHistoryLoading ? (
+        "Loading ... "
+      ) : (
+        <>
+          <Header />
+          <Container>
+            <MenuBar />
+            <ContentBox>
+              <Switch>
+                <Route path={`/`} exact>
+                  <Infra />
+                </Route>
+                <Route path={`/cost`}>
+                  <Cost />
+                </Route>
+              </Switch>
+            </ContentBox>
+          </Container>
+        </>
+      )}
     </>
   );
 };
