@@ -10,6 +10,8 @@ from .auth import create_access_token, get_user_id
 from .models.PatternFinder import PatternFinder
 from datetime import datetime, timedelta
 import boto3
+import asyncio
+import concurrent.futures
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -17,6 +19,14 @@ app = FastAPI()
 aws_info = boto3.Session()
 
 clients = dict()  # 수정 필요
+event_loop = None  # on_event('startup')시 오버라이드
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)  # boto3 io 작업이 실행될 스레드풀. KloudClient 객체 생성시 넘어감.
+
+
+@app.on_event('startup')
+async def startup():
+    global event_loop
+    event_loop = asyncio.get_running_loop()  # KloudClient 객체 생성시 넘어감.
 
 
 def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:  # 수정 필요
@@ -44,6 +54,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 ##### CORS #####
 
 
@@ -61,7 +73,9 @@ async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인,
                                                                           region=login_form.region)
         if await common_functions.is_valid_session(session_instance):
             kloud_client = KloudClient(access_key_id=login_form.access_key_public,
-                                       session_instance=session_instance)
+                                       session_instance=session_instance,
+                                       loop=event_loop,
+                                       executor=executor)
             await add_user_client(login_form.access_key_public, kloud_client)
             token = await create_access_token(login_form.access_key_public)
             return {"access_token": token}
