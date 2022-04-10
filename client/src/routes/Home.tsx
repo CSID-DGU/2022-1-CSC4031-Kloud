@@ -42,13 +42,13 @@ const Home = () => {
     "costHistory",
     getCostHistory
   );
-  const { isLoading: isSimilarityLoading, data: similarityTrend } =
-    useQuery<any>("similarity", getSimilarityTrend);
+  // const { isLoading: isSimilarityLoading, data: similarityTrend } =
+  //   useQuery<any>("similarity", getSimilarityTrend);
 
-  const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
-    "prophet",
-    getProphetTrend
-  );
+  // const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
+  //   "prophet",
+  //   getProphetTrend
+  // );
   return (
     <>
       <Header />
