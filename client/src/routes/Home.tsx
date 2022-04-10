@@ -1,4 +1,10 @@
-import { getCostHistory, getInfra, getNestedInfra } from "../api";
+import {
+  getCostHistory,
+  getInfra,
+  getNestedInfra,
+  getProphetTrend,
+  getSimilarityTrend,
+} from "../api";
 import styled from "styled-components";
 import { useQuery } from "react-query";
 import Header from "../components/Header";
@@ -35,6 +41,14 @@ const Home = () => {
     "costHistory",
     getCostHistory
   );
+  const { isLoading: isSimilarityLoading, data: similarityTrend } =
+    useQuery<any>("similarity", getSimilarityTrend);
+
+  const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
+    "prophet",
+    getProphetTrend
+  );
+
   return (
     <>
       <Header />
