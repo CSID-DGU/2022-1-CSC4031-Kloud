@@ -1,4 +1,4 @@
-import { getInfra } from "../api";
+import { getInfra, getNestedInfra } from "../api";
 import styled from "styled-components";
 import { useQuery } from "react-query";
 import Header from "../components/Header";
@@ -23,8 +23,14 @@ const ContentBox = styled.div`
 `;
 
 const Home = () => {
-  const { isLoading, data } = useQuery<any>("allInfra", getInfra);
-  console.log(data);
+  const { isLoading: isInfraLoading, data: allInfra } = useQuery<any>(
+    "allInfra",
+    getInfra
+  );
+  const { isLoading: isNestedInfraLoading, data: nestedInfra } = useQuery<any>(
+    "nestedInfra",
+    getNestedInfra
+  );
   return (
     <>
       <Header />

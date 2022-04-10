@@ -7,14 +7,6 @@ export async function login(
   access_key_secret: String,
   region: String
 ) {
-  // let loginData = {
-  //   method: "POST",
-  //   body: JSON.stringify({ access_key_public, access_key_secret, region }),
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  // };
-
   if (access_key_public) {
     return await axios({
       method: "POST",
@@ -25,25 +17,23 @@ export async function login(
         region: region,
       },
     });
-    // .then((res) => {
-    //   console.log(res);
-    // })
-    // .catch((error) => {
-    //   console.log(error);
-    //   throw new Error(error);
-    // });
   }
-  // return access_key_public
-  //   ? await fetch(`${BASE_URL}/login`, loginData).then((response) =>
-  //       response.json()
-  //     )
-  //   : null;
 }
 
 export function getInfra() {
   const data = axios({
     method: "POST",
     url: `${BASE_URL}/infra/info`,
+    data: {
+      access_token: localStorage.getItem("access_token"),
+    },
+  });
+  return data;
+}
+export function getNestedInfra() {
+  const data = axios({
+    method: "POST",
+    url: `${BASE_URL}/infra/tree`,
     data: {
       access_token: localStorage.getItem("access_token"),
     },
