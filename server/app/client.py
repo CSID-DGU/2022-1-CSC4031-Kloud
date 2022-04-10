@@ -76,7 +76,7 @@ class KloudClient:
     @staticmethod
     def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
         processed = dict()
-        for k, v in data.items():
+        for k, v in data.items():  # 첫번째 딕셔너리가 응답이고, 두번째가 메타데이터임.
             processed = v
             break
         return processed
