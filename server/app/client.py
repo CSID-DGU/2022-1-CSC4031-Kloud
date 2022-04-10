@@ -85,7 +85,7 @@ class KloudClient:
         await self._update_resource_dict()
         return self._resources
 
-    async def get_cost_history(self, time_period: dict, granularity: str) -> dict:
+    def get_cost_history(self, time_period: dict, granularity: str) -> dict:
         res = self._ce_client.get_cost_and_usage(TimePeriod=time_period,
                                                  Granularity=granularity,
                                                  Metrics=['UnblendedCost', 'UsageQuantity'],
@@ -93,13 +93,13 @@ class KloudClient:
                                                           {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}])
         return res
 
-    async def get_default_cost_history(self) -> dict:
+    def get_default_cost_history(self) -> dict:
         tp = {
-            'Start': str(datetime.date(datetime.now() - timedelta(days=90))),
+            'Start': str(datetime.date(datetime.now() - timedelta(days=180))),
             'End': str(datetime.date(datetime.now()))
         }
         granularity = 'DAILY'
-        return await self.get_cost_history(time_period=tp, granularity=granularity)
+        return self.get_cost_history(time_period=tp, granularity=granularity)
 
     async def get_infra_tree(self) -> dict:
         await self.get_current_infra_dict()
