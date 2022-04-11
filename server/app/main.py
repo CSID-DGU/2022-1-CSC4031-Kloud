@@ -69,9 +69,9 @@ class KloudLoginForm(BaseModel):
 @app.post("/login")
 def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
     try:
-        session_instance: boto3.Session = common_functions.create_session(access_key_id=login_form.access_key_public,
-                                                                          secret_access_key=login_form.access_key_secret,
-                                                                          region=login_form.region)
+        session_instance: boto3.Session = boto3.Session(aws_access_key_id=login_form.access_key_public,
+                                                        aws_secret_access_key=login_form.access_key_secret,
+                                                        region_name=login_form.region)
         if common_functions.is_valid_session(session_instance):  # todo 스레드풀에서 실행
             kloud_client = KloudClient(access_key_id=login_form.access_key_public,
                                        session_instance=session_instance,
