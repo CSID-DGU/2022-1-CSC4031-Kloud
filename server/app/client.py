@@ -53,8 +53,8 @@ class KloudClient:
                                                         functools.partial(self._response_process,
                                                                           identifier=identifier,
                                                                           describing_method=describing_method)))
-        completed, pending = await asyncio.wait(boto3_reqs)
-        for task in completed:
+        done, pending = await asyncio.wait(boto3_reqs)
+        for task in done:
             result = task.result()
             if result is not None:
                 resource_id = result['resource_id']
