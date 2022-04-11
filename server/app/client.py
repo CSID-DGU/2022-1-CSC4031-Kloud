@@ -1,5 +1,8 @@
 import boto3
 from datetime import datetime, timedelta
+import asyncio
+import functools
+from concurrent.futures import ThreadPoolExecutor
 
 RESOURCE_IDENTIFIERS = {'VpcId': 'vpc',
                         'SubnetId': 'subnet',
@@ -22,8 +25,10 @@ POSSIBLE_ROOT_NODES = {'vpc', 'igw'}
 
 
 class KloudClient:
-    def __init__(self, access_key_id: str, session_instance: boto3.Session, ):
+    def __init__(self, access_key_id: str, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
         self.id = access_key_id
+        self.loop = loop  # 비동기 이벤트 루프
+        self.executor = executor  # thread pool executor
 
         #### boto3 ####
         self._session = session_instance
@@ -43,24 +48,38 @@ class KloudClient:
                                     }
 
     async def _update_resource_dict(self) -> None:
-        for identifier, describing_method in self._describing_methods.items():
-            response: dict = self.cut_useless_metadata(describing_method())
+        boto3_reqs = []  # run in executor 작업 목록
 
-            if identifier == 'InstanceId':  # ec2 인스턴스일 경우
-                try:
-                    response = response[0]['Instances']
-                except IndexError:  # ec2 인스턴스가 없을 경우
-                    pass
-            for dic in response:
-                primary_key = dic[identifier]
-                dic['resource_id'] = primary_key
-                dic['resource_type'] = RESOURCE_IDENTIFIERS[identifier]
-                self._resources[primary_key] = dic
+        for identifier, describing_method in self._describing_methods.items():  # identifier: str, describing_method: function
+            func = functools.partial(self._response_process, identifier=identifier, describing_method=describing_method)
+            future = self.loop.run_in_executor(executor=self.executor, func=func)
+            boto3_reqs.append(future)
+
+        done, pending = await asyncio.wait(boto3_reqs)  # 작업이 모두 완료될 때 까지 대기
+
+        for task in done:
+            result = task.result()
+            if result is not None:  # 인프라가 없거나 하면 None
+                resource_id = result['resource_id']
+                self._resources[resource_id] = result
+
+    def _response_process(self, identifier, describing_method) -> dict:  # 응답을 받아서 후처리함.
+        response: list = self.cut_useless_metadata(describing_method())
+        if identifier == 'InstanceId':  # ec2 인스턴스일 경우
+            try:
+                response = response[0]['Instances']
+            except IndexError:  # ec2 인스턴스가 없을 경우
+                pass
+        for dic in response:  # 응답이 존재하지 않는 경우 for문이 실행되지 않고 넘어감.
+            primary_key = dic[identifier]
+            dic['resource_id'] = primary_key
+            dic['resource_type'] = RESOURCE_IDENTIFIERS[identifier]
+            return dic
 
     @staticmethod
-    def cut_useless_metadata(data: dict) -> dict:  # todo 예외 있는지 확인
+    def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
         processed = dict()
-        for k, v in data.items():
+        for k, v in data.items():  # dict의 첫번째 값이 응답이고, 두번째가 메타데이터임.
             processed = v
             break
         return processed
@@ -70,20 +89,21 @@ class KloudClient:
         return self._resources
 
     async def get_cost_history(self, time_period: dict, granularity: str) -> dict:
-        res = self._ce_client.get_cost_and_usage(TimePeriod=time_period,
-                                                 Granularity=granularity,
-                                                 Metrics=['UnblendedCost', 'UsageQuantity'],
-                                                 GroupBy=[{'Type': 'DIMENSION', 'Key': 'SERVICE'},
-                                                          {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}])
+        fun = functools.partial(self._ce_client.get_cost_and_usage,
+                                TimePeriod=time_period,
+                                Granularity=granularity,
+                                Metrics=['UnblendedCost', 'UsageQuantity'],
+                                GroupBy=[{'Type': 'DIMENSION', 'Key': 'SERVICE'},
+                                         {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}])
+
+        res = await self.loop.run_in_executor(executor=self.executor, func=fun)
         return res
 
     async def get_default_cost_history(self) -> dict:
-        tp = {
-            'Start': str(datetime.date(datetime.now() - timedelta(days=90))),
-            'End': str(datetime.date(datetime.now()))
-        }
+        time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=90))),
+                       'End': str(datetime.date(datetime.now()))}
         granularity = 'DAILY'
-        return await self.get_cost_history(time_period=tp, granularity=granularity)
+        return await self.get_cost_history(time_period=time_period, granularity=granularity)
 
     async def get_infra_tree(self) -> dict:
         await self.get_current_infra_dict()
