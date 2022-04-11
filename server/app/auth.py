@@ -7,14 +7,14 @@ from pydantic import BaseModel
 from fastapi import Depends
 
 
-async def build_token(user_id: str) -> dict:
+def build_token(user_id: str) -> dict:
     return {
         "user_id": user_id
     }
 
 
-async def create_access_token(user_id: str, expires_delta: Optional[timedelta] = None) -> str:
-    to_encode = await build_token(user_id=user_id)
+def create_access_token(user_id: str, expires_delta: Optional[timedelta] = None) -> str:
+    to_encode = build_token(user_id=user_id)
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
