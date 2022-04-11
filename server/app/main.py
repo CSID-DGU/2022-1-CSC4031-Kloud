@@ -118,8 +118,8 @@ async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
 
 
 @app.post("/cost/trend/similarity")
-def pattern_finder(user_client=Depends(get_user_client)):
-    data = user_client.get_default_cost_history()
+async def pattern_finder(user_client=Depends(get_user_client)):
+    data = await user_client.get_default_cost_history()
     p = PatternFinder(data)
     # 날짜는 수정이 가능함 원하는 날짜가 들어오게 만들면 될 듯
     result = p.search('2022-02-02', "2022-03-20", threshold=0.5)
@@ -145,8 +145,8 @@ def pattern_finder(user_client=Depends(get_user_client)):
 
 
 @app.post("/cost/trend/prophet")
-def pattern_finder2(user_client=Depends(get_user_client)):
-    data = user_client.get_default_cost_history()
+async def pattern_finder2(user_client=Depends(get_user_client)):
+    data = await user_client.get_default_cost_history()
     p = ProPhetPatternFinder(data = data)
     # 이후 5일 예측, default = 10
     periods = 5
