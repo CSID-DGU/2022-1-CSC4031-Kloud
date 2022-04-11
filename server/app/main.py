@@ -9,7 +9,7 @@ from . import common_functions
 from .auth import create_access_token, get_user_id
 from .models.PatternFinder import PatternFinder
 from datetime import datetime, timedelta
-from app.models.ProPhetPatternFinder import ProPhetPatternFinder
+from .models.ProPhetPatternFinder import ProPhetPatternFinder
 import boto3
 import asyncio
 import concurrent.futures
@@ -38,7 +38,7 @@ def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:  # 수�
 
 
 def add_user_client(user_id: str,
-                          user_client: KloudClient) -> None:  # todo 현재 KloudClient 객체를 딕셔너리에 저장함. 추후 변동 가능
+                    user_client: KloudClient) -> None:  # todo 현재 KloudClient 객체를 딕셔너리에 저장함. 추후 변동 가능
     clients[user_id] = user_client
 
 
@@ -98,8 +98,8 @@ async def infra_info(user_client=Depends(get_user_client)):
 
 
 @app.post("/cost/history/default")
-def cost_history_default(user_client=Depends(get_user_client)):
-    return user_client.get_default_cost_history()
+async def cost_history_default(user_client=Depends(get_user_client)):
+    return await user_client.get_default_cost_history()
 
 
 @app.post("/infra/tree")
