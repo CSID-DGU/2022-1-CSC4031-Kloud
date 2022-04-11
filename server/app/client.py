@@ -2,7 +2,7 @@ import boto3
 from datetime import datetime, timedelta
 import asyncio
 import functools
-import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 
 RESOURCE_IDENTIFIERS = {'VpcId': 'vpc',
                         'SubnetId': 'subnet',
@@ -24,10 +24,10 @@ PARENT = {
 
 
 class KloudClient:
-    def __init__(self, access_key_id: str, session_instance: boto3.Session, loop, executor: concurrent.futures.ThreadPoolExecutor):
+    def __init__(self, access_key_id: str, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
         self.id = access_key_id
         self.loop = loop  # 비동기 이벤트 루프
-        self.executor = executor  # con
+        self.executor = executor  # thread pool executor
 
         #### boto3 ####
         self._session = session_instance
@@ -47,16 +47,18 @@ class KloudClient:
                                     }
 
     async def _update_resource_dict(self) -> None:
-        boto3_reqs = []
-        for identifier, describing_method in self._describing_methods.items():
-            boto3_reqs.append(self.loop.run_in_executor(self.executor,
-                                                        functools.partial(self._response_process,
-                                                                          identifier=identifier,
-                                                                          describing_method=describing_method)))
-        done, pending = await asyncio.wait(boto3_reqs)
+        boto3_reqs = []  # run in executor 작업 목록
+
+        for identifier, describing_method in self._describing_methods.items():  # identifier: str, describing_method: function
+            func = functools.partial(self._response_process, identifier=identifier, describing_method=describing_method)
+            future = self.loop.run_in_executor(executor=self.executor, func=func)
+            boto3_reqs.append(future)
+
+        done, pending = await asyncio.wait(boto3_reqs)  # 작업이 모두 완료될 때 까지 대기
+
         for task in done:
             result = task.result()
-            if result is not None:
+            if result is not None:  # 인프라가 없거나 하면 None
                 resource_id = result['resource_id']
                 self._resources[resource_id] = result
 
@@ -76,7 +78,7 @@ class KloudClient:
     @staticmethod
     def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
         processed = dict()
-        for k, v in data.items():  # 첫번째 딕셔너리가 응답이고, 두번째가 메타데이터임.
+        for k, v in data.items():  # dict의 첫번째 값이 응답이고, 두번째가 메타데이터임.
             processed = v
             break
         return processed
@@ -86,20 +88,21 @@ class KloudClient:
         return self._resources
 
     async def get_cost_history(self, time_period: dict, granularity: str) -> dict:
-        res = self._ce_client.get_cost_and_usage(TimePeriod=time_period,
-                                                 Granularity=granularity,
-                                                 Metrics=['UnblendedCost', 'UsageQuantity'],
-                                                 GroupBy=[{'Type': 'DIMENSION', 'Key': 'SERVICE'},
-                                                          {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}])
+        fun = functools.partial(self._ce_client.get_cost_and_usage,
+                                TimePeriod=time_period,
+                                Granularity=granularity,
+                                Metrics=['UnblendedCost', 'UsageQuantity'],
+                                GroupBy=[{'Type': 'DIMENSION', 'Key': 'SERVICE'},
+                                         {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}])
+
+        res = await self.loop.run_in_executor(executor=self.executor, func=fun)
         return res
 
     async def get_default_cost_history(self) -> dict:
-        tp = {
-            'Start': str(datetime.date(datetime.now() - timedelta(days=90))),
-            'End': str(datetime.date(datetime.now()))
-        }
+        time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=90))),
+                       'End': str(datetime.date(datetime.now()))}
         granularity = 'DAILY'
-        return await self.get_cost_history(time_period=tp, granularity=granularity)
+        return await self.get_cost_history(time_period=time_period, granularity=granularity)
 
     async def get_infra_tree(self) -> dict:
         await self.get_current_infra_dict()
