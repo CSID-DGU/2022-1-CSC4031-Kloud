@@ -5,6 +5,7 @@ import {
   getProphetTrend,
   getSimilarityTrend,
 } from "../api";
+import { INestedInfra } from "../types";
 import styled from "styled-components";
 import { useQuery } from "react-query";
 import Header from "../components/Header";
@@ -34,10 +35,8 @@ const Home = () => {
     "allInfra",
     getInfra
   );
-  const { isLoading: isNestedInfraLoading, data: nestedInfra } = useQuery<any>(
-    "nestedInfra",
-    getNestedInfra
-  );
+  const { isLoading: isNestedInfraLoading, data: nestedInfra } =
+    useQuery<INestedInfra>("nestedInfra", getNestedInfra);
   const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
     "costHistory",
     getCostHistory
@@ -49,6 +48,7 @@ const Home = () => {
   //   "prophet",
   //   getProphetTrend
   // );
+  console.log(nestedInfra);
   return (
     <>
       <Header />

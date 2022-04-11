@@ -77,7 +77,7 @@ export default function Infra({
   margin = defaultMargin,
 }: LinkTypesProps) {
   const [layout, setLayout] = useState<string>("cartesian");
-  const [orientation, setOrientation] = useState<string>("horizontal");
+  const [orientation, setOrientation] = useState<string>("수평 보기");
   const [linkType, setLinkType] = useState<string>("step");
   const forceUpdate = useForceUpdate();
 
@@ -97,7 +97,7 @@ export default function Infra({
     sizeHeight = Math.min(innerWidth, innerHeight) / 2;
   } else {
     origin = { x: 0, y: 0 };
-    if (orientation === "vertical") {
+    if (orientation === "수직 보기") {
       sizeWidth = innerWidth;
       sizeHeight = innerHeight;
     } else {
@@ -154,7 +154,7 @@ export default function Infra({
                     const [radialX, radialY] = pointRadial(node.x, node.y);
                     top = radialY;
                     left = radialX;
-                  } else if (orientation === "vertical") {
+                  } else if (orientation === "수직 보기") {
                     top = node.y;
                     left = node.x;
                   } else {

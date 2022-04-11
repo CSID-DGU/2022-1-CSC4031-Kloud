@@ -1,5 +1,3 @@
-import React from "react";
-
 const controlStyles = { fontSize: 10 };
 
 type Props = {
@@ -27,8 +25,8 @@ export default function LinkControls({
         onChange={(e) => setLayout(e.target.value)}
         value={layout}
       >
-        <option value="cartesian">cartesian</option>
-        <option value="polar">polar</option>
+        <option value="cartesian">트리 구조</option>
+        <option value="polar">원형 트리 구조</option>
       </select>
       &nbsp;&nbsp;
       <label>orientation:</label>&nbsp;
@@ -38,8 +36,8 @@ export default function LinkControls({
         value={orientation}
         disabled={layout === "polar"}
       >
-        <option value="vertical">vertical</option>
-        <option value="horizontal">horizontal</option>
+        <option value="수평 보기">수평 보기</option>
+        <option value="수직 보기">수직 보기</option>
       </select>
       &nbsp;&nbsp; )
     </div>

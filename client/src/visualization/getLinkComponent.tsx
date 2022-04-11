@@ -23,7 +23,6 @@ export default function getLinkComponent({
   orientation: string;
 }): React.ComponentType<any> {
   let LinkComponent: React.ComponentType<any>;
-
   if (layout === "polar") {
     if (linkType === "step") {
       LinkComponent = LinkRadialStep;
@@ -34,7 +33,7 @@ export default function getLinkComponent({
     } else {
       LinkComponent = LinkRadial;
     }
-  } else if (orientation === "vertical") {
+  } else if (orientation === "수직 보기") {
     if (linkType === "step") {
       LinkComponent = LinkVerticalStep;
     } else if (linkType === "curve") {
