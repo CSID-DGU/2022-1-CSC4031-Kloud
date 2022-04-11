@@ -9,7 +9,7 @@ def create_session(access_key_id: str, secret_access_key: str, region: str) -> b
     return boto3.Session(aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key, region_name=region)
 
 
-async def is_valid_session(session: boto3.Session) -> bool:
+def is_valid_session(session: boto3.Session) -> bool:
     test_client = session.client(service_name="ec2")
     test_client.describe_vpcs()  # 에러 발생시 예외처리하여 에러코드 보냄. todo 추후 수정
     return True
