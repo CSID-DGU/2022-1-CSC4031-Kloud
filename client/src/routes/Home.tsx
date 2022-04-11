@@ -61,7 +61,7 @@ const Home = () => {
             <ContentBox>
               <Switch>
                 <Route path={`/`} exact>
-                  <Infra />
+                  <Infra width={400} height={400} />
                 </Route>
                 <Route path={`/cost`}>
                   <Cost />
