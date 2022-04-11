@@ -9,7 +9,7 @@ from . import common_functions
 from .auth import create_access_token, get_user_id
 from .models.PatternFinder import PatternFinder
 from datetime import datetime, timedelta
-from app.models.ProPhetPatternFinder import ProPhetPatternFinder
+from .models.ProPhetPatternFinder import ProPhetPatternFinder
 import boto3
 import asyncio
 import concurrent.futures
@@ -37,8 +37,8 @@ def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:  # 수�
         raise UserNotInDBException
 
 
-async def add_user_client(user_id: str,
-                          user_client: KloudClient) -> None:  # todo 현재 KloudClient 객체를 딕셔너리에 저장함. 추후 변동 가능
+def add_user_client(user_id: str,
+                    user_client: KloudClient) -> None:  # todo 현재 KloudClient 객체를 딕셔너리에 저장함. 추후 변동 가능
     clients[user_id] = user_client
 
 
@@ -67,18 +67,18 @@ class KloudLoginForm(BaseModel):
 
 
 @app.post("/login")
-async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
+def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
     try:
-        session_instance: boto3.Session = common_functions.create_session(access_key_id=login_form.access_key_public,
-                                                                          secret_access_key=login_form.access_key_secret,
-                                                                          region=login_form.region)
-        if await common_functions.is_valid_session(session_instance):  # todo 스레드풀에서 실행
+        session_instance: boto3.Session = boto3.Session(aws_access_key_id=login_form.access_key_public,
+                                                        aws_secret_access_key=login_form.access_key_secret,
+                                                        region_name=login_form.region)
+        if common_functions.is_valid_session(session_instance):  # todo 스레드풀에서 실행
             kloud_client = KloudClient(access_key_id=login_form.access_key_public,
                                        session_instance=session_instance,
                                        loop=event_loop,
                                        executor=executor)
-            await add_user_client(login_form.access_key_public, kloud_client)
-            token = await create_access_token(login_form.access_key_public)
+            add_user_client(login_form.access_key_public, kloud_client)
+            token = create_access_token(login_form.access_key_public)
             return {"access_token": token}
 
     except botocore.exceptions.ClientError:
@@ -98,8 +98,8 @@ async def infra_info(user_client=Depends(get_user_client)):
 
 
 @app.post("/cost/history/default")
-def cost_history_default(user_client=Depends(get_user_client)):
-    return user_client.get_default_cost_history()
+async def cost_history_default(user_client=Depends(get_user_client)):
+    return await user_client.get_default_cost_history()
 
 
 @app.post("/infra/tree")
@@ -118,8 +118,8 @@ async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
 
 
 @app.post("/cost/trend/similarity")
-def pattern_finder(user_client=Depends(get_user_client)):
-    data = user_client.get_default_cost_history()
+async def pattern_finder(user_client=Depends(get_user_client)):
+    data = await user_client.get_default_cost_history()
     p = PatternFinder(data)
     # 날짜는 수정이 가능함 원하는 날짜가 들어오게 만들면 될 듯
     result = p.search('2022-02-02', "2022-03-20", threshold=0.5)
@@ -145,8 +145,8 @@ def pattern_finder(user_client=Depends(get_user_client)):
 
 
 @app.post("/cost/trend/prophet")
-def pattern_finder2(user_client=Depends(get_user_client)):
-    data = user_client.get_default_cost_history()
+async def pattern_finder2(user_client=Depends(get_user_client)):
+    data = await user_client.get_default_cost_history()
     p = ProPhetPatternFinder(data = data)
     # 이후 5일 예측, default = 10
     periods = 5
