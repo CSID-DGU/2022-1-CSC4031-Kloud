@@ -63,7 +63,9 @@ export type LinkTypesProps = {
   margin?: { top: number; right: number; bottom: number; left: number };
 };
 
-const Container = styled.div``;
+const Container = styled.div`
+  padding: 30px;
+`;
 const Tmp = styled.span`
   font-size: 100px;
   color: gainsboro;
@@ -76,8 +78,7 @@ export default function Infra({
 }: LinkTypesProps) {
   const [layout, setLayout] = useState<string>("cartesian");
   const [orientation, setOrientation] = useState<string>("horizontal");
-  const [linkType, setLinkType] = useState<string>("diagonal");
-  const [stepPercent, setStepPercent] = useState<number>(0.5);
+  const [linkType, setLinkType] = useState<string>("step");
   const forceUpdate = useForceUpdate();
 
   const innerWidth = totalWidth - margin.left - margin.right;
@@ -108,20 +109,23 @@ export default function Infra({
   const LinkComponent = getLinkComponent({ layout, linkType, orientation });
 
   return totalWidth < 10 ? null : (
-    <div>
+    <Container>
       <LinkControls
         layout={layout}
         orientation={orientation}
         linkType={linkType}
-        stepPercent={stepPercent}
         setLayout={setLayout}
         setOrientation={setOrientation}
         setLinkType={setLinkType}
-        setStepPercent={setStepPercent}
       />
       <svg width={totalWidth} height={totalHeight}>
         <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
-        <rect width={totalWidth} height={totalHeight} rx={14} fill="#272b4d" />
+        <rect
+          width={totalWidth}
+          height={totalHeight}
+          rx={14}
+          fill={"transparent"}
+        />
         <Group top={margin.top} left={margin.left}>
           <Tree
             root={hierarchy(data, (d) => (d.isExpanded ? null : d.children))}
@@ -134,7 +138,6 @@ export default function Infra({
                   <LinkComponent
                     key={i}
                     data={link}
-                    percent={stepPercent}
                     stroke="rgb(254,110,158,0.6)"
                     strokeWidth="1"
                     fill="none"
@@ -167,7 +170,6 @@ export default function Infra({
                           fill="url('#links-gradient')"
                           onClick={() => {
                             node.data.isExpanded = !node.data.isExpanded;
-                            console.log(node);
                             forceUpdate();
                           }}
                         />
@@ -215,6 +217,6 @@ export default function Infra({
           </Tree>
         </Group>
       </svg>
-    </div>
+    </Container>
   );
 }
