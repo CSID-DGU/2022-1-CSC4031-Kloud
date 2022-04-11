@@ -98,8 +98,8 @@ async def infra_info(user_client=Depends(get_user_client)):
 
 
 @app.post("/cost/history/default")
-async def cost_history_default(user_client=Depends(get_user_client)):
-    return await user_client.get_default_cost_history()
+def cost_history_default(user_client=Depends(get_user_client)):
+    return user_client.get_default_cost_history()
 
 
 @app.post("/infra/tree")
@@ -117,10 +117,10 @@ async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
         return "logout_success"
 
 
-@app.post("/cost/trend/cos-sim")
-async def pattern_finder(user_client=Depends(get_user_client)):
-    data = await user_client.get_default_cost_history()
-    p = PatternFinder(data = data)
+@app.post("/cost/trend/similarity")
+def pattern_finder(user_client=Depends(get_user_client)):
+    data = user_client.get_default_cost_history()
+    p = PatternFinder(data)
     # 날짜는 수정이 가능함 원하는 날짜가 들어오게 만들면 될 듯
     result = p.search('2022-02-02', "2022-03-20", threshold=0.5)
     # 패턴을 못찾은 경우 추후에 try,except로 수정해야할듯
@@ -145,8 +145,8 @@ async def pattern_finder(user_client=Depends(get_user_client)):
 
 
 @app.post("/cost/trend/prophet")
-async def pattern_finder2(user_client=Depends(get_user_client)):
-    data = await user_client.get_default_cost_history()
+def pattern_finder2(user_client=Depends(get_user_client)):
+    data = user_client.get_default_cost_history()
     p = ProPhetPatternFinder(data = data)
     # 이후 5일 예측, default = 10
     periods = 5
