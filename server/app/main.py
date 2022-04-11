@@ -156,7 +156,6 @@ async def pattern_finder2(user_client=Depends(get_user_client)):
     answer = {}
     for i in range(len(expected_data)):
         date = str(expected_data.ds.iloc[i]).split()[0]
-        expected_data
         if i < len(real_data):
             answer[date] = {"real_data": round(real_data.y.iloc[i],6), "expected_data" : {"yhat" : round(expected_data.yhat.iloc[i],6), "yhat_lower": round(expected_data.yhat_lower.iloc[i],6), "yhat_upper" : round(expected_data.yhat_upper.iloc[i],6)}}
         else:
