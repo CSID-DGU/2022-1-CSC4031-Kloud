@@ -1,7 +1,8 @@
-FROM python:3.9
+FROM python:3.8
 
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . /code
 WORKDIR /code
 
-RUN pip install --no-cache-dir -r requirements.txt
 ENTRYPOINT celery -A app.da_tasks worker --loglevel=info
