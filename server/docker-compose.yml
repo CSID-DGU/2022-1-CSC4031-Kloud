@@ -1,18 +1,20 @@
 version: '3'
 
 services:
+
   kloud_redis:
     image: redis:latest
-    ports:
-      - "6379:6379"
+
   kloud_fast_api:
     build: .
+    ports:
+      - "8000:8000"
     depends_on:
       - kloud_redis
       - kloud_celery
     command: python /app/server.py
+
   kloud_celery:
-    build: ./server/app/data_analysis
+    build: ../data_analysis
     depends_on:
       - kloud_redis
-    command: celery -A data_worker worker -l info
