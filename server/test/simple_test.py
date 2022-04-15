@@ -54,3 +54,12 @@ class KloudTest(unittest.TestCase):
     def test_cost_history_default(self):
         res = post('/cost/history/default', self.access_token_dict)
         self.default_test(res)
+
+    def test_pattern_finder(self):
+        res = post('/cost/trend/similarity', self.access_token_dict)
+        self.default_test(res)
+
+    def test_pattern_finder2(self):
+        res = post("/cost/trend/prophet", self.access_token_dict)
+        self.default_test(res)
+
