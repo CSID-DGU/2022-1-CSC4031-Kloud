@@ -6,7 +6,7 @@ services:
     image: redis:latest
 
   kloud_fast_api:
-    build: .
+    build: server
     ports:
       - "8000:8000"
     depends_on:
@@ -15,6 +15,6 @@ services:
     command: python /app/server.py
 
   kloud_celery:
-    build: ../data_analysis
+    build: data_analysis
     depends_on:
       - kloud_redis
