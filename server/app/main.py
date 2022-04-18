@@ -4,17 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from .client import KloudClient
 from .response_exceptions import UserNotInDBException
-from pathlib import Path
 from . import common_functions
 from .auth import create_access_token, get_user_id
-from .models.PatternFinder import PatternFinder
-from datetime import datetime, timedelta
-from .models.ProPhetPatternFinder import ProPhetPatternFinder
 import boto3
 import asyncio
 import concurrent.futures
+from .config.cellery_app import da_app
 
-BASE_DIR = Path(__file__).resolve().parent
+# BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI()
 aws_info = boto3.Session()
@@ -117,47 +114,32 @@ async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
         return "logout_success"
 
 
+class Test(BaseModel):
+    a: int
+    b: int
+
+
+@app.post("/test")
+async def test(data: Test):
+    task_id = da_app.send_task('add', (data.a, data.b)).id
+    return task_id
+
+
 @app.post("/cost/trend/similarity")
 async def pattern_finder(user_client=Depends(get_user_client)):
     data = await user_client.get_default_cost_history()
-    p = PatternFinder(data)
-    # 날짜는 수정이 가능함 원하는 날짜가 들어오게 만들면 될 듯
-    result = p.search('2022-02-02', "2022-03-20", threshold=0.5)
-    # 패턴을 못찾은 경우 추후에 try,except로 수정해야할듯
-    if len(result) == 0:
-        print("threshold 혹은 date범위를 바꿔주어야함")
-        pass
-    base_norm = p.get_base_norm()
-    top_norm = p.get_target_norm()
-    answer = {}
-    base_norm_index = base_norm.index
-    for i in range(len(top_norm)):
-        if i < len(base_norm):
-            answer[base_norm_index[i]] = {"real_data": round(base_norm.iloc[i], 6),
-                                          "expected_data": round(top_norm.iloc[i], 6)}
-        else:
-            temp_time = str(base_norm_index[-1]).split("-")
-            time = datetime(int(temp_time[0]), int(temp_time[1]), int(temp_time[2]))
-            now_time = time + timedelta(days=i - len(base_norm) + 1)
-            now_time = str(now_time).split()[0]
-            answer[now_time] = {"expected_data": round(top_norm.iloc[i], 6)}
-    return answer
+    task = da_app.send_task("/cost/trend/similarity", [data])
+    return task.id
 
 
 @app.post("/cost/trend/prophet")
 async def pattern_finder2(user_client=Depends(get_user_client)):
     data = await user_client.get_default_cost_history()
-    p = ProPhetPatternFinder(data = data)
-    # 이후 5일 예측, default = 10
-    periods = 5
-    p.model_fit(periods = periods)
-    expected_data = p.expected_data()
-    real_data = p.real_data()
-    answer = {}
-    for i in range(len(expected_data)):
-        date = str(expected_data.ds.iloc[i]).split()[0]
-        if i < len(real_data):
-            answer[date] = {"real_data": round(real_data.y.iloc[i],6), "expected_data" : {"yhat" : round(expected_data.yhat.iloc[i],6), "yhat_lower": round(expected_data.yhat_lower.iloc[i],6), "yhat_upper" : round(expected_data.yhat_upper.iloc[i],6)}}
-        else:
-            answer[date] = {"expected_data" : {"yhat" : round(expected_data.yhat.iloc[i],6), "yhat_lower": round(expected_data.yhat_lower.iloc[i],6), "yhat_upper" : round(expected_data.yhat_upper.iloc[i],6)}}
-    return answer
+    task = da_app.send_task("/cost/trend/prophet", [data])
+    return task.id
+
+
+@app.get("/res/{job_id}")
+async def check(job_id):
+    return da_app.AsyncResult(job_id).result
+
