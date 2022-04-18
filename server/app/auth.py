@@ -36,7 +36,10 @@ async def validate_and_decode_access_token(access_token_form: AccessTokenForm) -
     return payload
 
 
-async def get_user_id(payload: dict = Depends(validate_and_decode_access_token)) -> str:  # 토큰에서 유저 id를 가져옴. 토큰이 유효하지 않을 경우 에러 raise
+async def get_user_id(payload: dict = Depends(validate_and_decode_access_token)) -> str:
+    """
+    토큰에서 유저 id를 가져옴. 토큰이 유효하지 않을 경우 에러 raise
+    """
     try:
         user_id: str = payload['user_id']
     except KeyError:
