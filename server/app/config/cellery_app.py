@@ -1,8 +1,9 @@
 from celery import Celery
+from .redis_conf import HOST, PORT, CELERYDB
 
 da_app = Celery(
     'da_app',
-    broker='redis://kloud_redis:6379/0',
-    backend='redis://kloud_redis:6379/0',
+    broker=f'redis://{HOST}:{PORT}/{CELERYDB}',
+    backend=f'redis://{HOST}:{PORT}/{CELERYDB}',
 )
 
