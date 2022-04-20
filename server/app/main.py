@@ -84,16 +84,9 @@ async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인,
         token = create_access_token(login_form.access_key_public)
         return {"access_token": token}
 
-        # if common_functions.is_valid_session(session_instance):  # todo 스레드풀에서 실행
-        #     kloud_client = KloudClient(access_key_id=login_form.access_key_public,
-        #                                session_instance=session_instance,
-        #                                loop=event_loop,
-        #                                executor=executor)
-        #     add_user_client(login_form.access_key_public, kloud_client)
-        #     token = create_access_token(login_form.access_key_public)
-        #     return {"access_token": token}
     except botocore.exceptions.ClientError:
         raise HTTPException(status_code=401, detail="login_failed")
+
     except botocore.exceptions.InvalidRegionError:
         raise HTTPException(status_code=400, detail="invalid_region")
 
@@ -127,17 +120,6 @@ async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
     #     pass
     # finally:
     #     return "logout_success"
-
-
-class Test(BaseModel):
-    a: int
-    b: int
-
-
-@app.get("/test")
-async def test(data: Test):
-    task_id = da_app.send_task('add', (data.a, data.b)).id
-    return task_id
 
 
 @app.get("/cost/trend/similarity")
