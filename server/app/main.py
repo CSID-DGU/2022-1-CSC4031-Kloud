@@ -72,7 +72,11 @@ class KloudLoginForm(BaseModel):
     region: str
 
 
-@app.post("/login")
+class AccessTokenResponse(BaseModel):
+    access_token: str
+
+
+@app.post("/login", response_model=AccessTokenResponse)
 async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
     try:
         session_instance: boto3.Session = boto3.Session(aws_access_key_id=login_form.access_key_public,
