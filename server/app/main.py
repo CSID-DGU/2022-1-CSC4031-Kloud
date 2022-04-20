@@ -19,7 +19,7 @@ app = FastAPI()
 aws_info = boto3.Session()
 
 clients = dict()  # 수정 필요
-event_loop: asyncio.unix_events._UnixSelectorEventLoop  # on_event('startup')시 오버라이드
+event_loop: asyncio.unix_events.SelectorEventLoop  # on_event('startup')시 오버라이드
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)  # boto3 io 작업이 실행될 스레드풀. KloudClient 객체 생성시 넘어감.
 
 
