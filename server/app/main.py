@@ -118,14 +118,15 @@ async def infra_tree(user_client=Depends(get_user_client)):
     return await user_client.get_infra_tree()
 
 
-@app.get("/logout")
+@app.post("/logout")
 async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
-    try:
-        clients.pop(user_id)
-    except KeyError:
-        pass
-    finally:
-        return "logout_success"
+    pass
+    # try:
+    #     clients.pop(user_id)
+    # except KeyError:
+    #     pass
+    # finally:
+    #     return "logout_success"
 
 
 class Test(BaseModel):
