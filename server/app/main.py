@@ -103,22 +103,22 @@ async def get_available_regions():
     return await common_functions.get_available_regions()
 
 
-@app.post("/infra/info")
+@app.get("/infra/info")
 async def infra_info(user_client=Depends(get_user_client)):
     return await user_client.get_current_infra_dict()
 
 
-@app.post("/cost/history/default")
+@app.get("/cost/history/default")
 async def cost_history_default(user_client=Depends(get_user_client)):
     return await user_client.get_default_cost_history()
 
 
-@app.post("/infra/tree")
+@app.get("/infra/tree")
 async def infra_tree(user_client=Depends(get_user_client)):
     return await user_client.get_infra_tree()
 
 
-@app.post("/logout")
+@app.get("/logout")
 async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
     try:
         clients.pop(user_id)
@@ -133,20 +133,20 @@ class Test(BaseModel):
     b: int
 
 
-@app.post("/test")
+@app.get("/test")
 async def test(data: Test):
     task_id = da_app.send_task('add', (data.a, data.b)).id
     return task_id
 
 
-@app.post("/cost/trend/similarity")
+@app.get("/cost/trend/similarity")
 async def pattern_finder(user_client=Depends(get_user_client)):
     data = await user_client.get_default_cost_history()
     task = da_app.send_task("/cost/trend/similarity", [data])
     return task.id
 
 
-@app.post("/cost/trend/prophet")
+@app.get("/cost/trend/prophet")
 async def pattern_finder2(user_client=Depends(get_user_client)):
     data = await user_client.get_default_cost_history()
     task = da_app.send_task("/cost/trend/prophet", [data])
