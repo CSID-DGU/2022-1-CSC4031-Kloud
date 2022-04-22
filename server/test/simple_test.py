@@ -18,8 +18,15 @@ def get_full_url(uri: str) -> str:
     return host+uri
 
 
-def post(url, data: dict):
-    return requests.post(url=get_full_url(url), data=json.dumps(data))
+def post(url, data: dict, token=None):
+    if token is not None:
+        return requests.post(url=get_full_url(url), data=json.dumps(data), headers={'Authorization': token})
+    else:
+        return requests.post(url=get_full_url(url), data=json.dumps(data))
+
+
+def get(url, token):
+    return requests.get(url=get_full_url(url), headers={'Authorization': f'Bearer {token}'})
 
 
 def login():
@@ -35,6 +42,7 @@ def login():
 class KloudTest(unittest.TestCase):
     def setUp(self) -> None:
         self.access_token_dict = login()
+        self.access_token = self.access_token_dict['access_token']
 
     def default_test(self, res):
         assert res.status_code == 200
@@ -44,22 +52,22 @@ class KloudTest(unittest.TestCase):
             self.fail()
 
     def test_infra_info(self):
-        res = post('/infra/info', self.access_token_dict)
+        res = get('/infra/info', self.access_token)
         self.default_test(res)
 
     def test_infra_tree(self):
-        res = post('/infra/tree', self.access_token_dict)
+        res = get('/infra/tree', self.access_token)
         self.default_test(res)
 
     def test_cost_history_default(self):
-        res = post('/cost/history/default', self.access_token_dict)
+        res = get('/cost/history/default', self.access_token)
         self.default_test(res)
 
     def test_pattern_finder(self):
-        res = post('/cost/trend/similarity', self.access_token_dict)
+        res = get('/cost/trend/similarity', self.access_token)
         self.default_test(res)
 
     def test_pattern_finder2(self):
-        res = post("/cost/trend/prophet", self.access_token_dict)
+        res = get("/cost/trend/prophet", self.access_token)
         self.default_test(res)
 

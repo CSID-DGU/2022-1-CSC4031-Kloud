@@ -6,8 +6,11 @@ from .response_exceptions import CredentialsException
 from .config.token_conf import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from pydantic import BaseModel
 from fastapi import Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import boto3
 import asyncio
+
+security = HTTPBearer(scheme_name='bearer')
 
 
 def build_token(user_id: str) -> dict:
@@ -61,9 +64,9 @@ def temp_session_create(cred: dict) -> boto3.Session:
                          region_name=cred['region'])
 
 
-async def validate_and_decode_access_token(access_token_form: AccessTokenForm) -> dict:
+async def validate_and_decode_access_token(auth_header: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     try:
-        payload = jwt.decode(access_token_form.access_token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(auth_header.credentials, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
         raise CredentialsException
     return payload
