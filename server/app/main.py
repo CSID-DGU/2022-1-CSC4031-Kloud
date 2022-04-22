@@ -19,7 +19,7 @@ app = FastAPI()
 aws_info = boto3.Session()
 
 clients = dict()  # 수정 필요
-event_loop: asyncio.unix_events._UnixSelectorEventLoop  # on_event('startup')시 오버라이드
+event_loop: asyncio.unix_events.SelectorEventLoop  # on_event('startup')시 오버라이드
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)  # boto3 io 작업이 실행될 스레드풀. KloudClient 객체 생성시 넘어감.
 
 
@@ -72,7 +72,11 @@ class KloudLoginForm(BaseModel):
     region: str
 
 
-@app.post("/login")
+class AccessTokenResponse(BaseModel):
+    access_token: str
+
+
+@app.post("/login", response_model=AccessTokenResponse)
 async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
     try:
         session_instance: boto3.Session = boto3.Session(aws_access_key_id=login_form.access_key_public,
@@ -84,16 +88,9 @@ async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인,
         token = create_access_token(login_form.access_key_public)
         return {"access_token": token}
 
-        # if common_functions.is_valid_session(session_instance):  # todo 스레드풀에서 실행
-        #     kloud_client = KloudClient(access_key_id=login_form.access_key_public,
-        #                                session_instance=session_instance,
-        #                                loop=event_loop,
-        #                                executor=executor)
-        #     add_user_client(login_form.access_key_public, kloud_client)
-        #     token = create_access_token(login_form.access_key_public)
-        #     return {"access_token": token}
     except botocore.exceptions.ClientError:
         raise HTTPException(status_code=401, detail="login_failed")
+
     except botocore.exceptions.InvalidRegionError:
         raise HTTPException(status_code=400, detail="invalid_region")
 
@@ -103,50 +100,40 @@ async def get_available_regions():
     return await common_functions.get_available_regions()
 
 
-@app.post("/infra/info")
+@app.get("/infra/info")
 async def infra_info(user_client=Depends(get_user_client)):
     return await user_client.get_current_infra_dict()
 
 
-@app.post("/cost/history/default")
+@app.get("/cost/history/default")
 async def cost_history_default(user_client=Depends(get_user_client)):
     return await user_client.get_default_cost_history()
 
 
-@app.post("/infra/tree")
+@app.get("/infra/tree")
 async def infra_tree(user_client=Depends(get_user_client)):
     return await user_client.get_infra_tree()
 
 
 @app.post("/logout")
 async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
-    try:
-        clients.pop(user_id)
-    except KeyError:
-        pass
-    finally:
-        return "logout_success"
+    pass
+    # try:
+    #     clients.pop(user_id)
+    # except KeyError:
+    #     pass
+    # finally:
+    #     return "logout_success"
 
 
-class Test(BaseModel):
-    a: int
-    b: int
-
-
-@app.post("/test")
-async def test(data: Test):
-    task_id = da_app.send_task('add', (data.a, data.b)).id
-    return task_id
-
-
-@app.post("/cost/trend/similarity")
+@app.get("/cost/trend/similarity")
 async def pattern_finder(user_client=Depends(get_user_client)):
     data = await user_client.get_default_cost_history()
     task = da_app.send_task("/cost/trend/similarity", [data])
     return task.id
 
 
-@app.post("/cost/trend/prophet")
+@app.get("/cost/trend/prophet")
 async def pattern_finder2(user_client=Depends(get_user_client)):
     data = await user_client.get_default_cost_history()
     task = da_app.send_task("/cost/trend/prophet", [data])

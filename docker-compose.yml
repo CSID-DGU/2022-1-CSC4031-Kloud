@@ -18,3 +18,4 @@ services:
     build: data_analysis
     depends_on:
       - kloud_redis
+    command: celery -A app.da_tasks worker --loglevel=info
