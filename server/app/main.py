@@ -80,12 +80,13 @@ BREAK_LOOP_STATE = {'SUCCESS', 'REVOKED', 'FAILURE'}
 async def wait_until_done(celery_task_id, interval=0.3, timeout=10.0):
     async_result = da_app.AsyncResult(celery_task_id)
     time_passed = 0
-    while async_result.state not in BREAK_LOOP_STATE and time_passed < timeout:
+    while async_result.state not in BREAK_LOOP_STATE:
         await asyncio.sleep(interval)
         time_passed += interval
-    if time_passed >= timeout:
-        async_result.forget()
-        da_app.control.revoke(celery_task_id)
+        if time_passed >= timeout:
+            async_result.forget()
+            da_app.control.revoke(celery_task_id)
+            break
     return async_result.get()
 
 
