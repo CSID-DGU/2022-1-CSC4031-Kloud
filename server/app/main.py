@@ -74,6 +74,16 @@ class AccessTokenResponse(BaseModel):
     access_token: str
 
 
+BREAK_LOOP_STATE = {'SUCCESS', 'REVOKED', 'FAILURE'}
+
+
+async def wait_until_done(celery_task_id, interval=0.3):
+    async_result = da_app.AsyncResult(celery_task_id)
+    while async_result.state not in BREAK_LOOP_STATE:
+        await asyncio.sleep(interval)
+    return async_result.get()
+
+
 @app.post("/login", response_model=AccessTokenResponse)
 async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
     try:
@@ -121,19 +131,17 @@ async def logout(user_id=Depends(get_user_id), token=Depends(security)):
 
 
 @app.get("/cost/trend/similarity")
-async def pattern_finder(user_client=Depends(get_user_client)):
-    data = await user_client.get_default_cost_history()
-    task = da_app.send_task("/cost/trend/similarity", [data])
-    return task.id
+async def pattern_finder(user_client=Depends(get_user_id), token=Depends(security)):
+    task = da_app.send_task("/cost/trend/similarity", [token.credentials])
+    return await wait_until_done(task.id)  # 비동기 실행, 결과값 체크 예시
 
 
 @app.get("/cost/trend/prophet")
-async def pattern_finder2(user_client=Depends(get_user_client)):
-    data = await user_client.get_default_cost_history()
-    task = da_app.send_task("/cost/trend/prophet", [data])
-    return task.id
+async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(security)):
+    task = da_app.send_task("/cost/trend/prophet", [token.credentials])
+    return await wait_until_done(task.id, interval=0.5)  # 비동기 실행, 결과값 체크 예시
 
 
 @app.get("/res/{job_id}")
 async def check(job_id):
-    return da_app.AsyncResult(job_id).result
+    return da_app.AsyncResult(job_id).get()

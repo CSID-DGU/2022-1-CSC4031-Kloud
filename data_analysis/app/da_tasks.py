@@ -1,6 +1,7 @@
 from .da_worker import celery_task
 from .models.PatternFinder import PatternFinder
 from .models.ProPhetPatternFinder import ProPhetPatternFinder
+from .request import get_cost_info
 from datetime import timedelta, datetime
 
 
@@ -10,9 +11,8 @@ def add(x, y):  # 예시
 
 
 @celery_task.task(name="/cost/trend/similarity")
-def pattern_finder(default_cost_history: dict):
-    # data = await user_client.get_default_cost_history()
-    data = default_cost_history
+def pattern_finder(token: str):
+    data = get_cost_info(token)
     p = PatternFinder(data)
     # 날짜는 수정이 가능함 원하는 날짜가 들어오게 만들면 될 듯
     result = p.search('2022-02-02', "2022-03-20", threshold=0.5)
@@ -38,9 +38,8 @@ def pattern_finder(default_cost_history: dict):
 
 
 @celery_task.task(name="/cost/trend/prophet")
-def pattern_finder2(default_cost_history: dict):
-    # data = await user_client.get_default_cost_history()
-    data = default_cost_history
+def pattern_finder2(token: str):
+    data = get_cost_info(token)
     p = ProPhetPatternFinder(data=data)
     # 이후 5일 예측, default = 10
     periods = 5

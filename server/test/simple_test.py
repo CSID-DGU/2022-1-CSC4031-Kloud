@@ -82,9 +82,13 @@ class KloudTest(unittest.TestCase):
         res = get("/cost/trend/prophet", self.access_token)
         self.default_test(res)
 
-    def test_zlogout(self):  # 알파벳 순서대로 실행됨. 로그아웃은 맨 마지막에 실행.
-        # ac = login()['access_token']
-        ac = self.access_token
+
+class LogoutTest(unittest.TestCase):
+    def test_logout(self):
+        """
+        위 테스트와 한 번에 실행하면 credential 정보가 서버에서 삭제되어 에러 발생 가능성 있음.
+        """
+        ac = login()['access_token']
         res = post("/logout", token=ac)
         assert res.status_code == 200
         time.sleep(0.1)  # 비동기 처리 시간 감안하여 지연
