@@ -5,15 +5,12 @@ from pydantic import BaseModel
 from .client import KloudClient
 from .response_exceptions import UserNotInDBException
 from . import common_functions
-from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create
+from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
 import boto3
 import asyncio
 import concurrent.futures
 from .config.cellery_app import da_app
-from .redis_req import set_cred_to_redis, get_cred_from_redis
-import functools
-
-# BASE_DIR = Path(__file__).resolve().parent
+from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis
 
 app = FastAPI()
 aws_info = boto3.Session()
@@ -26,13 +23,13 @@ executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)  # boto3 io 작
 @app.on_event('startup')
 async def startup():
     global event_loop
-    event_loop = asyncio.get_running_loop() # KloudClient 객체 생성시 넘어감.
+    event_loop = asyncio.get_running_loop()  # KloudClient 객체 생성시 넘어감.
 
 
 async def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:
-    '''
+    """
     redis에서 임시 자격증명을 가져와 객체를 생성함.
-    '''
+    """
     cred = await get_cred_from_redis(user_id)
     if cred is None:
         raise UserNotInDBException  # 없는 유저
@@ -48,7 +45,8 @@ def cache_user_client(user_id: str,
     # clients[user_id] = user_client
     pass
 
-##### CORS #####
+
+# #### CORS #####
 # 개발 편의를 위해 모든 origin 허용. 배포시 수정 필요
 
 origins = [
@@ -63,7 +61,7 @@ app.add_middleware(
 )
 
 
-##### CORS #####
+# #### CORS #####
 
 
 class KloudLoginForm(BaseModel):
@@ -84,7 +82,7 @@ async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인,
                                                         region_name=login_form.region)
         temp_cred = await request_temp_cred_async(session_instance, login_form.region)
 
-        asyncio.create_task(set_cred_to_redis(user_id=login_form.access_key_public, cred=temp_cred))
+        await set_cred_to_redis(user_id=login_form.access_key_public, cred=temp_cred)  # await 하지 않을시 잠재적 에러 가능성
         token = create_access_token(login_form.access_key_public)
         return {"access_token": token}
 
@@ -116,14 +114,10 @@ async def infra_tree(user_client=Depends(get_user_client)):
 
 
 @app.post("/logout")
-async def logout(user_id=Depends(get_user_id)):  # todo token revoke 목록
-    pass
-    # try:
-    #     clients.pop(user_id)
-    # except KeyError:
-    #     pass
-    # finally:
-    #     return "logout_success"
+async def logout(user_id=Depends(get_user_id), token=Depends(security)):
+    asyncio.create_task(revoke_token(token.credentials))  # 서버에서 발급한 jwt 무효화
+    asyncio.create_task(delete_cred_from_redis(user_id))  # 서버에 저장된 aws sts 토큰 삭제
+    return 'logout success'
 
 
 @app.get("/cost/trend/similarity")

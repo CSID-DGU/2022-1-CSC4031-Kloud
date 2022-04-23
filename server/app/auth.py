@@ -4,6 +4,7 @@ from jose import jwt, JWTError
 from typing import Optional
 from .response_exceptions import CredentialsException
 from .config.token_conf import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from .redis_req import add_revoked_redis, is_member_revoked_redis
 from pydantic import BaseModel
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -28,6 +29,14 @@ def create_access_token(user_id: str, expires_delta: Optional[timedelta] = None)
     to_encode.update({"exp": expire})  # 토큰 유효기간
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt  # 인코딩된 jwt 반환
+
+
+async def revoke_token(token: str) -> None:
+    await add_revoked_redis(token)
+
+
+async def is_revoked(token: str) -> bool:
+    return await is_member_revoked_redis(token)
 
 
 class AccessTokenForm(BaseModel):
@@ -67,6 +76,8 @@ def temp_session_create(cred: dict) -> boto3.Session:
 async def validate_and_decode_access_token(auth_header: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     try:
         payload = jwt.decode(auth_header.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        if await is_member_revoked_redis(auth_header.credentials):  # token revoke 여부 확인
+            raise CredentialsException
     except JWTError:
         raise CredentialsException
     return payload
@@ -81,3 +92,4 @@ async def get_user_id(payload: dict = Depends(validate_and_decode_access_token))
     except KeyError:
         raise CredentialsException
     return user_id
+
