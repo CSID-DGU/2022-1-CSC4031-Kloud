@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from .client import KloudClient
-from .response_exceptions import UserNotInDBException
+from .response_exceptions import UserNotInDBException, CeleryTimeOutError
 from . import common_functions
 from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
 import boto3
@@ -86,7 +86,7 @@ async def wait_until_done(celery_task_id, interval=0.3, timeout=10.0):
         if time_passed >= timeout:
             async_result.forget()
             da_app.control.revoke(celery_task_id)
-            break
+            raise CeleryTimeOutError
     return async_result.get()
 
 

@@ -11,4 +11,6 @@ UserNotInDBException = HTTPException(
     detail="user not in db"
 )
 
-
+CeleryTimeOutError = HTTPException(
+    status_code=status.HTTP_408_REQUEST_TIMEOUT
+)
