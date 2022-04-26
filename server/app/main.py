@@ -136,7 +136,7 @@ async def cost_history_default(user_id=Depends(get_user_id)):
     if cost_history is None:  # 캐시가 없음.
         user_client = await get_user_client(user_id)  # 캐시가 없을 때만 클라이언트 객체 생성.
         cost_history: dict = await user_client.get_default_cost_history()  # aws 에서 데이터 받아옴.
-        await set_cost_cache(user_client.id, cost_history)  # 비동기 캐시
+        asyncio.create_task(set_cost_cache(user_client.id, cost_history))  # 비동기 캐시
     else:
         print(f'cache hit {user_id=}')
     return cost_history
