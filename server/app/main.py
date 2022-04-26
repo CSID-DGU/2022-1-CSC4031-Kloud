@@ -85,7 +85,7 @@ async def wait_until_done(celery_task: da_app.AsyncResult, interval=0.3, timeout
     :param celery_task:  send_task 등으로 반환된 AsyncResult 객체
     :param interval:  결과 확인 빈도, 초 단위
     :param timeout:  초 단위
-    :return:
+    :return: 셀러리 태스크의 return 값
     """
     time_passed = 0
     while celery_task.state not in BREAK_LOOP_STATE:
