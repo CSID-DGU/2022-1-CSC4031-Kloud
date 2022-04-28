@@ -1,10 +1,11 @@
 import json
 from json import JSONDecodeError
 from aioredis import Redis
-from .config.redis_conf import HOST, PORT, CREDDB, CRED_EXP, REVOKED_TOKENS
+from .config.redis_conf import HOST, PORT, CREDDB, CRED_EXP, COST_EXP, REVOKED_TOKENS, CACHEDB
 from .response_exceptions import UserNotInDBException
 
 cred_db = Redis(host=HOST, port=PORT, db=CREDDB, decode_responses=True)
+cache_db = Redis(host=HOST, port=PORT, db=CACHEDB, decode_responses=True)
 
 
 async def get_cred_from_redis(user_id: str) -> dict:
@@ -19,7 +20,11 @@ async def get_cred_from_redis(user_id: str) -> dict:
 
 
 async def delete_cred_from_redis(user_id: str) -> None:
-    await cred_db.delete('user_id')
+    await cred_db.delete(user_id)
+
+
+async def delete_cache_from_redis(user_id: str) -> None:
+    await cache_db.delete(f'cost_cache_{user_id}')
 
 
 async def set_cred_to_redis(user_id: str, cred: dict) -> None:
@@ -43,3 +48,15 @@ async def is_member_revoked_redis(token: str) -> bool:
     멤버에 token이 존재하는지 확인
     """
     return await cred_db.sismember(REVOKED_TOKENS, token)
+
+
+async def set_cost_cache(user_id: str, cost_data: dict) -> None:  # 파라미터 추가 가능성 있음.
+    jsonified = json.dumps(cost_data)
+    await cache_db.set(f'cost_cache_{user_id}', jsonified, COST_EXP)
+
+
+async def get_cost_cache(user_id: str) -> (dict, None):  # 파라미터 추가 가능성 있음.
+    jsonified = await cache_db.get(f'cost_cache_{user_id}')
+    if jsonified is not None:
+        return json.loads(jsonified)
+
