@@ -61,15 +61,18 @@ class KloudClient:
             to_return[primary_key] = dic
         return to_return
 
-    async def _update_resource_dict(self) -> None:
+    async def _fetch_infra_info(self) -> list:
         boto3_reqs = []  # run in executor 작업 목록
-
         for identifier, describing_method in self._describing_methods.items():  # identifier: str, describing_method: function
-            func = functools.partial(self._response_process, identifier=identifier, describing_method=describing_method)
+            func = functools.partial(self._response_process, identifier=identifier,
+                                     describing_method=describing_method)
             future = self.loop.run_in_executor(executor=self.executor, func=func)
             boto3_reqs.append(future)
+        return boto3_reqs
 
-        done, pending = await asyncio.wait(boto3_reqs)  # 작업이 모두 완료될 때 까지 대기
+    async def _update_resource_dict(self):
+        reqs: list = await self._fetch_infra_info()  # boto3에 인프라 정보 요청
+        done, pending = await asyncio.wait(reqs)  # 작업이 모두 완료될 때 까지 대기
 
         for task in done:
             result: dict = task.result()
