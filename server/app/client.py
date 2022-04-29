@@ -133,7 +133,7 @@ class KloudClient:
                     if vpcs['VpcId'] == vpc_id:
                         return key
 
-    def _get_tree(self, data: dict):
+    def _get_tree(self, data: dict) -> dict:
         for key, val in data.items():
             parent = self._get_parent(val)
             try:
@@ -145,7 +145,12 @@ class KloudClient:
                 pass  # 부모가 None인 경우. 부모관계가 없는 resource
 
         to_return = dict()
+        to_return['orphan'] = dict()
         for k, v in data.items():
-            if v.get('resource_type') in POSSIBLE_ROOT_NODES and v.get('parent') is None:
+            resource_type = v.get('resource_type')
+            parent = v.get('parent')
+            if resource_type in POSSIBLE_ROOT_NODES and parent is None:
                 to_return[k] = v
+            elif resource_type not in POSSIBLE_ROOT_NODES and parent is None:
+                to_return['orphan'][k] = v
         return to_return
