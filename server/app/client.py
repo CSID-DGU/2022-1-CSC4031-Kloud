@@ -70,7 +70,8 @@ class KloudClient:
             boto3_reqs.append(future)
         return boto3_reqs
 
-    async def _update_resource_dict(self):
+    async def _update_resource_dict(self) -> dict:
+        to_return = {}
         reqs: list = await self._fetch_infra_info()  # boto3에 인프라 정보 요청
         done, pending = await asyncio.wait(reqs)  # 작업이 모두 완료될 때 까지 대기
 
@@ -78,7 +79,9 @@ class KloudClient:
             result: dict = task.result()
             if result is not None:  # 인프라가 없거나 하면 None
                 for key, val in result.items():
-                    self._resources[key] = val
+                    to_return[key] = val
+        self._resources = to_return
+        return to_return
 
     @staticmethod
     def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
@@ -89,8 +92,7 @@ class KloudClient:
         return processed
 
     async def get_current_infra_dict(self) -> dict:
-        await self._update_resource_dict()
-        return self._resources
+        return await self._update_resource_dict()
 
     async def get_cost_history(self, time_period: dict, granularity: str) -> dict:
         fun = functools.partial(self._ce_client.get_cost_and_usage,
