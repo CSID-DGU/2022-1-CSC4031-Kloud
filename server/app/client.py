@@ -21,7 +21,7 @@ PARENT = {
     'ec2': 'SubnetId',
 }
 
-POSSIBLE_ROOT_NODES = {'vpc', 'igw'}
+POSSIBLE_ROOT_NODES = {'vpc'}
 
 
 class KloudClient:
@@ -54,7 +54,7 @@ class KloudClient:
                 response = response[0]['Instances']
             except IndexError:  # ec2 인스턴스가 없을 경우
                 pass
-        to_return = {}
+        to_return = dict()
         for dic in response:  # 응답이 존재하지 않는 경우 for문이 실행되지 않고 넘어감.
             primary_key = dic[identifier]
             dic['resource_id'] = primary_key
@@ -72,7 +72,7 @@ class KloudClient:
         return boto3_reqs
 
     async def _update_resource_dict(self) -> dict:
-        to_return = {}
+        to_return = dict()
         reqs: list = await self._fetch_infra_info()  # boto3에 인프라 정보 요청
         done, pending = await asyncio.wait(reqs)  # 작업이 모두 완료될 때 까지 대기
 
@@ -113,40 +113,51 @@ class KloudClient:
         return await self.get_cost_history(time_period=time_period, granularity=granularity)
 
     async def get_infra_tree(self) -> dict:
-        await self.get_current_infra_dict()
-        return self._get_tree(self._resources)
+        resources = await self.get_current_infra_dict()
+        return self._get_tree(resources)
 
-    def _get_parent(self, child: dict):
-        resource_type = child.get('resource_type')
-        if resource_type == 'vpc':
-            return self._get_vpc_parent(child.get('resource_id'))
-        try:
-            resource_type = child['resource_type']
+    def _get_parent(self, child: dict, resources: dict) -> str:
+        # resource_type = child.get('resource_type')
+        # if resource_type == 'vpc':
+        #     return self._get_vpc_parent(child.get('resource_id'), resources)
+        # try:
+        resource_type = child['resource_type']
+        if resource_type in PARENT.keys():
             return child.get(PARENT[resource_type])
-        except KeyError:
+        else:
             pass
+        # except KeyError:
+        #     pass
 
-    def _get_vpc_parent(self, vpc_id: str) -> str:
-        for key, val in self._resources.items():
+    @staticmethod
+    def _get_vpc_parent(vpc_id: str, resources: dict) -> str:
+        """
+        describe vpcs에는 igw정보가 없기 때문에 resource 전체를 탐색해서 할당된 igw가 있는지 확인해야함.
+        """
+        for key, val in resources.items():
             if val['resource_type'] == 'igw':
                 for vpcs in val['Attachments']:
                     if vpcs['VpcId'] == vpc_id:
                         return key
 
-    def _get_tree(self, data: dict) -> dict:
-        for key, val in data.items():
-            parent = self._get_parent(val)
-            try:
-                data[key]['parent'] = parent
-                if data[parent].get('children') is None:
-                    data[parent]['children'] = {}
-                data[parent]['children'][key] = val
-            except KeyError:
-                pass  # 부모가 None인 경우. 부모관계가 없는 resource
+    def _get_tree(self, infra_data: dict) -> dict:
+        """
+        데이터를 모두 가져온 상태에서 부모 자식 관계 정보를 설정함.
+        """
+        for key, val in infra_data.items():
+            parent = self._get_parent(val, infra_data)
+            if parent:
+                infra_data[key]['parent'] = parent  # 부모노드와 자식노드 둘 다 업데이트
+                if infra_data[parent].get('children') is None:
+                    infra_data[parent]['children'] = dict()
+                infra_data[parent]['children'][key] = val
+            else:
+                pass
 
         to_return = dict()
         to_return['orphan'] = dict()
-        for k, v in data.items():
+
+        for k, v in infra_data.items():
             resource_type = v.get('resource_type')
             parent = v.get('parent')
             if resource_type in POSSIBLE_ROOT_NODES and parent is None:
