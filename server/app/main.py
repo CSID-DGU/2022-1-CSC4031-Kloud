@@ -3,14 +3,14 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from .client import KloudClient
-from .response_exceptions import UserNotInDBException
+from .response_exceptions import UserNotInDBException, CeleryTimeOutError
 from . import common_functions
 from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
 import boto3
 import asyncio
 import concurrent.futures
 from .config.cellery_app import da_app
-from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis
+from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, delete_cache_from_redis
 
 app = FastAPI()
 aws_info = boto3.Session()
@@ -77,21 +77,29 @@ class AccessTokenResponse(BaseModel):
 BREAK_LOOP_STATE = {'SUCCESS', 'REVOKED', 'FAILURE'}
 
 
-async def wait_until_done(celery_task_id, interval=0.3, timeout=10.0):
-    async_result = da_app.AsyncResult(celery_task_id)
+async def wait_until_done(celery_task: da_app.AsyncResult, interval=0.3, timeout=10.0):
+    """
+    바람직한 방법은 아닌 것 같으나, 일단 작동은 합니다.
+    asyncio.sleep(interval)로, interval(초) 만큼 이벤트 루프의 제어권을 넘깁니다.
+
+    :param celery_task:  send_task 등으로 반환된 AsyncResult 객체
+    :param interval:  결과 확인 빈도, 초 단위
+    :param timeout:  초 단위
+    :return: 셀러리 태스크의 return 값
+    """
     time_passed = 0
-    while async_result.state not in BREAK_LOOP_STATE:
+    while celery_task.state not in BREAK_LOOP_STATE:
         await asyncio.sleep(interval)
         time_passed += interval
         if time_passed >= timeout:
-            async_result.forget()
-            da_app.control.revoke(celery_task_id)
-            break
-    return async_result.get()
+            celery_task.forget()
+            da_app.control.revoke(celery_task.id)
+            raise CeleryTimeOutError
+    return celery_task.get()
 
 
 @app.post("/login", response_model=AccessTokenResponse)
-async def login(login_form: KloudLoginForm):  # todo token revoke 목록 확인, refresh token
+async def login(login_form: KloudLoginForm):
     try:
         session_instance: boto3.Session = boto3.Session(aws_access_key_id=login_form.access_key_public,
                                                         aws_secret_access_key=login_form.access_key_secret,
@@ -120,8 +128,18 @@ async def infra_info(user_client=Depends(get_user_client)):
 
 
 @app.get("/cost/history/default")
-async def cost_history_default(user_client=Depends(get_user_client)):
-    return await user_client.get_default_cost_history()
+async def cost_history_default(user_id=Depends(get_user_id)):
+    """
+    만약 cost history 관련 수정이 이루어진 경우에도 redis 캐시는 남아있음. 에러 피하기 위해선 캐시 처리 필요.
+    """
+    cost_history = await get_cost_cache(user_id)  # 캐시 확인
+    if cost_history is None:  # 캐시가 없음.
+        user_client = await get_user_client(user_id)  # 캐시가 없을 때만 클라이언트 객체 생성.
+        cost_history: dict = await user_client.get_default_cost_history()  # aws 에서 데이터 받아옴.
+        asyncio.create_task(set_cost_cache(user_client.id, cost_history))  # 비동기 캐시
+    else:
+        print(f'cache hit {user_id=}')
+    return cost_history
 
 
 @app.get("/infra/tree")
@@ -133,21 +151,22 @@ async def infra_tree(user_client=Depends(get_user_client)):
 async def logout(user_id=Depends(get_user_id), token=Depends(security)):
     asyncio.create_task(revoke_token(token.credentials))  # 서버에서 발급한 jwt 무효화
     asyncio.create_task(delete_cred_from_redis(user_id))  # 서버에 저장된 aws sts 토큰 삭제
+    asyncio.create_task(delete_cache_from_redis(user_id))  # 캐시 제거
     return 'logout success'
 
 
 @app.get("/cost/trend/similarity")
 async def pattern_finder(user_client=Depends(get_user_id), token=Depends(security)):
     task = da_app.send_task("/cost/trend/similarity", [token.credentials])
-    return await wait_until_done(task.id)  # 비동기 실행, 결과값 체크 예시
+    return await wait_until_done(task)  # 비동기 실행, 결과값 체크 예시
 
 
 @app.get("/cost/trend/prophet")
 async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(security)):
     task = da_app.send_task("/cost/trend/prophet", [token.credentials])
-    return await wait_until_done(task.id, interval=0.5)  # 비동기 실행, 결과값 체크 예시
+    return await wait_until_done(task, interval=0.5)  # 비동기 실행, 결과값 체크 예시
 
 
 @app.get("/res/{job_id}")
 async def check(job_id):
-    return da_app.AsyncResult(job_id).get()
+    return da_app.AsyncResult(job_id).get()  # 예시로, blocking io를 발생시킴.
