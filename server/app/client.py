@@ -4,14 +4,14 @@ import asyncio
 import functools
 from concurrent.futures import ThreadPoolExecutor
 
-RESOURCE_IDENTIFIERS = {'VpcId': 'vpc',
+RESOURCE_TYPE = {'VpcId': 'vpc',
                         'SubnetId': 'subnet',
                         'NetworkInterfaceId': 'network_interface',
                         'InternetGatewayId': 'igw',
                         'NatGatewayId': 'ngw',
                         'InstanceId': 'ec2',  # todo ec2 이외에도 InstanceId인 경우 있는지 확인할 것
                         'DBInstanceIdentifier': 'rds'
-                        }
+                 }
 
 GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENTITY", "LINKED_ACCOUNT", "OPERATION",
                       "PLATFORM", "PURCHASE_TYPE", "SERVICE", "TENANCY", "RECORD_TYPE", "USAGE_TYPE"]
@@ -46,6 +46,21 @@ class KloudClient:
                                     'DBInstanceIdentifier': self._rds_client.describe_db_instances
                                     }
 
+    def _response_process(self, identifier, describing_method) -> dict:  # 응답을 받아서 후처리함.
+        response: list = self.cut_useless_metadata(describing_method())
+        if identifier == 'InstanceId':  # ec2 인스턴스일 경우
+            try:
+                response = response[0]['Instances']
+            except IndexError:  # ec2 인스턴스가 없을 경우
+                pass
+        to_return = {}
+        for dic in response:  # 응답이 존재하지 않는 경우 for문이 실행되지 않고 넘어감.
+            primary_key = dic[identifier]
+            dic['resource_id'] = primary_key
+            dic['resource_type'] = RESOURCE_TYPE[identifier]
+            to_return[primary_key] = dic
+        return to_return
+
     async def _update_resource_dict(self) -> None:
         boto3_reqs = []  # run in executor 작업 목록
 
@@ -57,23 +72,10 @@ class KloudClient:
         done, pending = await asyncio.wait(boto3_reqs)  # 작업이 모두 완료될 때 까지 대기
 
         for task in done:
-            result = task.result()
+            result: dict = task.result()
             if result is not None:  # 인프라가 없거나 하면 None
-                resource_id = result['resource_id']
-                self._resources[resource_id] = result
-
-    def _response_process(self, identifier, describing_method) -> dict:  # 응답을 받아서 후처리함.
-        response: list = self.cut_useless_metadata(describing_method())
-        if identifier == 'InstanceId':  # ec2 인스턴스일 경우
-            try:
-                response = response[0]['Instances']
-            except IndexError:  # ec2 인스턴스가 없을 경우
-                pass
-        for dic in response:  # 응답이 존재하지 않는 경우 for문이 실행되지 않고 넘어감.
-            primary_key = dic[identifier]
-            dic['resource_id'] = primary_key
-            dic['resource_type'] = RESOURCE_IDENTIFIERS[identifier]
-            return dic
+                for key, val in result.items():
+                    self._resources[key] = val
 
     @staticmethod
     def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
