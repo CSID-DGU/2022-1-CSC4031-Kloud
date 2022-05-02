@@ -8,6 +8,7 @@ import useForceUpdate from "../visualization/useForceUpdate";
 import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
 
+// 인프라 데이터 interface
 interface TreeNode {
   name: string;
   isExpanded?: boolean;
@@ -64,7 +65,7 @@ export type LinkTypesProps = {
 };
 
 const Container = styled.div`
-  padding: 30px;
+  padding: 20px 30px;
 `;
 
 export default function Infra({
@@ -106,21 +107,14 @@ export default function Infra({
 
   return totalWidth < 10 ? null : (
     <Container>
-      <LinkControls
-        layout={layout}
-        orientation={orientation}
-        linkType={linkType}
-        setLayout={setLayout}
-        setOrientation={setOrientation}
-        setLinkType={setLinkType}
-      />
+      <LinkControls layout={layout} setLayout={setLayout} />
       <svg width={totalWidth} height={totalHeight}>
         <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
         <rect
           width={totalWidth}
           height={totalHeight}
           rx={14}
-          fill={"transparent"}
+          fill={"gainsboro"}
         />
         <Group top={margin.top} left={margin.left}>
           <Tree
@@ -134,7 +128,7 @@ export default function Infra({
                   <LinkComponent
                     key={i}
                     data={link}
-                    stroke="rgb(254,110,158,0.6)"
+                    stroke={"#040959"}
                     strokeWidth="1"
                     fill="none"
                   />
@@ -162,7 +156,7 @@ export default function Infra({
                     <Group top={top} left={left} key={key}>
                       {node.depth === 0 && (
                         <circle
-                          r={12}
+                          r={22}
                           fill="url('#links-gradient')"
                           onClick={() => {
                             node.data.isExpanded = !node.data.isExpanded;
@@ -184,7 +178,6 @@ export default function Infra({
                           rx={node.data.children ? 0 : 10}
                           onClick={() => {
                             node.data.isExpanded = !node.data.isExpanded;
-                            console.log(node);
                             forceUpdate();
                           }}
                         />
