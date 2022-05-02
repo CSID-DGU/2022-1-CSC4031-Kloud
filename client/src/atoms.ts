@@ -14,3 +14,8 @@ export const accessTokenAtom = atom({
   key: "accessToken",
   default: "",
 });
+
+export const regionAtom = atom({
+  key: "region",
+  default: "",
+});

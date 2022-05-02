@@ -49,7 +49,6 @@ const Home = () => {
     "prophet",
     getProphetTrend
   );
-  console.log(nestedInfra);
   return (
     <>
       <Header />

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "../api";
 import { useSetRecoilState } from "recoil";
-import { userIdAtom, isLoggedInAtom } from "../atoms";
+import { userIdAtom, isLoggedInAtom, regionAtom } from "../atoms";
 import styled from "styled-components";
 
 interface IForm {
@@ -64,6 +64,7 @@ const regions = [
 const Login = () => {
   const setUserId = useSetRecoilState(userIdAtom);
   const setIsLoggedIn = useSetRecoilState(isLoggedInAtom);
+  const setRegionAtom = useSetRecoilState(regionAtom);
   const [isLoading, setIsLoading] = useState(false);
   const [publicKey, setPublicKey] = useState("");
   const [secret, setSecret] = useState("");
@@ -89,6 +90,7 @@ const Login = () => {
         localStorage.setItem("access_token", loginResponse.access_token);
         setIsLoggedIn(true);
         setIsLoading(false);
+        setRegion(region);
       }
     })();
   }, [region]);

@@ -9,13 +9,19 @@ import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
 
 // 인프라 데이터 interface
-interface TreeNode {
+interface IInfra {
   name: string;
   isExpanded?: boolean;
-  children?: TreeNode[];
+  children?: IInfra[];
+}
+interface IInfra_ {
+  resource_id: string;
+  resource_type: string;
+  isExpanded?: boolean;
+  children?: IInfra[];
 }
 
-const data: TreeNode = {
+const data: IInfra = {
   name: "VPC",
   children: [
     {

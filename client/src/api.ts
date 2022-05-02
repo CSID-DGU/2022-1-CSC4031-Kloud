@@ -42,7 +42,13 @@ export async function getNestedInfra() {
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   };
-  const data: AxiosResponse = await axios(config);
+  const response: AxiosResponse = await axios(config);
+  const data = {
+    orphan: {
+      ...response.data.orphan,
+    },
+  };
+  console.log(data);
   return data;
 }
 export function getCostHistory() {
