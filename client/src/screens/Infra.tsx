@@ -16,7 +16,7 @@ interface TreeNode {
 }
 
 const data: TreeNode = {
-  name: "T",
+  name: "VPC",
   children: [
     {
       name: "A",
@@ -82,44 +82,21 @@ export default function Infra({
   const innerHeight = totalHeight - margin.top - margin.bottom;
 
   let origin: { x: number; y: number };
-  let sizeWidth: number;
-  let sizeHeight: number;
 
-  if (layout === "polar") {
-    origin = {
-      x: innerWidth / 2,
-      y: innerHeight / 2,
-    };
-    sizeWidth = 2 * Math.PI;
-    sizeHeight = Math.min(innerWidth, innerHeight) / 2;
-  } else {
-    origin = { x: 0, y: 0 };
-    if (orientation === "수직 보기") {
-      sizeWidth = innerWidth;
-      sizeHeight = innerHeight;
-    } else {
-      sizeWidth = innerHeight;
-      sizeHeight = innerWidth;
-    }
-  }
+  origin = { x: 0, y: 0 };
 
   const LinkComponent = getLinkComponent({ layout, linkType, orientation });
 
   return totalWidth < 10 ? null : (
     <Container>
       <LinkControls layout={layout} setLayout={setLayout} />
-      <svg width={totalWidth} height={totalHeight}>
+      <svg width="85%" height="80vh">
         <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
-        <rect
-          width={totalWidth}
-          height={totalHeight}
-          rx={14}
-          fill={"gainsboro"}
-        />
+        <rect width="85%" height="80vh" rx={14} fill={"gainsboro"} />
         <Group top={margin.top} left={margin.left}>
           <Tree
             root={hierarchy(data, (d) => (d.isExpanded ? null : d.children))}
-            size={[sizeWidth, sizeHeight]}
+            size={[innerHeight, innerWidth]}
             separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth}
           >
             {(tree) => (
@@ -137,20 +114,11 @@ export default function Infra({
                 {tree.descendants().map((node, key) => {
                   const width = 40;
                   const height = 20;
-
                   let top: number;
                   let left: number;
-                  if (layout === "polar") {
-                    const [radialX, radialY] = pointRadial(node.x, node.y);
-                    top = radialY;
-                    left = radialX;
-                  } else if (orientation === "수직 보기") {
-                    top = node.y;
-                    left = node.x;
-                  } else {
-                    top = node.x;
-                    left = node.y;
-                  }
+
+                  top = node.x;
+                  left = node.y;
 
                   return (
                     <Group top={top} left={left} key={key}>
