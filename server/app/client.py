@@ -4,23 +4,24 @@ import asyncio
 import functools
 from concurrent.futures import ThreadPoolExecutor
 
-RESOURCE_IDENTIFIERS = {'VpcId': 'vpc',
+RESOURCE_TYPE = {'VpcId': 'vpc',
                         'SubnetId': 'subnet',
                         'NetworkInterfaceId': 'network_interface',
                         'InternetGatewayId': 'igw',
                         'NatGatewayId': 'ngw',
                         'InstanceId': 'ec2',  # todo ec2 이외에도 InstanceId인 경우 있는지 확인할 것
                         'DBInstanceIdentifier': 'rds'
-                        }
+                 }
 
 GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENTITY", "LINKED_ACCOUNT", "OPERATION",
                       "PLATFORM", "PURCHASE_TYPE", "SERVICE", "TENANCY", "RECORD_TYPE", "USAGE_TYPE"]
 
 PARENT = {
-    'vpc': 'root',
     'subnet': 'VpcId',
     'ec2': 'SubnetId',
 }
+
+POSSIBLE_ROOT_NODES = {'vpc'}
 
 
 class KloudClient:
@@ -46,22 +47,6 @@ class KloudClient:
                                     'DBInstanceIdentifier': self._rds_client.describe_db_instances
                                     }
 
-    async def _update_resource_dict(self) -> None:
-        boto3_reqs = []  # run in executor 작업 목록
-
-        for identifier, describing_method in self._describing_methods.items():  # identifier: str, describing_method: function
-            func = functools.partial(self._response_process, identifier=identifier, describing_method=describing_method)
-            future = self.loop.run_in_executor(executor=self.executor, func=func)
-            boto3_reqs.append(future)
-
-        done, pending = await asyncio.wait(boto3_reqs)  # 작업이 모두 완료될 때 까지 대기
-
-        for task in done:
-            result = task.result()
-            if result is not None:  # 인프라가 없거나 하면 None
-                resource_id = result['resource_id']
-                self._resources[resource_id] = result
-
     def _response_process(self, identifier, describing_method) -> dict:  # 응답을 받아서 후처리함.
         response: list = self.cut_useless_metadata(describing_method())
         if identifier == 'InstanceId':  # ec2 인스턴스일 경우
@@ -69,11 +54,35 @@ class KloudClient:
                 response = response[0]['Instances']
             except IndexError:  # ec2 인스턴스가 없을 경우
                 pass
+        to_return = dict()
         for dic in response:  # 응답이 존재하지 않는 경우 for문이 실행되지 않고 넘어감.
             primary_key = dic[identifier]
             dic['resource_id'] = primary_key
-            dic['resource_type'] = RESOURCE_IDENTIFIERS[identifier]
-            return dic
+            dic['resource_type'] = RESOURCE_TYPE[identifier]
+            to_return[primary_key] = dic
+        return to_return
+
+    async def _fetch_infra_info(self) -> list:
+        boto3_reqs = []  # run in executor 작업 목록
+        for identifier, describing_method in self._describing_methods.items():  # identifier: str, describing_method: function
+            func = functools.partial(self._response_process, identifier=identifier,
+                                     describing_method=describing_method)
+            future = self.loop.run_in_executor(executor=self.executor, func=func)
+            boto3_reqs.append(future)
+        return boto3_reqs
+
+    async def _update_resource_dict(self) -> dict:
+        to_return = dict()
+        reqs: list = await self._fetch_infra_info()  # boto3에 인프라 정보 요청
+        done, pending = await asyncio.wait(reqs)  # 작업이 모두 완료될 때 까지 대기
+
+        for task in done:
+            result: dict = task.result()
+            if result is not None:  # 인프라가 없거나 하면 None
+                for key, val in result.items():
+                    to_return[key] = val
+        self._resources = to_return
+        return to_return
 
     @staticmethod
     def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
@@ -84,8 +93,7 @@ class KloudClient:
         return processed
 
     async def get_current_infra_dict(self) -> dict:
-        await self._update_resource_dict()
-        return self._resources
+        return await self._update_resource_dict()
 
     async def get_cost_history(self, time_period: dict, granularity: str) -> dict:
         fun = functools.partial(self._ce_client.get_cost_and_usage,
@@ -105,31 +113,55 @@ class KloudClient:
         return await self.get_cost_history(time_period=time_period, granularity=granularity)
 
     async def get_infra_tree(self) -> dict:
-        await self.get_current_infra_dict()
-        return self.get_tree(self._resources)
+        resources = await self.get_current_infra_dict()
+        return self._get_tree(resources)
+
+    def _get_parent(self, child: dict, resources: dict) -> str:
+        # resource_type = child.get('resource_type')
+        # if resource_type == 'vpc':
+        #     return self._get_vpc_parent(child.get('resource_id'), resources)
+        # try:
+        resource_type = child['resource_type']
+        if resource_type in PARENT.keys():
+            return child.get(PARENT[resource_type])
+        else:
+            pass
+        # except KeyError:
+        #     pass
 
     @staticmethod
-    def get_parent(child: dict):
-        try:
-            resource_type = child['resource_type']
-            return child.get(PARENT[resource_type])
-        except KeyError:
-            pass
+    def _get_vpc_parent(vpc_id: str, resources: dict) -> str:
+        """
+        describe vpcs에는 igw정보가 없기 때문에 resource 전체를 탐색해서 할당된 igw가 있는지 확인해야함.
+        """
+        for key, val in resources.items():
+            if val['resource_type'] == 'igw':
+                for vpcs in val['Attachments']:
+                    if vpcs['VpcId'] == vpc_id:
+                        return key
 
-    def get_tree(self, data: dict):
-        for key, val in data.items():
-            parent = self.get_parent(val)
-            try:
-                data[key]['parent'] = parent
-                if data[parent].get('children') is None:
-                    data[parent]['children'] = {}
-                if val['resource_type'] != 'vpc':
-                    data[parent]['children'][key] = val
-            except KeyError:
-                pass  # 부모가 None인 경우. 부모관계가 없는 resource
+    def _get_tree(self, infra_data: dict) -> dict:
+        """
+        데이터를 모두 가져온 상태에서 부모 자식 관계 정보를 설정함.
+        """
+        for key, val in infra_data.items():
+            parent = self._get_parent(val, infra_data)
+            if parent:
+                infra_data[key]['parent'] = parent  # 부모노드와 자식노드 둘 다 업데이트
+                if infra_data[parent].get('children') is None:
+                    infra_data[parent]['children'] = dict()
+                infra_data[parent]['children'][key] = val
+            else:
+                pass
 
         to_return = dict()
-        for k, v in data.items():
-            if v.get('resource_type') == 'vpc':
+        to_return['orphan'] = dict()
+
+        for k, v in infra_data.items():
+            resource_type = v.get('resource_type')
+            parent = v.get('parent')
+            if resource_type in POSSIBLE_ROOT_NODES and parent is None:
                 to_return[k] = v
+            elif resource_type not in POSSIBLE_ROOT_NODES and parent is None:
+                to_return['orphan'][k] = v
         return to_return

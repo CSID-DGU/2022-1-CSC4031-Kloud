@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+  kloud_redis:
+    image: redis:latest
+
+  kloud_fast_api:
+    build: server
+    ports:
+      - "8000:8000"
+    depends_on:
+      - kloud_redis
+      - kloud_celery
+    command: python /app/server.py
+
+  kloud_celery:
+    build: data_analysis
+    depends_on:
+      - kloud_redis
+    command: celery -A app.da_tasks worker --loglevel=info

@@ -43,8 +43,6 @@ class PatternFinder:
             # Normalize(정규화)
             target_norm = (target - target.min()) / (target.max() - target.min())
             # 코싸인 유사도 저장(정규화 된 데이터와 기준이되는 데이터 사이에서 코싸인유사도 계산)
-            # print(self.base_norm)
-            # print(target_norm)
             cos_similarity = self.cosine_similarity(self.base_norm, target_norm)
             # 코싸인 유사도 <- i(인덱스), 시계열 데이터 함께 저장
             sim_list.append(cos_similarity)
@@ -73,8 +71,6 @@ class PatternFinder:
         plt.axvline(x = len(self.base_norm) - 1, c = 'r', linestyle = '--')
 
         plt.axvspan(len(self.base_norm.values) - 1, len(self.top_norm.values) - 1, facecolor = "yellow", alpha=0.3)
-        # plt.xticks(range(len(base_norm.values)),base_norm.index)
-        # plt.xticks(rotation=45)
         plt.legend()
         plt.show()
     
