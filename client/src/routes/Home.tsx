@@ -49,19 +49,24 @@ const Home = () => {
     "prophet",
     getProphetTrend
   );
+  console.log(nestedInfra);
   return (
     <>
       <Header />
       <Container>
         <MenuBar />
-        {isInfraLoading || isNestedInfraLoading || isCostHistoryLoading ? (
+        {isInfraLoading ||
+        isNestedInfraLoading ||
+        isCostHistoryLoading ||
+        isSimilarityLoading ||
+        isProphetLoading ? (
           <Loader />
         ) : (
           <>
             <ContentBox>
               <Switch>
                 <Route path={`/`} exact>
-                  <Infra />
+                  <Infra width={800} height={600} />
                 </Route>
                 <Route path={`/cost`}>
                   <Cost />
