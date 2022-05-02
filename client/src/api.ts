@@ -22,58 +22,61 @@ export async function login(
 
 export function getInfra() {
   const data = axios({
-    method: "POST",
+    method: "GET",
     url: `${BASE_URL}/infra/info`,
-    data: {
-      access_token: localStorage.getItem("access_token"),
+    data: {},
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   });
   return data;
 }
 export async function getNestedInfra() {
   const config: AxiosRequestConfig = {
-    method: "POST",
+    method: "GET",
     url: `${BASE_URL}/infra/tree`,
-    data: {
-      access_token: localStorage.getItem("access_token"),
+    data: {},
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   };
   const data: AxiosResponse = await axios(config);
-  // const data = axios({
-  //   method: "POST",
-  //   url: `${BASE_URL}/infra/tree`,
-  //   data: {
-  //     access_token: localStorage.getItem("access_token"),
-  //   },
-  // });
   return data;
 }
 export function getCostHistory() {
   const data = axios({
-    method: "POST",
+    method: "GET",
     url: `${BASE_URL}/cost/history/default`,
-    data: {
-      access_token: localStorage.getItem("access_token"),
+    data: {},
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   });
   return data;
 }
 export function getSimilarityTrend() {
   const data = axios({
-    method: "POST",
+    method: "GET",
     url: `${BASE_URL}/cost/trend/similarity`,
-    data: {
-      access_token: localStorage.getItem("access_token"),
+    data: {},
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   });
   return data;
 }
 export function getProphetTrend() {
   const data = axios({
-    method: "POST",
+    method: "GET",
     url: `${BASE_URL}/cost/trend/prophet`,
-    data: {
-      access_token: localStorage.getItem("access_token"),
+    data: {},
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   });
   return data;
