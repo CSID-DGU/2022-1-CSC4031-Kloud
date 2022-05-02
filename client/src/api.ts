@@ -1,4 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { regionAtom } from "./atoms";
+import { useRecoilValue } from "recoil";
 
 const BASE_URL = "http://localhost:8000";
 
@@ -32,7 +34,7 @@ export function getInfra() {
   });
   return data;
 }
-export async function getNestedInfra() {
+export async function getNestedInfra(region: String) {
   const config: AxiosRequestConfig = {
     method: "GET",
     url: `${BASE_URL}/infra/tree`,
@@ -46,6 +48,9 @@ export async function getNestedInfra() {
   const data = {
     orphan: {
       ...response.data.orphan,
+    },
+    region: {
+      ...response.data,
     },
   };
   console.log(data);

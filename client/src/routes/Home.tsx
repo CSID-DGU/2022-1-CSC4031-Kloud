@@ -13,6 +13,8 @@ import Loader from "../components/Loader";
 import { Switch, Route } from "react-router-dom";
 import Cost from "../screens/Cost";
 import Infra from "../screens/Infra";
+import { useRecoilValue } from "recoil";
+import { regionAtom } from "../atoms";
 
 interface IInfra {
   tmp: null;
@@ -30,13 +32,14 @@ const ContentBox = styled.div`
 `;
 
 const Home = () => {
+  const region = useRecoilValue(regionAtom);
   const { isLoading: isInfraLoading, data: allInfra } = useQuery<any>(
     "allInfra",
     getInfra
   );
   const { isLoading: isNestedInfraLoading, data: nestedInfra } = useQuery<any>(
     "nestedInfra",
-    getNestedInfra
+    () => getNestedInfra(region)
   );
   const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
     "costHistory",

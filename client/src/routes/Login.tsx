@@ -90,7 +90,7 @@ const Login = () => {
         localStorage.setItem("access_token", loginResponse.access_token);
         setIsLoggedIn(true);
         setIsLoading(false);
-        setRegion(region);
+        setRegionAtom(region);
       }
     })();
   }, [region]);
