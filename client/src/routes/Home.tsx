@@ -5,7 +5,6 @@ import {
   getProphetTrend,
   getSimilarityTrend,
 } from "../api";
-import { INestedInfra } from "../types";
 import styled from "styled-components";
 import { useQuery } from "react-query";
 import Header from "../components/Header";
@@ -35,26 +34,32 @@ const Home = () => {
     "allInfra",
     getInfra
   );
-  const { isLoading: isNestedInfraLoading, data: nestedInfra } =
-    useQuery<INestedInfra>("nestedInfra", getNestedInfra);
+  const { isLoading: isNestedInfraLoading, data: nestedInfra } = useQuery<any>(
+    "nestedInfra",
+    getNestedInfra
+  );
   const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
     "costHistory",
     getCostHistory
   );
-  // const { isLoading: isSimilarityLoading, data: similarityTrend } =
-  //   useQuery<any>("similarity", getSimilarityTrend);
+  const { isLoading: isSimilarityLoading, data: similarityTrend } =
+    useQuery<any>("similarity", getSimilarityTrend);
 
-  // const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
-  //   "prophet",
-  //   getProphetTrend
-  // );
+  const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
+    "prophet",
+    getProphetTrend
+  );
   console.log(nestedInfra);
   return (
     <>
       <Header />
       <Container>
         <MenuBar />
-        {isInfraLoading || isNestedInfraLoading || isCostHistoryLoading ? (
+        {isInfraLoading ||
+        isNestedInfraLoading ||
+        isCostHistoryLoading ||
+        isSimilarityLoading ||
+        isProphetLoading ? (
           <Loader />
         ) : (
           <>

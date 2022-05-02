@@ -66,10 +66,6 @@ export type LinkTypesProps = {
 const Container = styled.div`
   padding: 30px;
 `;
-const Tmp = styled.span`
-  font-size: 100px;
-  color: gainsboro;
-`;
 
 export default function Infra({
   width: totalWidth,

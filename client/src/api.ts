@@ -1,5 +1,4 @@
-import axios from "axios";
-import { INestedInfra } from "./types";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const BASE_URL = "http://localhost:8000";
 
@@ -31,14 +30,22 @@ export function getInfra() {
   });
   return data;
 }
-export function getNestedInfra() {
-  const data = axios({
+export async function getNestedInfra() {
+  const config: AxiosRequestConfig = {
     method: "POST",
     url: `${BASE_URL}/infra/tree`,
     data: {
       access_token: localStorage.getItem("access_token"),
     },
-  });
+  };
+  const data: AxiosResponse = await axios(config);
+  // const data = axios({
+  //   method: "POST",
+  //   url: `${BASE_URL}/infra/tree`,
+  //   data: {
+  //     access_token: localStorage.getItem("access_token"),
+  //   },
+  // });
   return data;
 }
 export function getCostHistory() {
