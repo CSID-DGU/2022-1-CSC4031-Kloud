@@ -7,6 +7,9 @@ import { pointRadial } from "d3-shape";
 import useForceUpdate from "../visualization/useForceUpdate";
 import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
+import { useQuery } from "react-query";
+import { INestedInfra, INestedInfraResponse } from "../types";
+import { getNestedInfra } from "../api";
 
 // 인프라 데이터 interface
 interface IInfra {
@@ -86,9 +89,17 @@ export default function Infra({
 
   const innerWidth = totalWidth - margin.left - margin.right;
   const innerHeight = totalHeight - margin.top - margin.bottom;
+  const { isLoading: isNestedInfraLoading, data: nestedInfra } =
+    useQuery<INestedInfraResponse>("nestedInfra", getNestedInfra);
+  const orphan = nestedInfra?.orphan;
+  const infra: INestedInfra = nestedInfra?.infra
+    ? nestedInfra.infra
+    : {
+        resource_id: "null",
+        resource_type: "null",
+      };
 
   let origin: { x: number; y: number };
-
   origin = { x: 0, y: 0 };
 
   const LinkComponent = getLinkComponent({ layout, linkType, orientation });
@@ -101,7 +112,7 @@ export default function Infra({
         <rect width="85%" height="80vh" rx={14} fill={"gainsboro"} />
         <Group top={margin.top} left={margin.left}>
           <Tree
-            root={hierarchy(data, (d) => (d.isExpanded ? null : d.children))}
+            root={hierarchy(infra, (d) => (d.isExpanded ? null : d.children))}
             size={[innerHeight, innerWidth]}
             separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth}
           >
@@ -170,7 +181,7 @@ export default function Infra({
                             : "#26deb0"
                         }
                       >
-                        {node.data.name}
+                        {node.data.resource_type}
                       </text>
                     </Group>
                   );

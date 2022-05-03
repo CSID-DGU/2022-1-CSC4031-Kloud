@@ -89,7 +89,6 @@ export async function getNestedInfra() {
     }
     data.infra.children?.push(vpcObj);
   }
-  console.log(data);
   return data;
 }
 export function getCostHistory() {
