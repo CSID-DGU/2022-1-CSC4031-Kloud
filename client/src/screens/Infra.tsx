@@ -9,7 +9,7 @@ import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
 import { useQuery } from "react-query";
 import { INestedInfra, INestedInfraResponse } from "../types";
-import { getNestedInfra } from "../api";
+import { getInfra, getNestedInfra } from "../api";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
@@ -31,7 +31,35 @@ const Sidebar = styled.div`
   background-color: gainsboro;
   border-radius: 14px;
   margin-top: 37px;
-  padding: 20px;
+  padding: 25px 5px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+`;
+const SelectedInfra = styled.span`
+  font-weight: bold;
+  font-size: 20px;
+`;
+const ChartTmp = styled.div`
+  width: 13vw;
+  height: 13vw;
+  border-radius: 10px;
+  margin: 20px 0px;
+  background-color: gray;
+`;
+const SelectedInfraInfo = styled.span`
+  margin-bottom: 25px;
+`;
+const SidebarButton = styled.button<{ buttonType: string }>`
+  width: 13vw;
+  height: 3vw;
+  border-radius: 10px;
+  border: none;
+  margin-bottom: 15px;
+  font-size: 18px;
+  background-color: ${(props) =>
+    props.buttonType === "stop" ? "tomato" : "gray"};
+  color: ${(props) => props.theme.bgColor};
 `;
 
 export default function Infra({
@@ -44,11 +72,16 @@ export default function Infra({
   const [linkType, setLinkType] = useState<string>("step");
   const forceUpdate = useForceUpdate();
   const [sidebarItem, setSidebarItem] = useState<string>();
+  const [sidebarItemType, setSidebarItemType] = useState<string>();
 
   const innerWidth = totalWidth - margin.left - margin.right;
   const innerHeight = totalHeight - margin.top - margin.bottom;
   const { isLoading: isNestedInfraLoading, data: nestedInfra } =
     useQuery<INestedInfraResponse>("nestedInfra", getNestedInfra);
+  const { isLoading: isInfraLoading, data: allInfra } = useQuery<any>(
+    "allInfra",
+    getInfra
+  );
   const orphan = nestedInfra?.orphan;
   const infra: INestedInfra = nestedInfra?.infra
     ? nestedInfra.infra
@@ -141,9 +174,10 @@ export default function Infra({
                           }
                           onMouseOver={(e) => {
                             const {
-                              data: { resource_id },
+                              data: { resource_id, resource_type },
                             } = node;
                             setSidebarItem(resource_id);
+                            setSidebarItemType(resource_type);
                           }}
                         >
                           {node.data.resource_type}
@@ -157,7 +191,19 @@ export default function Infra({
           </Group>
         </svg>
       </div>
-      <Sidebar>{sidebarItem}</Sidebar>
+      <Sidebar>
+        <SelectedInfra>{sidebarItem}</SelectedInfra>
+        <ChartTmp></ChartTmp>
+        <SelectedInfraInfo>
+          Resource Type : <strong>{sidebarItemType}</strong>
+        </SelectedInfraInfo>
+        {sidebarItemType === "ec2" ? (
+          <>
+            <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
+            <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
+          </>
+        ) : null}
+      </Sidebar>
     </Container>
   );
 }
