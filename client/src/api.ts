@@ -1,4 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { INestedInfra } from "./routes/Home";
+
 const BASE_URL = "http://localhost:8000";
 
 export async function login(
@@ -44,11 +46,11 @@ export async function getNestedInfra(region: String) {
   };
   const { data: response }: AxiosResponse = await axios(config);
   const data = {
-    orphan: <Object[]>[],
-    infra: {
+    orphan: <INestedInfra[]>[],
+    infra: <INestedInfra>{
       resource_id: r,
       resource_type: "region",
-      children: <Object[]>[],
+      children: [],
     },
   };
   // orphan 집어넣기
@@ -65,13 +67,13 @@ export async function getNestedInfra(region: String) {
     var vpcObj = {
       resource_id: vpc,
       resource_type: response[`${vpc}`].resource_type,
-      children: <Object[]>[],
+      children: <INestedInfra[]>[],
     };
     for (const subnet in response[`${vpc}`].children) {
       var subnetObj = {
         resource_id: subnet,
         resource_type: response[`${vpc}`].children[`${subnet}`].resource_type,
-        children: <Object[]>[],
+        children: <INestedInfra[]>[],
       };
       for (const instance in response[`${vpc}`].children[`${subnet}`]
         .children) {
@@ -85,7 +87,7 @@ export async function getNestedInfra(region: String) {
       }
       vpcObj.children.push(subnetObj);
     }
-    data.infra.children.push(vpcObj);
+    data.infra.children?.push(vpcObj);
   }
   console.log(data);
   return data;

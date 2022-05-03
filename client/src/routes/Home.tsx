@@ -19,6 +19,15 @@ import { regionAtom } from "../atoms";
 interface IInfra {
   tmp: null;
 }
+export interface INestedInfra {
+  resource_id: string;
+  resource_type: string;
+  children?: INestedInfra[];
+}
+interface INestedInfraResponse {
+  orphan: INestedInfra[];
+  infra: INestedInfra;
+}
 
 const Container = styled.div`
   display: flex;
@@ -37,10 +46,8 @@ const Home = () => {
     "allInfra",
     getInfra
   );
-  const { isLoading: isNestedInfraLoading, data: nestedInfra } = useQuery<any>(
-    "nestedInfra",
-    () => getNestedInfra(region)
-  );
+  const { isLoading: isNestedInfraLoading, data: nestedInfra } =
+    useQuery<INestedInfra>("nestedInfra", getNestedInfra);
   // const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
   //   "costHistory",
   //   getCostHistory
