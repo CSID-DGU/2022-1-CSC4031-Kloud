@@ -11,60 +11,6 @@ import { useQuery } from "react-query";
 import { INestedInfra, INestedInfraResponse } from "../types";
 import { getNestedInfra } from "../api";
 
-// 인프라 데이터 interface
-interface IInfra {
-  name: string;
-  isExpanded?: boolean;
-  children?: IInfra[];
-}
-export interface IInfra_ {
-  resource_id: string;
-  resource_type: string;
-  isExpanded?: boolean;
-  children?: IInfra[];
-}
-
-const data: IInfra = {
-  name: "VPC",
-  children: [
-    {
-      name: "A",
-      children: [
-        { name: "A1" },
-        { name: "A2" },
-        { name: "A3" },
-        {
-          name: "C",
-          children: [
-            {
-              name: "C1",
-            },
-            {
-              name: "D",
-              children: [
-                {
-                  name: "D1",
-                },
-                {
-                  name: "D2",
-                },
-                {
-                  name: "D3",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    { name: "Z" },
-    {
-      name: "B",
-      children: [{ name: "B1" }, { name: "B2" }, { name: "B3" }],
-    },
-  ],
-};
-
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
 export type LinkTypesProps = {
@@ -75,6 +21,16 @@ export type LinkTypesProps = {
 
 const Container = styled.div`
   padding: 20px 30px;
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+`;
+const Sidebar = styled.div`
+  width: 20%;
+  height: 80vh;
+  background-color: gainsboro;
+  border-radius: 14px;
+  margin-top: 37px;
 `;
 
 export default function Infra({
@@ -106,91 +62,94 @@ export default function Infra({
 
   return totalWidth < 10 ? null : (
     <Container>
-      <LinkControls layout={layout} setLayout={setLayout} />
-      <svg width="85%" height="80vh">
-        <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
-        <rect width="85%" height="80vh" rx={14} fill={"gainsboro"} />
-        <Group top={margin.top} left={margin.left}>
-          <Tree
-            root={hierarchy(infra, (d) => (d.isExpanded ? null : d.children))}
-            size={[innerHeight, innerWidth]}
-            separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth}
-          >
-            {(tree) => (
-              <Group top={origin.y} left={origin.x}>
-                {tree.links().map((link, i) => (
-                  <LinkComponent
-                    key={i}
-                    data={link}
-                    stroke={"#040959"}
-                    strokeWidth="1"
-                    fill="none"
-                  />
-                ))}
+      <div>
+        <LinkControls layout={layout} setLayout={setLayout} />
+        <svg width="60vw" height="80vh">
+          <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
+          <rect width="100%" height="80vh" rx={14} fill={"gainsboro"} />
+          <Group top={margin.top} left={margin.left}>
+            <Tree
+              root={hierarchy(infra, (d) => (d.isExpanded ? null : d.children))}
+              size={[innerHeight, innerWidth]}
+              separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth}
+            >
+              {(tree) => (
+                <Group top={origin.y} left={origin.x}>
+                  {tree.links().map((link, i) => (
+                    <LinkComponent
+                      key={i}
+                      data={link}
+                      stroke={"#040959"}
+                      strokeWidth="1"
+                      fill="none"
+                    />
+                  ))}
 
-                {tree.descendants().map((node, key) => {
-                  const width = 40;
-                  const height = 20;
-                  let top: number;
-                  let left: number;
+                  {tree.descendants().map((node, key) => {
+                    const width = 40;
+                    const height = 20;
+                    let top: number;
+                    let left: number;
 
-                  top = node.x;
-                  left = node.y;
+                    top = node.x;
+                    left = node.y;
 
-                  return (
-                    <Group top={top} left={left} key={key}>
-                      {node.depth === 0 && (
-                        <circle
-                          r={22}
-                          fill="url('#links-gradient')"
-                          onClick={() => {
-                            node.data.isExpanded = !node.data.isExpanded;
-                            forceUpdate();
-                          }}
-                        />
-                      )}
-                      {node.depth !== 0 && (
-                        <rect
-                          height={height}
-                          width={width}
-                          y={-height / 2}
-                          x={-width / 2}
-                          fill="#272b4d"
-                          stroke={node.data.children ? "#03c0dc" : "#26deb0"}
-                          strokeWidth={1}
-                          strokeDasharray={node.data.children ? "0" : "2,2"}
-                          strokeOpacity={node.data.children ? 1 : 0.6}
-                          rx={node.data.children ? 0 : 10}
-                          onClick={() => {
-                            node.data.isExpanded = !node.data.isExpanded;
-                            forceUpdate();
-                          }}
-                        />
-                      )}
-                      <text
-                        dy=".33em"
-                        fontSize={9}
-                        fontFamily="Arial"
-                        textAnchor="middle"
-                        style={{ pointerEvents: "none" }}
-                        fill={
-                          node.depth === 0
-                            ? "#71248e"
-                            : node.children
-                            ? "white"
-                            : "#26deb0"
-                        }
-                      >
-                        {node.data.resource_type}
-                      </text>
-                    </Group>
-                  );
-                })}
-              </Group>
-            )}
-          </Tree>
-        </Group>
-      </svg>
+                    return (
+                      <Group top={top} left={left} key={key}>
+                        {node.depth === 0 && (
+                          <circle
+                            r={22}
+                            fill="url('#links-gradient')"
+                            onClick={() => {
+                              node.data.isExpanded = !node.data.isExpanded;
+                              forceUpdate();
+                            }}
+                          />
+                        )}
+                        {node.depth !== 0 && (
+                          <rect
+                            height={height}
+                            width={width}
+                            y={-height / 2}
+                            x={-width / 2}
+                            fill="#272b4d"
+                            stroke={node.data.children ? "#03c0dc" : "#26deb0"}
+                            strokeWidth={1}
+                            strokeDasharray={node.data.children ? "0" : "2,2"}
+                            strokeOpacity={node.data.children ? 1 : 0.6}
+                            rx={node.data.children ? 0 : 10}
+                            onClick={() => {
+                              node.data.isExpanded = !node.data.isExpanded;
+                              forceUpdate();
+                            }}
+                          />
+                        )}
+                        <text
+                          dy=".33em"
+                          fontSize={9}
+                          fontFamily="Arial"
+                          textAnchor="middle"
+                          style={{ pointerEvents: "none" }}
+                          fill={
+                            node.depth === 0
+                              ? "#71248e"
+                              : node.children
+                              ? "white"
+                              : "#26deb0"
+                          }
+                        >
+                          {node.data.resource_type}
+                        </text>
+                      </Group>
+                    );
+                  })}
+                </Group>
+              )}
+            </Tree>
+          </Group>
+        </svg>
+      </div>
+      <Sidebar>asdf</Sidebar>
     </Container>
   );
 }
