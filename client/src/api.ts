@@ -33,7 +33,7 @@ export function getInfra() {
   });
   return data;
 }
-export async function getNestedInfra(region: String) {
+export async function getNestedInfra() {
   const r = localStorage.getItem("region");
   const config: AxiosRequestConfig = {
     method: "GET",

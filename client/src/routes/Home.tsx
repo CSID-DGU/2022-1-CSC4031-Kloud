@@ -25,7 +25,7 @@ export interface INestedInfra {
   children?: INestedInfra[];
 }
 interface INestedInfraResponse {
-  orphan: INestedInfra[];
+  orphan?: INestedInfra[];
   infra: INestedInfra;
 }
 
@@ -47,7 +47,7 @@ const Home = () => {
     getInfra
   );
   const { isLoading: isNestedInfraLoading, data: nestedInfra } =
-    useQuery<INestedInfra>("nestedInfra", getNestedInfra);
+    useQuery<INestedInfraResponse>("nestedInfra", getNestedInfra);
   // const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
   //   "costHistory",
   //   getCostHistory
