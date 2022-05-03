@@ -48,15 +48,15 @@ const ChartTmp = styled.div`
   background-color: gray;
 `;
 const SelectedInfraInfo = styled.span`
-  margin-bottom: 25px;
+  margin-bottom: 210px;
 `;
 const SidebarButton = styled.button<{ buttonType: string }>`
   width: 13vw;
-  height: 3vw;
+  height: 2.5vw;
   border-radius: 10px;
   border: none;
-  margin-bottom: 15px;
-  font-size: 18px;
+  margin-bottom: 13px;
+  font-size: 15px;
   background-color: ${(props) =>
     props.buttonType === "stop" ? "tomato" : "gray"};
   color: ${(props) => props.theme.bgColor};
