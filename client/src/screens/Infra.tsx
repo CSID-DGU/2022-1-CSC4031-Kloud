@@ -31,6 +31,7 @@ const Sidebar = styled.div`
   background-color: gainsboro;
   border-radius: 14px;
   margin-top: 37px;
+  padding: 20px;
 `;
 
 export default function Infra({
@@ -42,6 +43,7 @@ export default function Infra({
   const [orientation, setOrientation] = useState<string>("수평 보기");
   const [linkType, setLinkType] = useState<string>("step");
   const forceUpdate = useForceUpdate();
+  const [sidebarItem, setSidebarItem] = useState<string>();
 
   const innerWidth = totalWidth - margin.left - margin.right;
   const innerHeight = totalHeight - margin.top - margin.bottom;
@@ -129,7 +131,7 @@ export default function Infra({
                           fontSize={9}
                           fontFamily="Arial"
                           textAnchor="middle"
-                          style={{ pointerEvents: "none" }}
+                          style={{ cursor: "default" }}
                           fill={
                             node.depth === 0
                               ? "#71248e"
@@ -137,6 +139,12 @@ export default function Infra({
                               ? "white"
                               : "#26deb0"
                           }
+                          onMouseOver={(e) => {
+                            const {
+                              data: { resource_id },
+                            } = node;
+                            setSidebarItem(resource_id);
+                          }}
                         >
                           {node.data.resource_type}
                         </text>
@@ -149,7 +157,7 @@ export default function Infra({
           </Group>
         </svg>
       </div>
-      <Sidebar>asdf</Sidebar>
+      <Sidebar>{sidebarItem}</Sidebar>
     </Container>
   );
 }
