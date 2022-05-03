@@ -88,6 +88,7 @@ const Login = () => {
       if (response !== null) {
         const loginResponse = response?.data;
         localStorage.setItem("access_token", loginResponse.access_token);
+        localStorage.setItem("region", region);
         setIsLoggedIn(true);
         setIsLoading(false);
         setRegionAtom(region);

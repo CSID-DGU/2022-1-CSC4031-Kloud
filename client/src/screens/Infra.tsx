@@ -14,7 +14,7 @@ interface IInfra {
   isExpanded?: boolean;
   children?: IInfra[];
 }
-interface IInfra_ {
+export interface IInfra_ {
   resource_id: string;
   resource_type: string;
   isExpanded?: boolean;

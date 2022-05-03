@@ -1,7 +1,4 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { regionAtom } from "./atoms";
-import { useRecoilValue } from "recoil";
-
 const BASE_URL = "http://localhost:8000";
 
 export async function login(
@@ -35,6 +32,7 @@ export function getInfra() {
   return data;
 }
 export async function getNestedInfra(region: String) {
+  const r = localStorage.getItem("region");
   const config: AxiosRequestConfig = {
     method: "GET",
     url: `${BASE_URL}/infra/tree`,
@@ -44,16 +42,24 @@ export async function getNestedInfra(region: String) {
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   };
-  const response: AxiosResponse = await axios(config);
+  const { data: response }: AxiosResponse = await axios(config);
   const data = {
-    orphan: {
-      ...response.data.orphan,
-    },
-    region: {
-      ...response.data,
+    orphan: <Object[]>[],
+    infra: {
+      resource_id: r,
+      resource_type: "region",
+      children: {},
     },
   };
-  console.log(data);
+  // orphan 집어넣기
+  for (const o in response.orphan) {
+    var obj = {
+      resource_id: o,
+      resource_type: response.orphan[`${o}`].resource_type,
+    };
+    data.orphan.push(obj);
+  }
+
   return data;
 }
 export function getCostHistory() {

@@ -41,27 +41,23 @@ const Home = () => {
     "nestedInfra",
     () => getNestedInfra(region)
   );
-  const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
-    "costHistory",
-    getCostHistory
-  );
-  const { isLoading: isSimilarityLoading, data: similarityTrend } =
-    useQuery<any>("similarity", getSimilarityTrend);
+  // const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
+  //   "costHistory",
+  //   getCostHistory
+  // );
+  // const { isLoading: isSimilarityLoading, data: similarityTrend } =
+  //   useQuery<any>("similarity", getSimilarityTrend);
 
-  const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
-    "prophet",
-    getProphetTrend
-  );
+  // const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
+  //   "prophet",
+  //   getProphetTrend
+  // );
   return (
     <>
       <Header />
       <Container>
         <MenuBar />
-        {isInfraLoading ||
-        isNestedInfraLoading ||
-        isCostHistoryLoading ||
-        isSimilarityLoading ||
-        isProphetLoading ? (
+        {isInfraLoading || isNestedInfraLoading ? (
           <Loader />
         ) : (
           <>
