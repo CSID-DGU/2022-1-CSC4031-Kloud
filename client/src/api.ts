@@ -48,18 +48,46 @@ export async function getNestedInfra(region: String) {
     infra: {
       resource_id: r,
       resource_type: "region",
-      children: {},
+      children: <Object[]>[],
     },
   };
   // orphan 집어넣기
-  for (const o in response.orphan) {
-    var obj = {
-      resource_id: o,
-      resource_type: response.orphan[`${o}`].resource_type,
+  for (const orphan in response.orphan) {
+    var orphanObj = {
+      resource_id: orphan,
+      resource_type: response.orphan[`${orphan}`].resource_type,
     };
-    data.orphan.push(obj);
+    data.orphan.push(orphanObj);
   }
 
+  for (const vpc in response) {
+    if (vpc === "orphan") continue;
+    var vpcObj = {
+      resource_id: vpc,
+      resource_type: response[`${vpc}`].resource_type,
+      children: <Object[]>[],
+    };
+    for (const subnet in response[`${vpc}`].children) {
+      var subnetObj = {
+        resource_id: subnet,
+        resource_type: response[`${vpc}`].children[`${subnet}`].resource_type,
+        children: <Object[]>[],
+      };
+      for (const instance in response[`${vpc}`].children[`${subnet}`]
+        .children) {
+        var instanceObj = {
+          resource_id: instance,
+          resource_type:
+            response[`${vpc}`].children[`${subnet}`].children[`${instance}`]
+              .resource_type,
+        };
+        subnetObj.children.push(instanceObj);
+      }
+      vpcObj.children.push(subnetObj);
+    }
+    data.infra.children.push(vpcObj);
+  }
+  console.log(data);
   return data;
 }
 export function getCostHistory() {
