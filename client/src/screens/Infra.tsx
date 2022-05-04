@@ -48,7 +48,7 @@ const ChartTmp = styled.div`
   background-color: gray;
 `;
 const SelectedInfraInfo = styled.span`
-  margin-bottom: 210px;
+  margin-bottom: 20px;
 `;
 const SidebarButton = styled.button<{ buttonType: string }>`
   width: 13vw;
@@ -60,6 +60,16 @@ const SidebarButton = styled.button<{ buttonType: string }>`
   background-color: ${(props) =>
     props.buttonType === "stop" ? "tomato" : "gray"};
   color: ${(props) => props.theme.bgColor};
+  :hover {
+    cursor: pointer;
+  }
+`;
+const SidebarButtonBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 140px;
 `;
 
 export default function Infra({
@@ -199,8 +209,34 @@ export default function Infra({
         </SelectedInfraInfo>
         {sidebarItemType === "ec2" ? (
           <>
-            <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
-            <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
+            <SelectedInfraInfo>
+              Instance Size :{" "}
+              <strong>{allInfra.data[`${sidebarItem}`].InstanceType}</strong>
+            </SelectedInfraInfo>
+            <SelectedInfraInfo>
+              {allInfra.data[`${sidebarItem}`].LaunchTime}
+            </SelectedInfraInfo>
+            <SidebarButtonBox>
+              <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
+              <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
+            </SidebarButtonBox>
+          </>
+        ) : null}
+        {sidebarItemType === "subnet" ? (
+          <>
+            <SelectedInfraInfo>
+              Region :{" "}
+              <strong>
+                {allInfra.data[`${sidebarItem}`].AvailabilityZone}
+              </strong>
+            </SelectedInfraInfo>
+            <SelectedInfraInfo>
+              VPC Id : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
+            </SelectedInfraInfo>
+            <SidebarButtonBox>
+              <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
+              <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
+            </SidebarButtonBox>
           </>
         ) : null}
       </Sidebar>
