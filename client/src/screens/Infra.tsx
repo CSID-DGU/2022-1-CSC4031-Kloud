@@ -195,32 +195,82 @@ export default function Infra({
                       </Group>
                     );
                   })}
-                  {orphan?.map((d) => {
-                    <>
-                      <Group top={40} left={40} key={d.resource_id}>
-                        <rect
-                          height={25}
-                          width={45}
-                          y={-40 / 2}
-                          x={-40 / 2}
-                          fill="#272b4d"
-                          stroke="#26deb0"
-                          strokeWidth={1}
-                          strokeOpacity="1"
-                        />
-                        <text
-                          dy="-.33em"
-                          dx=".3em"
-                          fontSize={10}
-                          fontFamily="Arial"
-                          textAnchor="middle"
-                          style={{ cursor: "default" }}
-                          fill="#26deb0"
+                  {orphan?.map((d, key) => {
+                    if (d.resource_type === "network_interface") {
+                      var top = 550;
+                      var left = 30;
+                      return (
+                        <Group
+                          top={top}
+                          left={left + key * 50}
+                          key={d.resource_id}
                         >
-                          d.resource_type
-                        </text>
-                      </Group>
-                    </>;
+                          <rect
+                            height={25}
+                            width={45}
+                            y={-40 / 2}
+                            x={-40 / 2}
+                            fill="#272b4d"
+                            stroke="#26deb0"
+                            strokeWidth={1}
+                            strokeOpacity="1"
+                          />
+                          <text
+                            dy="-.33em"
+                            dx=".3em"
+                            fontSize={10}
+                            fontFamily="Arial"
+                            textAnchor="middle"
+                            style={{ cursor: "default" }}
+                            fill="white"
+                            onMouseOver={(e) => {
+                              const { resource_id, resource_type } = d;
+                              setSidebarItem(resource_id);
+                              setSidebarItemType(resource_type);
+                            }}
+                          >
+                            NI
+                          </text>
+                        </Group>
+                      );
+                    } else {
+                      var top = 550;
+                      var left = 30;
+                      return (
+                        <Group
+                          top={top}
+                          left={left + key * 50}
+                          key={d.resource_id}
+                        >
+                          <rect
+                            height={25}
+                            width={45}
+                            y={-40 / 2}
+                            x={-40 / 2}
+                            fill="#272b4d"
+                            stroke="#26deb0"
+                            strokeWidth={1}
+                            strokeOpacity="1"
+                          />
+                          <text
+                            dy="-.33em"
+                            dx=".3em"
+                            fontSize={10}
+                            fontFamily="Arial"
+                            textAnchor="middle"
+                            style={{ cursor: "default" }}
+                            fill="white"
+                            onMouseOver={(e) => {
+                              const { resource_id, resource_type } = d;
+                              setSidebarItem(resource_id);
+                              setSidebarItemType(resource_type);
+                            }}
+                          >
+                            {d.resource_type}
+                          </text>
+                        </Group>
+                      );
+                    }
                   })}
                 </Group>
               )}
