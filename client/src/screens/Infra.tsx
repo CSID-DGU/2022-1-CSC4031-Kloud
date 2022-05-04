@@ -312,6 +312,20 @@ export default function Infra({
             </SelectedInfraInfo>
           </>
         ) : null}
+        {sidebarItemType === "rds" ? (
+          <>
+            <SelectedInfraInfo>
+              Region :{" "}
+              <strong>
+                {allInfra.data[`${sidebarItem}`].AvailabilityZone}
+              </strong>
+            </SelectedInfraInfo>
+            <SelectedInfraInfo>
+              DB Size :{" "}
+              <strong>{allInfra.data[`${sidebarItem}`].DBInstanceClass}</strong>
+            </SelectedInfraInfo>
+          </>
+        ) : null}
       </Sidebar>
     </Container>
   );
