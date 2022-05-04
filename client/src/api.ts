@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { INestedInfra } from "./routes/Home";
 
 const BASE_URL = "http://localhost:8000";
 
@@ -33,6 +34,7 @@ export function getInfra() {
   return data;
 }
 export async function getNestedInfra() {
+  const r = localStorage.getItem("region");
   const config: AxiosRequestConfig = {
     method: "GET",
     url: `${BASE_URL}/infra/tree`,
@@ -42,7 +44,51 @@ export async function getNestedInfra() {
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   };
-  const data: AxiosResponse = await axios(config);
+  const { data: response }: AxiosResponse = await axios(config);
+  const data = {
+    orphan: <INestedInfra[]>[],
+    infra: <INestedInfra>{
+      resource_id: r,
+      resource_type: "region",
+      children: [],
+    },
+  };
+  // orphan 집어넣기
+  for (const orphan in response.orphan) {
+    var orphanObj = {
+      resource_id: orphan,
+      resource_type: response.orphan[`${orphan}`].resource_type,
+    };
+    data.orphan.push(orphanObj);
+  }
+
+  for (const vpc in response) {
+    if (vpc === "orphan") continue;
+    var vpcObj = {
+      resource_id: vpc,
+      resource_type: response[`${vpc}`].resource_type,
+      children: <INestedInfra[]>[],
+    };
+    for (const subnet in response[`${vpc}`].children) {
+      var subnetObj = {
+        resource_id: subnet,
+        resource_type: response[`${vpc}`].children[`${subnet}`].resource_type,
+        children: <INestedInfra[]>[],
+      };
+      for (const instance in response[`${vpc}`].children[`${subnet}`]
+        .children) {
+        var instanceObj = {
+          resource_id: instance,
+          resource_type:
+            response[`${vpc}`].children[`${subnet}`].children[`${instance}`]
+              .resource_type,
+        };
+        subnetObj.children.push(instanceObj);
+      }
+      vpcObj.children.push(subnetObj);
+    }
+    data.infra.children?.push(vpcObj);
+  }
   return data;
 }
 export function getCostHistory() {

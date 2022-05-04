@@ -13,9 +13,20 @@ import Loader from "../components/Loader";
 import { Switch, Route } from "react-router-dom";
 import Cost from "../screens/Cost";
 import Infra from "../screens/Infra";
+import { useRecoilValue } from "recoil";
+import { regionAtom } from "../atoms";
 
 interface IInfra {
   tmp: null;
+}
+export interface INestedInfra {
+  resource_id: string;
+  resource_type: string;
+  children?: INestedInfra[];
+}
+interface INestedInfraResponse {
+  orphan?: INestedInfra[];
+  infra: INestedInfra;
 }
 
 const Container = styled.div`
@@ -30,36 +41,30 @@ const ContentBox = styled.div`
 `;
 
 const Home = () => {
+  const region = useRecoilValue(regionAtom);
   const { isLoading: isInfraLoading, data: allInfra } = useQuery<any>(
     "allInfra",
     getInfra
   );
-  const { isLoading: isNestedInfraLoading, data: nestedInfra } = useQuery<any>(
-    "nestedInfra",
-    getNestedInfra
-  );
-  const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
-    "costHistory",
-    getCostHistory
-  );
-  const { isLoading: isSimilarityLoading, data: similarityTrend } =
-    useQuery<any>("similarity", getSimilarityTrend);
+  const { isLoading: isNestedInfraLoading, data: nestedInfra } =
+    useQuery<INestedInfraResponse>("nestedInfra", getNestedInfra);
+  // const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
+  //   "costHistory",
+  //   getCostHistory
+  // );
+  // const { isLoading: isSimilarityLoading, data: similarityTrend } =
+  //   useQuery<any>("similarity", getSimilarityTrend);
 
-  const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
-    "prophet",
-    getProphetTrend
-  );
-  console.log(nestedInfra);
+  // const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
+  //   "prophet",
+  //   getProphetTrend
+  // );
   return (
     <>
       <Header />
       <Container>
         <MenuBar />
-        {isInfraLoading ||
-        isNestedInfraLoading ||
-        isCostHistoryLoading ||
-        isSimilarityLoading ||
-        isProphetLoading ? (
+        {isInfraLoading || isNestedInfraLoading ? (
           <Loader />
         ) : (
           <>
