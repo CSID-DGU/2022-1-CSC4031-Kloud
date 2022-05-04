@@ -51,7 +51,12 @@ class KloudClient:
         response: list = self.cut_useless_metadata(describing_method())
         if identifier == 'InstanceId':  # ec2 인스턴스일 경우
             try:
-                response = response[0]['Instances']
+                instances = list()
+                for group_dict in response:
+                    for instance_dict in group_dict['Instances']:
+                        instances.append(instance_dict)
+
+                response = instances
             except IndexError:  # ec2 인스턴스가 없을 경우
                 pass
         to_return = dict()
