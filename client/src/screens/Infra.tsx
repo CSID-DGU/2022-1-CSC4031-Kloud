@@ -69,7 +69,7 @@ const SidebarButtonBox = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 140px;
+  margin-top: 130px;
 `;
 
 export default function Infra({
@@ -171,7 +171,7 @@ export default function Infra({
                         )}
                         <text
                           dy=".33em"
-                          fontSize={9}
+                          fontSize={10}
                           fontFamily="Arial"
                           textAnchor="middle"
                           style={{ cursor: "default" }}
@@ -194,6 +194,33 @@ export default function Infra({
                         </text>
                       </Group>
                     );
+                  })}
+                  {orphan?.map((d) => {
+                    <>
+                      <Group top={40} left={40} key={d.resource_id}>
+                        <rect
+                          height={25}
+                          width={45}
+                          y={-40 / 2}
+                          x={-40 / 2}
+                          fill="#272b4d"
+                          stroke="#26deb0"
+                          strokeWidth={1}
+                          strokeOpacity="1"
+                        />
+                        <text
+                          dy="-.33em"
+                          dx=".3em"
+                          fontSize={10}
+                          fontFamily="Arial"
+                          textAnchor="middle"
+                          style={{ cursor: "default" }}
+                          fill="#26deb0"
+                        >
+                          d.resource_type
+                        </text>
+                      </Group>
+                    </>;
                   })}
                 </Group>
               )}
@@ -233,10 +260,6 @@ export default function Infra({
             <SelectedInfraInfo>
               VPC Id : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
             </SelectedInfraInfo>
-            <SidebarButtonBox>
-              <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
-              <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
-            </SidebarButtonBox>
           </>
         ) : null}
       </Sidebar>
