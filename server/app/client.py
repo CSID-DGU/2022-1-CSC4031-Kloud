@@ -130,7 +130,9 @@ class KloudClient:
                     'MatchOptions': ['EQUALS']
                 }
             },
-            Metrics=['UnblendedCost'],
+            Metrics=['UnblendedCost',
+            # 'UsageQuantity'
+            ],
             GroupBy=[{'Type': 'DIMENSION',
                       'Key': 'RESOURCE_ID'},
                      # {'Type': 'DIMENSION',
