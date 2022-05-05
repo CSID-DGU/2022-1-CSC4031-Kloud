@@ -138,7 +138,7 @@ class KloudClient:
                      # 네트워크 사용료, 저장장치 사용료 분리해서 표시 가능. 추후 인프라당 한 달 예상비용 보여줄 경우엔 저장장치와 네트워크 사용 예상량 합하면 될듯함.
                      ]
         )
-        return res
+        return res['ResultsByTime']
 
     async def get_cost_history_by_instances(self):
         fun = self.get_ec2_instances_cost_history
