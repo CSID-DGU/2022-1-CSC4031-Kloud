@@ -1,12 +1,13 @@
 import ApexChart from "react-apexcharts";
 
 interface IChartProps {
+  size: number;
   resourceId: string;
   costHistory: ICostHistory;
 }
 interface ICostHistory {}
 
-function Chart({ resourceId, costHistory }: IChartProps) {
+function Chart({ size, resourceId, costHistory }: IChartProps) {
   const data = [
     { price: 1, date: "5/1" },
     { price: 2, date: "5/2" },
@@ -29,8 +30,8 @@ function Chart({ resourceId, costHistory }: IChartProps) {
             mode: "dark",
           },
           chart: {
-            height: 500,
-            width: 500,
+            height: `${size}vw`,
+            width: `${size}vw`,
             toolbar: {
               show: false,
             },

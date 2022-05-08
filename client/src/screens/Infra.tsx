@@ -10,6 +10,7 @@ import { useQuery } from "react-query";
 import { INestedInfra, INestedInfraResponse } from "../types";
 import { getInfra, getNestedInfra } from "../api";
 import Modal from "../components/Modal";
+import Chart from "../components/Chart";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
@@ -292,7 +293,9 @@ export default function Infra({
         ) : (
           <SelectedInfra>{sidebarItem}</SelectedInfra>
         )}
-        <ChartBox onClick={() => setOpenModal((prev) => !prev)}></ChartBox>
+        <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
+          <Chart size={13} resourceId="123" costHistory={{}} />
+        </ChartBox>
         {sidebarItemType === "network_interface" ? (
           <SelectedInfraInfo>
             Type : <strong>{sidebarItemType}</strong>
