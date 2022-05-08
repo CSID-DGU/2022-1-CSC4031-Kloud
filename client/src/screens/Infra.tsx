@@ -3,13 +3,13 @@ import { useState } from "react";
 import { Group } from "@visx/group";
 import { hierarchy, Tree } from "@visx/hierarchy";
 import { LinearGradient } from "@visx/gradient";
-import { pointRadial } from "d3-shape";
 import useForceUpdate from "../visualization/useForceUpdate";
 import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
 import { useQuery } from "react-query";
 import { INestedInfra, INestedInfraResponse } from "../types";
 import { getInfra, getNestedInfra } from "../api";
+import Modal from "../components/Modal";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
@@ -83,6 +83,7 @@ export default function Infra({
   const forceUpdate = useForceUpdate();
   const [sidebarItem, setSidebarItem] = useState<string>();
   const [sidebarItemType, setSidebarItemType] = useState<string>();
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   const innerWidth = totalWidth - margin.left - margin.right;
   const innerHeight = totalHeight - margin.top - margin.bottom;
@@ -361,6 +362,7 @@ export default function Infra({
           </>
         ) : null}
       </Sidebar>
+      {openModal ? <Modal></Modal> : null}
     </Container>
   );
 }
