@@ -281,9 +281,15 @@ export default function Infra({
       <Sidebar>
         <SelectedInfra>{sidebarItem}</SelectedInfra>
         <ChartTmp></ChartTmp>
-        <SelectedInfraInfo>
-          Resource Type : <strong>{sidebarItemType}</strong>
-        </SelectedInfraInfo>
+        {sidebarItemType === "network_interface" ? (
+          <SelectedInfraInfo>
+            Type : <strong>{sidebarItemType}</strong>
+          </SelectedInfraInfo>
+        ) : (
+          <SelectedInfraInfo>
+            Resource Type : <strong>{sidebarItemType}</strong>
+          </SelectedInfraInfo>
+        )}
         {sidebarItemType === "ec2" ? (
           <>
             <SelectedInfraInfo>
@@ -323,6 +329,23 @@ export default function Infra({
             <SelectedInfraInfo>
               DB Size :{" "}
               <strong>{allInfra.data[`${sidebarItem}`].DBInstanceClass}</strong>
+            </SelectedInfraInfo>
+          </>
+        ) : null}
+        {sidebarItemType === "network_interface" ? (
+          <>
+            <SelectedInfraInfo>
+              Group : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
+            </SelectedInfraInfo>
+          </>
+        ) : null}
+        {sidebarItemType === "igw" ? (
+          <>
+            <SelectedInfraInfo>
+              Group :{" "}
+              <strong>
+                {allInfra.data[`${sidebarItem}`].Attachments[0].VpcId}
+              </strong>
             </SelectedInfraInfo>
           </>
         ) : null}
