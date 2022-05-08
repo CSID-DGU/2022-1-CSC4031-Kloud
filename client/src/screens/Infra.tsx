@@ -366,7 +366,9 @@ export default function Infra({
           </>
         ) : null}
       </Sidebar>
-      {openModal ? <Modal></Modal> : null}
+      {openModal ? (
+        <Modal handleModal={() => setOpenModal(false)}></Modal>
+      ) : null}
     </Container>
   );
 }

@@ -70,13 +70,16 @@ const Contents = styled.div`
   flex-direction: column;
   align-items: center;
 `;
+interface IHandleModal {
+  handleModal: () => void;
+}
 
-const ModalFrame = () => {
+const ModalFrame = ({ handleModal }: IHandleModal) => {
   return (
     <Container>
-      <Background />
+      <Background onClick={handleModal} />
       <ModalBlock>
-        <Close>X</Close>
+        <Close onClick={handleModal}>X</Close>
         <Contents></Contents>
       </ModalBlock>
     </Container>
