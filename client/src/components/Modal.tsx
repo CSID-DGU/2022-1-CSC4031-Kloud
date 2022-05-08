@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Chart from "./Chart";
 
 const Container = styled.div`
   position: absolute;
@@ -36,7 +37,7 @@ const ModalBlock = styled.div`
   top: 6.5rem;
   border-radius: 10px;
   padding: 1.5rem;
-  background-color: black;
+  background-color: gray;
   width: 60rem;
   @media (max-width: 1120px) {
     width: 50rem;
@@ -80,7 +81,9 @@ const ModalFrame = ({ handleModal }: IHandleModal) => {
       <Background onClick={handleModal} />
       <ModalBlock>
         <Close onClick={handleModal}>X</Close>
-        <Contents></Contents>
+        <Contents>
+          <Chart size={"150%"} resourceId="123" costHistory={{}} />
+        </Contents>
       </ModalBlock>
     </Container>
   );

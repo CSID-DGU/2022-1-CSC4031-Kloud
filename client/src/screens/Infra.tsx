@@ -294,7 +294,7 @@ export default function Infra({
           <SelectedInfra>{sidebarItem}</SelectedInfra>
         )}
         <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
-          <Chart size={13} resourceId="123" costHistory={{}} />
+          <Chart resourceId="123" costHistory={{}} />
         </ChartBox>
         {sidebarItemType === "network_interface" ? (
           <SelectedInfraInfo>

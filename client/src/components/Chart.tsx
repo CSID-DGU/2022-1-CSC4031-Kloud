@@ -1,7 +1,7 @@
 import ApexChart from "react-apexcharts";
 
 interface IChartProps {
-  size: number;
+  size?: string;
   resourceId: string;
   costHistory: ICostHistory;
 }
@@ -14,6 +14,11 @@ function Chart({ size, resourceId, costHistory }: IChartProps) {
     { price: 3, date: "5/3" },
     { price: 4, date: "5/4" },
     { price: 5, date: "5/5" },
+    { price: 5, date: "5/6" },
+    { price: 8, date: "5/7" },
+    { price: 13, date: "5/8" },
+    { price: 50, date: "5/9" },
+    { price: 4, date: "5/10" },
   ];
   return (
     <>
@@ -30,11 +35,10 @@ function Chart({ size, resourceId, costHistory }: IChartProps) {
             mode: "dark",
           },
           chart: {
-            height: `${size}vw`,
-            width: `${size}vw`,
             toolbar: {
               show: false,
             },
+            background: "gray",
           },
           stroke: {
             curve: "smooth",
@@ -57,6 +61,7 @@ function Chart({ size, resourceId, costHistory }: IChartProps) {
             },
           },
         }}
+        width={size ? size : "100%"}
       />
     </>
   );
