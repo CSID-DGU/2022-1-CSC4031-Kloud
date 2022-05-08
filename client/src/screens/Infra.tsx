@@ -281,6 +281,8 @@ export default function Infra({
       <Sidebar>
         {sidebarItemType === "subnet" ? (
           <SelectedInfra>Subnet</SelectedInfra>
+        ) : sidebarItemType === "vpc" ? (
+          <SelectedInfra>VPC</SelectedInfra>
         ) : (
           <SelectedInfra>{sidebarItem}</SelectedInfra>
         )}
@@ -317,10 +319,13 @@ export default function Infra({
               </strong>
             </SelectedInfraInfo>
             <SelectedInfraInfo>
-              Subnet Id : <strong>{sidebarItem}</strong>
+              Subnet : <strong>{sidebarItem?.split("-")[1]}</strong>
             </SelectedInfraInfo>
             <SelectedInfraInfo>
-              VPC Id : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
+              VPC :{" "}
+              <strong>
+                {allInfra.data[`${sidebarItem}`].VpcId.split("-")[1]}
+              </strong>
             </SelectedInfraInfo>
           </>
         ) : sidebarItemType == "rds" ? (
@@ -345,10 +350,13 @@ export default function Infra({
         ) : sidebarItemType === "igw" ? (
           <>
             <SelectedInfraInfo>
-              Group :{" "}
-              <strong>
-                {allInfra.data[`${sidebarItem}`].Attachments[0].VpcId}
-              </strong>
+              Group : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
+            </SelectedInfraInfo>
+          </>
+        ) : sidebarItemType === "vpc" ? (
+          <>
+            <SelectedInfraInfo>
+              VPC Id : <strong>{sidebarItem?.split("-")[1]}</strong>
             </SelectedInfraInfo>
           </>
         ) : null}
