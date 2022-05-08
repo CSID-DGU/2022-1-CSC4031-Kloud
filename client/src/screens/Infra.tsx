@@ -62,8 +62,9 @@ const SidebarButton = styled.button<{ buttonType: string }>`
   margin-bottom: 13px;
   font-size: 15px;
   background-color: ${(props) =>
-    props.buttonType === "stop" ? "tomato" : "gray"};
-  color: ${(props) => props.theme.bgColor};
+    props.buttonType === "stop" ? "tomato" : props.theme.bgColor};
+  color: ${(props) =>
+    props.buttonType === "stop" ? props.theme.textColor : "white"};
   :hover {
     cursor: pointer;
   }
@@ -311,8 +312,8 @@ export default function Infra({
               {allInfra.data[`${sidebarItem}`].LaunchTime}
             </SelectedInfraInfo>
             <SidebarButtonBox>
-              <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
               <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
+              <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
             </SidebarButtonBox>
           </>
         ) : sidebarItemType == "subnet" ? (
