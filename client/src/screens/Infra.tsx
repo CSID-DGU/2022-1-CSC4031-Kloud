@@ -40,12 +40,16 @@ const SelectedInfra = styled.span`
   font-weight: bold;
   font-size: 20px;
 `;
-const ChartTmp = styled.div`
+const ChartBox = styled.button`
   width: 13vw;
   height: 13vw;
   border-radius: 10px;
   margin: 20px 0px;
   background-color: gray;
+  border: none;
+  :hover {
+    cursor: pointer;
+  }
 `;
 const SelectedInfraInfo = styled.span`
   margin-bottom: 20px;
@@ -287,7 +291,7 @@ export default function Infra({
         ) : (
           <SelectedInfra>{sidebarItem}</SelectedInfra>
         )}
-        <ChartTmp></ChartTmp>
+        <ChartBox onClick={() => setOpenModal((prev) => !prev)}></ChartBox>
         {sidebarItemType === "network_interface" ? (
           <SelectedInfraInfo>
             Type : <strong>{sidebarItemType}</strong>
