@@ -142,6 +142,13 @@ async def cost_history_default(user_id=Depends(get_user_id)):
     return cost_history
 
 
+@app.get("/cost/history/by-resource")
+async def cost_history_by_resource(user_id=Depends(get_user_id)):
+    # 현재 월별 출력중이나, 일별 출력, 시간별 출력도 가능함.
+    user_client = await get_user_client(user_id)
+    return await user_client.get_cost_history_by_instances()
+
+
 @app.get("/infra/tree")
 async def infra_tree(user_client=Depends(get_user_client)):
     return await user_client.get_infra_tree()

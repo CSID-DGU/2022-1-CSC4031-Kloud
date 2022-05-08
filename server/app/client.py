@@ -5,12 +5,12 @@ import functools
 from concurrent.futures import ThreadPoolExecutor
 
 RESOURCE_TYPE = {'VpcId': 'vpc',
-                        'SubnetId': 'subnet',
-                        'NetworkInterfaceId': 'network_interface',
-                        'InternetGatewayId': 'igw',
-                        'NatGatewayId': 'ngw',
-                        'InstanceId': 'ec2',  # todo ec2 이외에도 InstanceId인 경우 있는지 확인할 것
-                        'DBInstanceIdentifier': 'rds'
+                 'SubnetId': 'subnet',
+                 'NetworkInterfaceId': 'network_interface',
+                 'InternetGatewayId': 'igw',
+                 'NatGatewayId': 'ngw',
+                 'InstanceId': 'ec2',  # todo ec2 이외에도 InstanceId인 경우 있는지 확인할 것
+                 'DBInstanceIdentifier': 'rds'
                  }
 
 GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENTITY", "LINKED_ACCOUNT", "OPERATION",
@@ -22,6 +22,14 @@ PARENT = {
 }
 
 POSSIBLE_ROOT_NODES = {'vpc'}
+
+
+def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
+    processed = dict()
+    for k, v in data.items():  # dict의 첫번째 값이 응답이고, 두번째가 메타데이터임.
+        processed = v
+        break
+    return processed
 
 
 class KloudClient:
@@ -47,8 +55,9 @@ class KloudClient:
                                     'DBInstanceIdentifier': self._rds_client.describe_db_instances
                                     }
 
-    def _response_process(self, identifier, describing_method) -> dict:  # 응답을 받아서 후처리함.
-        response: list = self.cut_useless_metadata(describing_method())
+    @staticmethod
+    def _response_process(identifier, describing_method) -> dict:  # 응답을 받아서 후처리함.
+        response: list = cut_useless_metadata(describing_method())
         if identifier == 'InstanceId':  # ec2 인스턴스일 경우
             try:
                 instances = list()
@@ -89,14 +98,6 @@ class KloudClient:
         self._resources = to_return
         return to_return
 
-    @staticmethod
-    def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
-        processed = dict()
-        for k, v in data.items():  # dict의 첫번째 값이 응답이고, 두번째가 메타데이터임.
-            processed = v
-            break
-        return processed
-
     async def get_current_infra_dict(self) -> dict:
         return await self._update_resource_dict()
 
@@ -110,6 +111,40 @@ class KloudClient:
 
         res = await self.loop.run_in_executor(executor=self.executor, func=fun)
         return res
+
+    def get_ec2_instances_cost_history(self):
+        time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
+                       'End': str(datetime.date(datetime.now()))}
+
+        ec2_dict = self._response_process(identifier='InstanceId',
+                                          describing_method=self._ec2_client.describe_instances)
+        infra_keys = list(ec2_dict.keys())  # ec2 이외 다른 리소스도 조회가 가능할 경우, 키만 가져와서 합치면 됨.
+
+        res = self._ce_client.get_cost_and_usage_with_resources(
+            TimePeriod=time_period,
+            Granularity='MONTHLY',
+            Filter={
+                'Dimensions': {
+                    'Key': 'RESOURCE_ID',
+                    'Values': infra_keys,
+                    'MatchOptions': ['EQUALS']
+                }
+            },
+            Metrics=['UnblendedCost',
+            # 'UsageQuantity'
+            ],
+            GroupBy=[{'Type': 'DIMENSION',
+                      'Key': 'RESOURCE_ID'},
+                     # {'Type': 'DIMENSION',
+                     #  'Key': 'USAGE_TYPE'}
+                     # 네트워크 사용료, 저장장치 사용료 분리해서 표시 가능. 추후 인프라당 한 달 예상비용 보여줄 경우엔 저장장치와 네트워크 사용 예상량 합하면 될듯함.
+                     ]
+        )
+        return res['ResultsByTime']
+
+    async def get_cost_history_by_instances(self):
+        fun = self.get_ec2_instances_cost_history
+        return await self.loop.run_in_executor(executor=self.executor, func=fun)
 
     async def get_default_cost_history(self) -> dict:
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=90))),
@@ -170,3 +205,5 @@ class KloudClient:
             elif resource_type not in POSSIBLE_ROOT_NODES and parent is None:
                 to_return['orphan'][k] = v
         return to_return
+
+
