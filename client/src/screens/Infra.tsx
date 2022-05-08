@@ -69,7 +69,7 @@ const SidebarButtonBox = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 130px;
+  margin-top: 100px;
 `;
 
 export default function Infra({
@@ -279,7 +279,11 @@ export default function Infra({
         </svg>
       </div>
       <Sidebar>
-        <SelectedInfra>{sidebarItem}</SelectedInfra>
+        {sidebarItemType === "subnet" ? (
+          <SelectedInfra>Subnet</SelectedInfra>
+        ) : (
+          <SelectedInfra>{sidebarItem}</SelectedInfra>
+        )}
         <ChartTmp></ChartTmp>
         {sidebarItemType === "network_interface" ? (
           <SelectedInfraInfo>
@@ -304,8 +308,7 @@ export default function Infra({
               <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
             </SidebarButtonBox>
           </>
-        ) : null}
-        {sidebarItemType === "subnet" ? (
+        ) : sidebarItemType == "subnet" ? (
           <>
             <SelectedInfraInfo>
               Region :{" "}
@@ -314,11 +317,13 @@ export default function Infra({
               </strong>
             </SelectedInfraInfo>
             <SelectedInfraInfo>
+              Subnet Id : <strong>{sidebarItem}</strong>
+            </SelectedInfraInfo>
+            <SelectedInfraInfo>
               VPC Id : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
             </SelectedInfraInfo>
           </>
-        ) : null}
-        {sidebarItemType === "rds" ? (
+        ) : sidebarItemType == "rds" ? (
           <>
             <SelectedInfraInfo>
               Region :{" "}
@@ -331,15 +336,13 @@ export default function Infra({
               <strong>{allInfra.data[`${sidebarItem}`].DBInstanceClass}</strong>
             </SelectedInfraInfo>
           </>
-        ) : null}
-        {sidebarItemType === "network_interface" ? (
+        ) : sidebarItemType == "network_interface" ? (
           <>
             <SelectedInfraInfo>
               Group : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
             </SelectedInfraInfo>
           </>
-        ) : null}
-        {sidebarItemType === "igw" ? (
+        ) : sidebarItemType === "igw" ? (
           <>
             <SelectedInfraInfo>
               Group :{" "}
