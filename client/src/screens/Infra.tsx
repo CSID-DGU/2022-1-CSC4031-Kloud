@@ -3,13 +3,14 @@ import { useState } from "react";
 import { Group } from "@visx/group";
 import { hierarchy, Tree } from "@visx/hierarchy";
 import { LinearGradient } from "@visx/gradient";
-import { pointRadial } from "d3-shape";
 import useForceUpdate from "../visualization/useForceUpdate";
 import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
 import { useQuery } from "react-query";
 import { INestedInfra, INestedInfraResponse } from "../types";
 import { getInfra, getNestedInfra } from "../api";
+import Modal from "../components/Modal";
+import Chart from "../components/Chart";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
@@ -40,15 +41,19 @@ const SelectedInfra = styled.span`
   font-weight: bold;
   font-size: 20px;
 `;
-const ChartTmp = styled.div`
+const ChartBox = styled.button`
   width: 13vw;
   height: 13vw;
   border-radius: 10px;
   margin: 20px 0px;
   background-color: gray;
+  border: none;
+  :hover {
+    cursor: pointer;
+  }
 `;
 const SelectedInfraInfo = styled.span`
-  margin-bottom: 210px;
+  margin-bottom: 20px;
 `;
 const SidebarButton = styled.button<{ buttonType: string }>`
   width: 13vw;
@@ -58,8 +63,19 @@ const SidebarButton = styled.button<{ buttonType: string }>`
   margin-bottom: 13px;
   font-size: 15px;
   background-color: ${(props) =>
-    props.buttonType === "stop" ? "tomato" : "gray"};
-  color: ${(props) => props.theme.bgColor};
+    props.buttonType === "stop" ? "tomato" : props.theme.bgColor};
+  color: ${(props) =>
+    props.buttonType === "stop" ? props.theme.textColor : "white"};
+  :hover {
+    cursor: pointer;
+  }
+`;
+const SidebarButtonBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 100px;
 `;
 
 export default function Infra({
@@ -73,6 +89,7 @@ export default function Infra({
   const forceUpdate = useForceUpdate();
   const [sidebarItem, setSidebarItem] = useState<string>();
   const [sidebarItemType, setSidebarItemType] = useState<string>();
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   const innerWidth = totalWidth - margin.left - margin.right;
   const innerHeight = totalHeight - margin.top - margin.bottom;
@@ -161,7 +178,7 @@ export default function Infra({
                         )}
                         <text
                           dy=".33em"
-                          fontSize={9}
+                          fontSize={10}
                           fontFamily="Arial"
                           textAnchor="middle"
                           style={{ cursor: "default" }}
@@ -185,6 +202,83 @@ export default function Infra({
                       </Group>
                     );
                   })}
+                  {orphan?.map((d, key) => {
+                    if (d.resource_type === "network_interface") {
+                      var top = 550;
+                      var left = 30;
+                      return (
+                        <Group
+                          top={top}
+                          left={left + key * 50}
+                          key={d.resource_id}
+                        >
+                          <rect
+                            height={25}
+                            width={45}
+                            y={-40 / 2}
+                            x={-40 / 2}
+                            fill="#272b4d"
+                            stroke="#26deb0"
+                            strokeWidth={1}
+                            strokeOpacity="1"
+                          />
+                          <text
+                            dy="-.33em"
+                            dx=".3em"
+                            fontSize={10}
+                            fontFamily="Arial"
+                            textAnchor="middle"
+                            style={{ cursor: "default" }}
+                            fill="white"
+                            onMouseOver={(e) => {
+                              const { resource_id, resource_type } = d;
+                              setSidebarItem(resource_id);
+                              setSidebarItemType(resource_type);
+                            }}
+                          >
+                            NI
+                          </text>
+                        </Group>
+                      );
+                    } else {
+                      var top = 550;
+                      var left = 30;
+                      return (
+                        <Group
+                          top={top}
+                          left={left + key * 50}
+                          key={d.resource_id}
+                        >
+                          <rect
+                            height={25}
+                            width={45}
+                            y={-40 / 2}
+                            x={-40 / 2}
+                            fill="#272b4d"
+                            stroke="#26deb0"
+                            strokeWidth={1}
+                            strokeOpacity="1"
+                          />
+                          <text
+                            dy="-.33em"
+                            dx=".3em"
+                            fontSize={10}
+                            fontFamily="Arial"
+                            textAnchor="middle"
+                            style={{ cursor: "default" }}
+                            fill="white"
+                            onMouseOver={(e) => {
+                              const { resource_id, resource_type } = d;
+                              setSidebarItem(resource_id);
+                              setSidebarItemType(resource_type);
+                            }}
+                          >
+                            {d.resource_type}
+                          </text>
+                        </Group>
+                      );
+                    }
+                  })}
                 </Group>
               )}
             </Tree>
@@ -192,18 +286,93 @@ export default function Infra({
         </svg>
       </div>
       <Sidebar>
-        <SelectedInfra>{sidebarItem}</SelectedInfra>
-        <ChartTmp></ChartTmp>
-        <SelectedInfraInfo>
-          Resource Type : <strong>{sidebarItemType}</strong>
-        </SelectedInfraInfo>
+        {sidebarItemType === "subnet" ? (
+          <SelectedInfra>Subnet</SelectedInfra>
+        ) : sidebarItemType === "vpc" ? (
+          <SelectedInfra>VPC</SelectedInfra>
+        ) : (
+          <SelectedInfra>{sidebarItem}</SelectedInfra>
+        )}
+        <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
+          <Chart resourceId="123" costHistory={{}} />
+        </ChartBox>
+        {sidebarItemType === "network_interface" ? (
+          <SelectedInfraInfo>
+            Type : <strong>{sidebarItemType}</strong>
+          </SelectedInfraInfo>
+        ) : (
+          <SelectedInfraInfo>
+            Resource Type : <strong>{sidebarItemType}</strong>
+          </SelectedInfraInfo>
+        )}
         {sidebarItemType === "ec2" ? (
           <>
-            <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
-            <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
+            <SelectedInfraInfo>
+              Instance Size :{" "}
+              <strong>{allInfra.data[`${sidebarItem}`].InstanceType}</strong>
+            </SelectedInfraInfo>
+            <SelectedInfraInfo>
+              {allInfra.data[`${sidebarItem}`].LaunchTime}
+            </SelectedInfraInfo>
+            <SidebarButtonBox>
+              <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
+              <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
+            </SidebarButtonBox>
+          </>
+        ) : sidebarItemType == "subnet" ? (
+          <>
+            <SelectedInfraInfo>
+              Region :{" "}
+              <strong>
+                {allInfra.data[`${sidebarItem}`].AvailabilityZone}
+              </strong>
+            </SelectedInfraInfo>
+            <SelectedInfraInfo>
+              Subnet : <strong>{sidebarItem?.split("-")[1]}</strong>
+            </SelectedInfraInfo>
+            <SelectedInfraInfo>
+              VPC :{" "}
+              <strong>
+                {allInfra.data[`${sidebarItem}`].VpcId.split("-")[1]}
+              </strong>
+            </SelectedInfraInfo>
+          </>
+        ) : sidebarItemType == "rds" ? (
+          <>
+            <SelectedInfraInfo>
+              Region :{" "}
+              <strong>
+                {allInfra.data[`${sidebarItem}`].AvailabilityZone}
+              </strong>
+            </SelectedInfraInfo>
+            <SelectedInfraInfo>
+              DB Size :{" "}
+              <strong>{allInfra.data[`${sidebarItem}`].DBInstanceClass}</strong>
+            </SelectedInfraInfo>
+          </>
+        ) : sidebarItemType == "network_interface" ? (
+          <>
+            <SelectedInfraInfo>
+              Group : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
+            </SelectedInfraInfo>
+          </>
+        ) : sidebarItemType === "igw" ? (
+          <>
+            <SelectedInfraInfo>
+              Group : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
+            </SelectedInfraInfo>
+          </>
+        ) : sidebarItemType === "vpc" ? (
+          <>
+            <SelectedInfraInfo>
+              VPC Id : <strong>{sidebarItem?.split("-")[1]}</strong>
+            </SelectedInfraInfo>
           </>
         ) : null}
       </Sidebar>
+      {openModal ? (
+        <Modal handleModal={() => setOpenModal(false)}></Modal>
+      ) : null}
     </Container>
   );
 }
