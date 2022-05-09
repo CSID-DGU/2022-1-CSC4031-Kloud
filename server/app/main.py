@@ -1,3 +1,5 @@
+import datetime
+
 import botocore.exceptions
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +12,9 @@ import boto3
 import asyncio
 import concurrent.futures
 from .config.cellery_app import da_app
-from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, delete_cache_from_redis
+from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
+    delete_cache_from_redis
+from pydantic.types import Optional
 
 app = FastAPI()
 aws_info = boto3.Session()
@@ -127,26 +131,52 @@ async def infra_info(user_client=Depends(get_user_client)):
     return await user_client.get_current_infra_dict()
 
 
-@app.get("/cost/history/default")
-async def cost_history_default(user_id=Depends(get_user_id)):
+@app.get("/cost/history/param")
+async def cost_history_param(user_id=Depends(get_user_id),
+                             granularity: Optional[str] = 'DAILY',
+                             days: Optional[int] = 90) -> dict:
     """
-    만약 cost history 관련 수정이 이루어진 경우에도 redis 캐시는 남아있음. 에러 피하기 위해선 캐시 처리 필요.
+    :param user_id:
+    :param granularity: HOURLY|DAILY|MONTHLY
+    :param days: maximum 180
+    :return: dict
+
+    HOURLY 일시 최대 14일 가능
     """
-    cost_history = await get_cost_cache(user_id)  # 캐시 확인
-    if cost_history is None:  # 캐시가 없음.
-        user_client = await get_user_client(user_id)  # 캐시가 없을 때만 클라이언트 객체 생성.
-        cost_history: dict = await user_client.get_default_cost_history()  # aws 에서 데이터 받아옴.
-        asyncio.create_task(set_cost_cache(user_client.id, cost_history))  # 비동기 캐시
+    key = f'{user_id}_{granularity}_{days}'
+    cost_history = await get_cost_cache(key)
+    if cost_history is None:
+        user_client = await get_user_client(user_id)
+        cost_history: dict = await user_client.get_cost_history(days=days, granularity=granularity)
+        asyncio.create_task(set_cost_cache(key, cost_history))
     else:
         print(f'cache hit {user_id=}')
     return cost_history
 
 
+@app.get("/cost/history/default")
+async def cost_history_default(user_id=Depends(get_user_id)):
+    """
+    deprecated
+    cost_history_param 사용할것.
+    """
+    return await cost_history_param(user_id=user_id)
+
+
 @app.get("/cost/history/by-resource")
-async def cost_history_by_resource(user_id=Depends(get_user_id)):
-    # 현재 월별 출력중이나, 일별 출력, 시간별 출력도 가능함.
+async def cost_history_by_resource(user_id=Depends(get_user_id),
+                                   specific: Optional[bool] = False,
+                                   granularity: Optional[str] = 'MONTHLY'
+                                   ):
+    """
+    :param user_id:
+    :param specific: true|false, default false, usage type and quantity 나누어 세부적으로 출력
+    :param granularity: MONTHLY|DAILY|HOURLY
+    :return: dict
+    """
     user_client = await get_user_client(user_id)
-    return await user_client.get_cost_history_by_instances()
+    return await user_client.get_cost_history_by_instances(show_usage_type_and_quantity=specific,
+                                                           granularity=granularity)
 
 
 @app.get("/infra/tree")
