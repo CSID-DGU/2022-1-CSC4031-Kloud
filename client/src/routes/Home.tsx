@@ -2,7 +2,7 @@ import styled from "styled-components";
 import Header from "../components/Header";
 import MenuBar from "../components/MenuBar";
 import { Switch, Route } from "react-router-dom";
-import Cost from "../screens/Cost";
+import Cost from "./Cost";
 import Infra from "../screens/Infra";
 import { useRecoilValue } from "recoil";
 import { regionAtom } from "../atoms";

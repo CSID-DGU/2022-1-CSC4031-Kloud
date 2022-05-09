@@ -5,9 +5,51 @@ interface IChartProps {
   resourceId: string;
   costHistory: ICostHistory;
 }
-export interface ICostHistory {}
 
-function Chart({ size, resourceId, costHistory }: IChartProps) {
+export interface ICostHistory {
+  data: IDayCost[];
+}
+
+export interface TimePeriod {
+  Start: Date;
+  End: Date;
+}
+
+export interface UnblendedCost {
+  Amount: string;
+  Unit: string;
+}
+
+export interface Total {
+  UnblendedCost: UnblendedCost;
+}
+
+export interface UnblendedCost2 {
+  Amount: string;
+  Unit: string;
+}
+
+export interface Metrics {
+  UnblendedCost: UnblendedCost2;
+}
+
+export interface Group {
+  Keys: string[];
+  Metrics: Metrics;
+}
+
+export interface IDayCost {
+  Estimated: boolean;
+  Groups: Group[];
+  Total: Total;
+  TimePeriod: TimePeriod;
+}
+
+function Chart({
+  size,
+  resourceId,
+  costHistory: { data: costHistory },
+}: IChartProps) {
   const data = [
     { price: 1, date: "5/1" },
     { price: 2, date: "5/2" },
@@ -18,6 +60,11 @@ function Chart({ size, resourceId, costHistory }: IChartProps) {
     { price: 8, date: "5/7" },
     { price: 13, date: "5/8" },
     { price: 50, date: "5/9" },
+    { price: 4, date: "5/10" },
+    { price: 4, date: "5/10" },
+    { price: 4, date: "5/10" },
+    { price: 4, date: "5/10" },
+    { price: 4, date: "5/10" },
     { price: 4, date: "5/10" },
   ];
   console.log(costHistory);
@@ -50,7 +97,7 @@ function Chart({ size, resourceId, costHistory }: IChartProps) {
           },
           xaxis: {
             labels: { show: size ? true : false },
-            categories: data?.map((d) => d.date),
+            categories: costHistory?.map((d) => d.TimePeriod.Start),
             type: "datetime",
           },
           fill: {

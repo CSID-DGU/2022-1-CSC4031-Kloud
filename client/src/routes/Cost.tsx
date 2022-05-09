@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { Link, useRouteMatch, Switch, Route } from "react-router-dom";
-import Solution from "./Solution";
-import Analysis from "./Analysis";
-import Trend from "./Trend";
+import Solution from "../screens/Solution";
+import Analysis from "../screens/Analysis";
+import Trend from "../screens/Trend";
 
 const Container = styled.div`
   height: 100%;
