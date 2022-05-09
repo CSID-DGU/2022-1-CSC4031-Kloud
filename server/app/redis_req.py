@@ -50,13 +50,13 @@ async def is_member_revoked_redis(token: str) -> bool:
     return await cred_db.sismember(REVOKED_TOKENS, token)
 
 
-async def set_cost_cache(user_id: str, cost_data: dict) -> None:  # 파라미터 추가 가능성 있음.
+async def set_cost_cache(key: str, cost_data: dict) -> None:  # 파라미터 추가 가능성 있음.
     jsonified = json.dumps(cost_data)
-    await cache_db.set(f'cost_cache_{user_id}', jsonified, COST_EXP)
+    await cache_db.set(f'cost_cache_{key}', jsonified, COST_EXP)
 
 
-async def get_cost_cache(user_id: str) -> (dict, None):  # 파라미터 추가 가능성 있음.
-    jsonified = await cache_db.get(f'cost_cache_{user_id}')
+async def get_cost_cache(key: str) -> (dict, None):  # 파라미터 추가 가능성 있음.
+    jsonified = await cache_db.get(f'cost_cache_{key}')
     if jsonified is not None:
         return json.loads(jsonified)
 
