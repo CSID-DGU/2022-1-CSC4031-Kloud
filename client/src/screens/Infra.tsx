@@ -11,6 +11,7 @@ import { INestedInfra, INestedInfraResponse } from "../types";
 import { getInfra, getNestedInfra } from "../api";
 import Modal from "../components/Modal";
 import Chart from "../components/Chart";
+import ChartModal from "../components/ChartModal";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
@@ -388,7 +389,7 @@ export default function Infra({
       </Sidebar>
       {openModal ? (
         <Modal
-          content={<Chart size={"200%"} resourceId={"123"} costHistory={{}} />}
+          content={<ChartModal />}
           handleModal={() => setOpenModal(false)}
         ></Modal>
       ) : null}
