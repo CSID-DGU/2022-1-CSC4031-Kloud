@@ -8,10 +8,11 @@ import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
 import { useQuery } from "react-query";
 import { INestedInfra, INestedInfraResponse } from "../types";
-import { getInfra, getNestedInfra } from "../api";
+import { getCostHistoryByResource, getInfra, getNestedInfra } from "../api";
 import Modal from "../components/Modal";
 import Chart from "../components/Chart";
 import ChartModal from "../components/ChartModal";
+import Loader from "../components/Loader";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
@@ -100,6 +101,11 @@ export default function Infra({
     "allInfra",
     getInfra
   );
+  const {
+    isLoading: isCostHistoryByResourceLoading,
+    data: costHistoryByResourceLoading,
+  } = useQuery<any>("costHistoryByResource", getCostHistoryByResource);
+
   const orphan = nestedInfra?.orphan;
   const infra: INestedInfra = nestedInfra?.infra
     ? nestedInfra.infra
@@ -113,7 +119,11 @@ export default function Infra({
 
   const LinkComponent = getLinkComponent({ layout, linkType, orientation });
 
-  return totalWidth < 10 ? null : (
+  return totalWidth < 10 ? null : isInfraLoading ||
+    isNestedInfraLoading ||
+    isCostHistoryByResourceLoading ? (
+    <Loader />
+  ) : (
     <Container>
       <div>
         <LinkControls layout={layout} setLayout={setLayout} />

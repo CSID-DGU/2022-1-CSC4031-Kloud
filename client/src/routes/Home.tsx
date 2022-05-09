@@ -43,16 +43,16 @@ const ContentBox = styled.div`
 
 const Home = () => {
   const region = useRecoilValue(regionAtom);
-  const { isLoading: isInfraLoading, data: allInfra } = useQuery<any>(
-    "allInfra",
-    getInfra
-  );
-  const { isLoading: isNestedInfraLoading, data: nestedInfra } =
-    useQuery<INestedInfraResponse>("nestedInfra", getNestedInfra);
-  const {
-    isLoading: isCostHistoryByResourceLoading,
-    data: costHistoryByResourceLoading,
-  } = useQuery<any>("costHistoryByResource", getCostHistoryByResource);
+  // const { isLoading: isInfraLoading, data: allInfra } = useQuery<any>(
+  //   "allInfra",
+  //   getInfra
+  // );
+  // const { isLoading: isNestedInfraLoading, data: nestedInfra } =
+  //   useQuery<INestedInfraResponse>("nestedInfra", getNestedInfra);
+  // const {
+  //   isLoading: isCostHistoryByResourceLoading,
+  //   data: costHistoryByResourceLoading,
+  // } = useQuery<any>("costHistoryByResource", getCostHistoryByResource);
   // const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
   //   "costHistory",
   //   getCostHistory
@@ -69,24 +69,16 @@ const Home = () => {
       <Header />
       <Container>
         <MenuBar />
-        {isInfraLoading ||
-        isNestedInfraLoading ||
-        isCostHistoryByResourceLoading ? (
-          <Loader />
-        ) : (
-          <>
-            <ContentBox>
-              <Switch>
-                <Route path={`/`} exact>
-                  <Infra width={800} height={600} />
-                </Route>
-                <Route path={`/cost`}>
-                  <Cost />
-                </Route>
-              </Switch>
-            </ContentBox>
-          </>
-        )}
+        <ContentBox>
+          <Switch>
+            <Route path={`/`} exact>
+              <Infra width={800} height={600} />
+            </Route>
+            <Route path={`/cost`}>
+              <Cost />
+            </Route>
+          </Switch>
+        </ContentBox>
       </Container>
     </>
   );

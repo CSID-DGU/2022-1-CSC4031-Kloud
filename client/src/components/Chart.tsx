@@ -20,6 +20,7 @@ function Chart({ size, resourceId, costHistory }: IChartProps) {
     { price: 50, date: "5/9" },
     { price: 4, date: "5/10" },
   ];
+  console.log(costHistory);
   return (
     <>
       <ApexChart

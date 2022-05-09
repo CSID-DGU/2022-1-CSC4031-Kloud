@@ -59,7 +59,9 @@ export async function getNestedInfra() {
       resource_id: orphan,
       resource_type: response.orphan[`${orphan}`].resource_type,
     };
-    data.orphan.push(orphanObj);
+    if (orphanObj.resource_type !== "network_interface") {
+      data.orphan.push(orphanObj);
+    }
   }
 
   for (const vpc in response) {
