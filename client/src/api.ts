@@ -91,6 +91,7 @@ export async function getNestedInfra() {
   }
   return data;
 }
+
 export function getCostHistory() {
   const data = axios({
     method: "GET",
@@ -103,6 +104,20 @@ export function getCostHistory() {
   });
   return data;
 }
+
+export function getCostHistoryByResource() {
+  const data = axios({
+    method: "GET",
+    url: `${BASE_URL}/cost/history/by-resource`,
+    data: {},
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+  return data;
+}
+
 export function getSimilarityTrend() {
   const data = axios({
     method: "GET",

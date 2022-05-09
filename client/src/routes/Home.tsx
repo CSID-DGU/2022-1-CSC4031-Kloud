@@ -1,5 +1,6 @@
 import {
   getCostHistory,
+  getCostHistoryByResource,
   getInfra,
   getNestedInfra,
   getProphetTrend,
@@ -48,6 +49,10 @@ const Home = () => {
   );
   const { isLoading: isNestedInfraLoading, data: nestedInfra } =
     useQuery<INestedInfraResponse>("nestedInfra", getNestedInfra);
+  const {
+    isLoading: isCostHistoryByResourceLoading,
+    data: costHistoryByResourceLoading,
+  } = useQuery<any>("costHistoryByResource", getCostHistoryByResource);
   // const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
   //   "costHistory",
   //   getCostHistory
@@ -64,7 +69,9 @@ const Home = () => {
       <Header />
       <Container>
         <MenuBar />
-        {isInfraLoading || isNestedInfraLoading ? (
+        {isInfraLoading ||
+        isNestedInfraLoading ||
+        isCostHistoryByResourceLoading ? (
           <Loader />
         ) : (
           <>
