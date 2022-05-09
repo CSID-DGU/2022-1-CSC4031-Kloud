@@ -13,7 +13,7 @@ const Container = styled.div`
 `;
 const Title = styled.span`
   font-size: 40px;
-  color: yellow;
+  color: wheat;
   font-weight: lighter;
   margin: 15px 0px;
 `;

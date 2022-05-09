@@ -45,10 +45,10 @@ function Chart({ size, resourceId, costHistory }: IChartProps) {
             width: 3,
           },
           yaxis: {
-            show: false,
+            show: size ? true : false,
           },
           xaxis: {
-            labels: { show: false },
+            labels: { show: size ? true : false },
             categories: data?.map((d) => d.date),
             type: "datetime",
           },
