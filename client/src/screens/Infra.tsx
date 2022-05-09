@@ -387,7 +387,10 @@ export default function Infra({
         ) : null}
       </Sidebar>
       {openModal ? (
-        <Modal handleModal={() => setOpenModal(false)}></Modal>
+        <Modal
+          content={<Chart size={"200%"} resourceId={"123"} costHistory={{}} />}
+          handleModal={() => setOpenModal(false)}
+        ></Modal>
       ) : null}
     </Container>
   );
