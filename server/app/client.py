@@ -139,10 +139,9 @@ class KloudClient:
     async def get_current_infra_dict(self) -> dict:
         return await self._update_resource_dict()
 
-    async def get_cost_history(self, time_period: dict = None, granularity: str = None) -> dict:
-        if time_period is None:
-            time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=90))),
-                           'End': str(datetime.date(datetime.now()))}
+가    async def get_cost_history(self, days: int = 90, granularity: str = None) -> dict:
+        time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=days))),
+                       'End': str(datetime.date(datetime.now()))}
         if granularity is None:
             granularity = 'DAILY'
 
