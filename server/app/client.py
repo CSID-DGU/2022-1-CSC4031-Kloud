@@ -139,39 +139,6 @@ class KloudClient:
     async def get_current_infra_dict(self) -> dict:
         return await self._update_resource_dict()
 
-    def get_ec2_instances_cost_history(self):
-        """
-        ec2 자원별 과금 내역을 조회함. 최대 14일.
-        """
-        time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
-                       'End': str(datetime.date(datetime.now()))}
-
-        ec2_dict = self._response_process(identifier='InstanceId',
-                                          describing_method=self._ec2_client.describe_instances)
-        infra_keys = list(ec2_dict.keys())  # ec2 이외 다른 리소스도 조회가 가능할 경우, 키만 가져와서 합치면 됨.
-
-        res = self._ce_client.get_cost_and_usage_with_resources(
-            TimePeriod=time_period,
-            Granularity='MONTHLY',
-            Filter={
-                'Dimensions': {
-                    'Key': 'RESOURCE_ID',
-                    'Values': infra_keys,
-                    'MatchOptions': ['EQUALS']
-                }
-            },
-            Metrics=['UnblendedCost',
-                     # 'UsageQuantity'
-                     ],
-            GroupBy=[{'Type': 'DIMENSION',
-                      'Key': 'RESOURCE_ID'},
-                     # {'Type': 'DIMENSION',
-                     #  'Key': 'USAGE_TYPE'}
-                     # 네트워크 사용료, 저장장치 사용료 분리해서 표시 가능. 추후 인프라당 한 달 예상비용 보여줄 경우엔 저장장치와 네트워크 사용 예상량 합하면 될듯함.
-                     ]
-        )
-        return res['ResultsByTime']
-
     async def get_cost_history(self, time_period: dict = None, granularity: str = None) -> dict:
         if time_period is None:
             time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=90))),
@@ -188,8 +155,44 @@ class KloudClient:
         res = await self.loop.run_in_executor(executor=self.executor, func=fun)
         return res
 
-    async def get_cost_history_by_instances(self):  # deprecated
-        fun = self.get_ec2_instances_cost_history
+    def get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str):
+        time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
+                       'End': str(datetime.date(datetime.now()))}
+
+        ec2_dict: dict = self._response_process(identifier='InstanceId',
+                                                describing_method=self._ec2_client.describe_instances)
+        resource_id_list = list(ec2_dict.keys())  # ec2 이외 다른 리소스도 조회가 가능할 경우, 키만 가져와서 합치면 됨.
+        metrics = ['UnblendedCost']
+        group_by = [{'Type': 'DIMENSION', 'Key': 'RESOURCE_ID'}]
+
+        if show_usage_type_and_quantity is True:
+            metrics.append('UsageQuantity')
+            group_by.append({'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'})
+
+        res = self._ce_client.get_cost_and_usage_with_resources(
+            TimePeriod=time_period,
+            Granularity=granularity,
+            Filter={
+                'Dimensions': {
+                    'Key': 'RESOURCE_ID',
+                    'Values': resource_id_list,
+                    'MatchOptions': ['EQUALS']
+                }
+            },
+            Metrics=metrics,
+            GroupBy=group_by
+        )
+        return res['ResultsByTime']
+
+    async def get_cost_history_by_instances(self, show_usage_type_and_quantity: bool, granularity: str) -> dict:
+        """
+        :param show_usage_type_and_quantity: bool
+        :param granularity: MONTHLY|DAILY|HOURLY
+        :return: dict
+        """
+        fun = functools.partial(self.get_ec2_instances_cost_history,
+                                show_usage_type_and_quantity=show_usage_type_and_quantity,
+                                granularity=granularity)
         return await self.loop.run_in_executor(executor=self.executor, func=fun)
 
     async def get_default_cost_history(self) -> dict:
