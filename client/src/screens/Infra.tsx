@@ -286,90 +286,103 @@ export default function Infra({
         </svg>
       </div>
       <Sidebar>
-        {sidebarItemType === "subnet" ? (
-          <SelectedInfra>Subnet</SelectedInfra>
-        ) : sidebarItemType === "vpc" ? (
-          <SelectedInfra>VPC</SelectedInfra>
-        ) : (
-          <SelectedInfra>{sidebarItem}</SelectedInfra>
-        )}
-        <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
-          <Chart resourceId="123" costHistory={{}} />
-        </ChartBox>
-        {sidebarItemType === "network_interface" ? (
-          <SelectedInfraInfo>
-            Type : <strong>{sidebarItemType}</strong>
-          </SelectedInfraInfo>
-        ) : (
-          <SelectedInfraInfo>
-            Resource Type : <strong>{sidebarItemType}</strong>
-          </SelectedInfraInfo>
-        )}
-        {sidebarItemType === "ec2" ? (
+        {sidebarItem ? (
           <>
-            <SelectedInfraInfo>
-              Instance Size :{" "}
-              <strong>{allInfra.data[`${sidebarItem}`].InstanceType}</strong>
-            </SelectedInfraInfo>
-            <SelectedInfraInfo>
-              {allInfra.data[`${sidebarItem}`].LaunchTime}
-            </SelectedInfraInfo>
-            <SidebarButtonBox>
-              <SidebarButton buttonType={"start"}>인스턴스 실행</SidebarButton>
-              <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
-            </SidebarButtonBox>
-          </>
-        ) : sidebarItemType === "subnet" ? (
-          <>
-            <SelectedInfraInfo>
-              Region :{" "}
-              <strong>
-                {allInfra.data[`${sidebarItem}`].AvailabilityZone}
-              </strong>
-            </SelectedInfraInfo>
-            <SelectedInfraInfo>
-              Subnet : <strong>{sidebarItem?.split("-")[1]}</strong>
-            </SelectedInfraInfo>
-            <SelectedInfraInfo>
-              VPC :{" "}
-              <strong>
-                {allInfra.data[`${sidebarItem}`].VpcId.split("-")[1]}
-              </strong>
-            </SelectedInfraInfo>
-          </>
-        ) : sidebarItemType === "rds" ? (
-          <>
-            <SelectedInfraInfo>
-              Region :{" "}
-              <strong>
-                {allInfra.data[`${sidebarItem}`].AvailabilityZone}
-              </strong>
-            </SelectedInfraInfo>
-            <SelectedInfraInfo>
-              DB Size :{" "}
-              <strong>{allInfra.data[`${sidebarItem}`].DBInstanceClass}</strong>
-            </SelectedInfraInfo>
-          </>
-        ) : sidebarItemType === "network_interface" ? (
-          <>
-            <SelectedInfraInfo>
-              Group : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
-            </SelectedInfraInfo>
-          </>
-        ) : sidebarItemType === "igw" ? (
-          <>
-            <SelectedInfraInfo>
-              Group :{" "}
-              <strong>
-                {allInfra.data[`${sidebarItem}`].Attachments[0].VpcId}
-              </strong>
-            </SelectedInfraInfo>
-          </>
-        ) : sidebarItemType === "vpc" ? (
-          <>
-            <SelectedInfraInfo>
-              VPC Id : <strong>{sidebarItem?.split("-")[1]}</strong>
-            </SelectedInfraInfo>
+            {sidebarItemType === "subnet" ? (
+              <SelectedInfra>Subnet</SelectedInfra>
+            ) : sidebarItemType === "vpc" ? (
+              <SelectedInfra>VPC</SelectedInfra>
+            ) : (
+              <SelectedInfra>{sidebarItem}</SelectedInfra>
+            )}
+            <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
+              <Chart resourceId="123" costHistory={{}} />
+            </ChartBox>
+            {sidebarItemType === "network_interface" ? (
+              <SelectedInfraInfo>
+                Type : <strong>{sidebarItemType}</strong>
+              </SelectedInfraInfo>
+            ) : (
+              <SelectedInfraInfo>
+                Resource Type : <strong>{sidebarItemType}</strong>
+              </SelectedInfraInfo>
+            )}
+            {sidebarItemType === "ec2" ? (
+              <>
+                <SelectedInfraInfo>
+                  Instance Size :{" "}
+                  <strong>
+                    {allInfra.data[`${sidebarItem}`].InstanceType}
+                  </strong>
+                </SelectedInfraInfo>
+                <SelectedInfraInfo>
+                  {allInfra.data[`${sidebarItem}`].LaunchTime}
+                </SelectedInfraInfo>
+                <SidebarButtonBox>
+                  <SidebarButton buttonType={"start"}>
+                    인스턴스 실행
+                  </SidebarButton>
+                  <SidebarButton buttonType={"stop"}>
+                    인스턴스 중지
+                  </SidebarButton>
+                </SidebarButtonBox>
+              </>
+            ) : sidebarItemType === "subnet" ? (
+              <>
+                <SelectedInfraInfo>
+                  Region :{" "}
+                  <strong>
+                    {allInfra.data[`${sidebarItem}`].AvailabilityZone}
+                  </strong>
+                </SelectedInfraInfo>
+                <SelectedInfraInfo>
+                  Subnet : <strong>{sidebarItem?.split("-")[1]}</strong>
+                </SelectedInfraInfo>
+                <SelectedInfraInfo>
+                  VPC :{" "}
+                  <strong>
+                    {allInfra.data[`${sidebarItem}`].VpcId.split("-")[1]}
+                  </strong>
+                </SelectedInfraInfo>
+              </>
+            ) : sidebarItemType === "rds" ? (
+              <>
+                <SelectedInfraInfo>
+                  Region :{" "}
+                  <strong>
+                    {allInfra.data[`${sidebarItem}`].AvailabilityZone}
+                  </strong>
+                </SelectedInfraInfo>
+                <SelectedInfraInfo>
+                  DB Size :{" "}
+                  <strong>
+                    {allInfra.data[`${sidebarItem}`].DBInstanceClass}
+                  </strong>
+                </SelectedInfraInfo>
+              </>
+            ) : sidebarItemType === "network_interface" ? (
+              <>
+                <SelectedInfraInfo>
+                  Group :{" "}
+                  <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
+                </SelectedInfraInfo>
+              </>
+            ) : sidebarItemType === "igw" ? (
+              <>
+                <SelectedInfraInfo>
+                  Group :{" "}
+                  <strong>
+                    {allInfra.data[`${sidebarItem}`].Attachments[0].VpcId}
+                  </strong>
+                </SelectedInfraInfo>
+              </>
+            ) : sidebarItemType === "vpc" ? (
+              <>
+                <SelectedInfraInfo>
+                  VPC Id : <strong>{sidebarItem?.split("-")[1]}</strong>
+                </SelectedInfraInfo>
+              </>
+            ) : null}
           </>
         ) : null}
       </Sidebar>

@@ -108,7 +108,7 @@ export function getCostHistory() {
 export function getCostHistoryByResource() {
   const data = axios({
     method: "GET",
-    url: `${BASE_URL}/cost/history/by-resource`,
+    url: `${BASE_URL}/cost/history/by-resource?granularity=DAILY`,
     data: {},
     headers: {
       Accept: "application/json",
