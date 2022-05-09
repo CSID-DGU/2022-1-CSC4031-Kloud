@@ -5,7 +5,7 @@ interface IChartProps {
   resourceId: string;
   costHistory: ICostHistory;
 }
-interface ICostHistory {}
+export interface ICostHistory {}
 
 function Chart({ size, resourceId, costHistory }: IChartProps) {
   const data = [

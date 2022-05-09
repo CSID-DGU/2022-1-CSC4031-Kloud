@@ -1,9 +1,49 @@
-import Chart from "./Chart";
+import styled from "styled-components";
+import Chart, { ICostHistory } from "./Chart";
 
-const ChartModal = () => {
+interface IChartModal {
+  resourceId: string;
+  instanceType?: string;
+  costHistory: ICostHistory;
+}
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+const Title = styled.span`
+  font-size: 40px;
+  color: yellow;
+  font-weight: lighter;
+  margin: 15px 0px;
+`;
+const ResourceInfo = styled.span`
+  font-size: 20px;
+  color: white;
+  font-weight: lighter;
+`;
+
+const ResourceInfoBox = styled.div`
+  justify-content: space-between;
+  display: flex;
+  margin-bottom: 35px;
+`;
+
+const ChartModal = ({ resourceId, costHistory, instanceType }: IChartModal) => {
   return (
     <>
-      <Chart size={"200%"} resourceId={"123"} costHistory={{}} />
+      <Container>
+        <Title>Cost Chart</Title>
+        <ResourceInfoBox>
+          <ResourceInfo>{instanceType ? instanceType : null}</ResourceInfo>
+          <ResourceInfo>{resourceId}</ResourceInfo>
+        </ResourceInfoBox>
+        <Chart
+          size={"180%"}
+          resourceId={resourceId}
+          costHistory={costHistory}
+        />
+      </Container>
     </>
   );
 };

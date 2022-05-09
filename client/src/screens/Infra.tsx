@@ -388,10 +388,25 @@ export default function Infra({
         ) : null}
       </Sidebar>
       {openModal ? (
-        <Modal
-          content={<ChartModal />}
-          handleModal={() => setOpenModal(false)}
-        ></Modal>
+        sidebarItemType === "ec2" ? (
+          <Modal
+            content={
+              <ChartModal
+                instanceType={allInfra.data[`${sidebarItem}`].InstanceType}
+                resourceId={`${sidebarItem}`}
+                costHistory={{}}
+              />
+            }
+            handleModal={() => setOpenModal(false)}
+          />
+        ) : (
+          <Modal
+            content={
+              <ChartModal resourceId={`${sidebarItem}`} costHistory={{}} />
+            }
+            handleModal={() => setOpenModal(false)}
+          />
+        )
       ) : null}
     </Container>
   );
