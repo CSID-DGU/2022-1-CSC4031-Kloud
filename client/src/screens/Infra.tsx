@@ -103,7 +103,7 @@ export default function Infra({
   );
   const {
     isLoading: isCostHistoryByResourceLoading,
-    data: costHistoryByResourceLoading,
+    data: costHistoryByResource,
   } = useQuery<any>("costHistoryByResource", getCostHistoryByResource);
 
   const orphan = nestedInfra?.orphan;
@@ -307,7 +307,7 @@ export default function Infra({
               <SelectedInfra>{sidebarItem}</SelectedInfra>
             )}
             <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
-              <Chart resourceId="123" costHistory={{}} />
+              <Chart resourceId={sidebarItem} costHistory={{}} />
             </ChartBox>
             {sidebarItemType === "network_interface" ? (
               <SelectedInfraInfo>
@@ -404,7 +404,7 @@ export default function Infra({
               <ChartModal
                 instanceType={allInfra.data[`${sidebarItem}`].InstanceType}
                 resourceId={`${sidebarItem}`}
-                costHistory={{}}
+                costHistory={costHistoryByResource.data}
               />
             }
             handleModal={() => setOpenModal(false)}
@@ -412,7 +412,10 @@ export default function Infra({
         ) : (
           <Modal
             content={
-              <ChartModal resourceId={`${sidebarItem}`} costHistory={{}} />
+              <ChartModal
+                resourceId={`${sidebarItem}`}
+                costHistory={costHistoryByResource.data}
+              />
             }
             handleModal={() => setOpenModal(false)}
           />

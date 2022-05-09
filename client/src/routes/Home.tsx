@@ -1,25 +1,12 @@
-import {
-  getCostHistory,
-  getCostHistoryByResource,
-  getInfra,
-  getNestedInfra,
-  getProphetTrend,
-  getSimilarityTrend,
-} from "../api";
 import styled from "styled-components";
-import { useQuery } from "react-query";
 import Header from "../components/Header";
 import MenuBar from "../components/MenuBar";
-import Loader from "../components/Loader";
 import { Switch, Route } from "react-router-dom";
 import Cost from "../screens/Cost";
 import Infra from "../screens/Infra";
 import { useRecoilValue } from "recoil";
 import { regionAtom } from "../atoms";
 
-interface IInfra {
-  tmp: null;
-}
 export interface INestedInfra {
   resource_id: string;
   resource_type: string;

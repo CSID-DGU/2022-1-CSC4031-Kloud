@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import Chart from "./Chart";
 
 const Container = styled.div`
   position: absolute;
