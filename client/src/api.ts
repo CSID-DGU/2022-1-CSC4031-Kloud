@@ -95,7 +95,7 @@ export async function getNestedInfra() {
 export function getCostHistory() {
   const data = axios({
     method: "GET",
-    url: `${BASE_URL}/cost/history/default`,
+    url: `${BASE_URL}/cost/history/param`,
     data: {},
     headers: {
       Accept: "application/json",

@@ -75,7 +75,7 @@ const SidebarButtonBox = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 100px;
+  margin-top: 65px;
 `;
 
 export default function Infra({
@@ -204,12 +204,12 @@ export default function Infra({
                   })}
                   {orphan?.map((d, key) => {
                     if (d.resource_type === "network_interface") {
-                      var top = 550;
-                      var left = 30;
+                      var orphan_top = 500;
+                      var orphan_left = 30;
                       return (
                         <Group
-                          top={top}
-                          left={left + key * 50}
+                          top={orphan_top}
+                          left={orphan_left + key * 50}
                           key={d.resource_id}
                         >
                           <rect
@@ -241,12 +241,12 @@ export default function Infra({
                         </Group>
                       );
                     } else {
-                      var top = 550;
-                      var left = 30;
+                      var orphan_top = 500;
+                      var orphan_left = 30;
                       return (
                         <Group
-                          top={top}
-                          left={left + key * 50}
+                          top={orphan_top}
+                          left={orphan_left + key * 50}
                           key={d.resource_id}
                         >
                           <rect
@@ -319,7 +319,7 @@ export default function Infra({
               <SidebarButton buttonType={"stop"}>인스턴스 중지</SidebarButton>
             </SidebarButtonBox>
           </>
-        ) : sidebarItemType == "subnet" ? (
+        ) : sidebarItemType === "subnet" ? (
           <>
             <SelectedInfraInfo>
               Region :{" "}
@@ -337,7 +337,7 @@ export default function Infra({
               </strong>
             </SelectedInfraInfo>
           </>
-        ) : sidebarItemType == "rds" ? (
+        ) : sidebarItemType === "rds" ? (
           <>
             <SelectedInfraInfo>
               Region :{" "}
@@ -350,7 +350,7 @@ export default function Infra({
               <strong>{allInfra.data[`${sidebarItem}`].DBInstanceClass}</strong>
             </SelectedInfraInfo>
           </>
-        ) : sidebarItemType == "network_interface" ? (
+        ) : sidebarItemType === "network_interface" ? (
           <>
             <SelectedInfraInfo>
               Group : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
@@ -359,7 +359,10 @@ export default function Infra({
         ) : sidebarItemType === "igw" ? (
           <>
             <SelectedInfraInfo>
-              Group : <strong>{allInfra.data[`${sidebarItem}`].VpcId}</strong>
+              Group :{" "}
+              <strong>
+                {allInfra.data[`${sidebarItem}`].Attachments[0].VpcId}
+              </strong>
             </SelectedInfraInfo>
           </>
         ) : sidebarItemType === "vpc" ? (
