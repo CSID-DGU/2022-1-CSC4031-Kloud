@@ -8,7 +8,13 @@ import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
 import { useQuery } from "react-query";
 import { INestedInfra, INestedInfraResponse } from "../types";
-import { getCostHistoryByResource, getInfra, getNestedInfra } from "../api";
+import {
+  getCostHistoryByResource,
+  getInfra,
+  getNestedInfra,
+  startInstance,
+  stopInstance,
+} from "../api";
 import Modal from "../components/Modal";
 import Chart from "../components/Chart";
 import ChartModal from "../components/ChartModal";
@@ -77,7 +83,7 @@ const SidebarButtonBox = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 20px;
+  margin-top: 50px;
 `;
 
 export default function Infra({
@@ -177,7 +183,9 @@ export default function Infra({
                             x={-width / 2}
                             fill={
                               node.data.resource_type === "ec2"
-                                ? "green"
+                                ? node.data.state === "running"
+                                  ? "green"
+                                  : "tomato"
                                 : "#272b4d"
                             }
                             stroke={node.data.children ? "#03c0dc" : "#26deb0"}
@@ -341,10 +349,16 @@ export default function Infra({
                   {allInfra.data[`${sidebarItem}`].LaunchTime}
                 </SelectedInfraInfo>
                 <SidebarButtonBox>
-                  <SidebarButton buttonType={"start"}>
+                  <SidebarButton
+                    buttonType={"start"}
+                    onClick={() => startInstance(sidebarItem)}
+                  >
                     인스턴스 실행
                   </SidebarButton>
-                  <SidebarButton buttonType={"stop"}>
+                  <SidebarButton
+                    buttonType={"stop"}
+                    onClick={() => stopInstance(sidebarItem)}
+                  >
                     인스턴스 중지
                   </SidebarButton>
                 </SidebarButtonBox>

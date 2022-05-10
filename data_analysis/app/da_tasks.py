@@ -11,11 +11,11 @@ def add(x, y):  # 예시
 
 
 @celery_task.task(name="/cost/trend/similarity")
-def pattern_finder(token: str, start_date : str, end_date : str, threshold: float):
+def pattern_finder(token: str, start_date="2022-02-02", end_date="2022-05-10" , threshold=0.5):
     data = get_cost_info(token)
     p = PatternFinder(data)
     # 날짜는 수정이 가능함 원하는 날짜가 들어오게 만들면 될 듯
-    result = p.search('2022-02-02', "2022-05-07", threshold=0.5)
+    result = p.search('2022-02-02', "2022-05-10", threshold=0.5)
     # 패턴을 못찾은 경우 추후에 try,except로 수정해야할듯
     if len(result) == 0:
         print("threshold 혹은 date범위를 바꿔주어야함")
@@ -38,12 +38,12 @@ def pattern_finder(token: str, start_date : str, end_date : str, threshold: floa
 
 
 @celery_task.task(name="/cost/trend/prophet")
-def pattern_finder2(token: str, period : int):
+def pattern_finder2(token: str, period=5):
     data = get_cost_info(token)
-    p = ProPhetPatternFinder(data=data)
+    p = ProPhetPatternFinder(data=data, period=period)
     # 이후 5일 예측, default = 10
     periods = 5
-    p.model_fit(periods=periods)
+    p.model_fit()
     expected_data = p.expected_data()
     real_data = p.real_data()
     answer = {}

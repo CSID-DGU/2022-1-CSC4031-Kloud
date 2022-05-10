@@ -4,9 +4,9 @@ import { INestedInfra } from "./types";
 const BASE_URL = "http://localhost:8000";
 
 export async function login(
-  access_key_public: String,
-  access_key_secret: String,
-  region: String
+  access_key_public: string,
+  access_key_secret: string,
+  region: string
 ) {
   if (access_key_public) {
     return await axios({
@@ -19,6 +19,34 @@ export async function login(
       },
     });
   }
+}
+export async function stopInstance(instance_id: string) {
+  return await axios({
+    method: "POST",
+    url: `${BASE_URL}/mod/instance/stop`,
+    data: {
+      instance_id: instance_id,
+      hibernate: true,
+      force: true,
+    },
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+}
+export async function startInstance(instance_id: string) {
+  return await axios({
+    method: "POST",
+    url: `${BASE_URL}/mod/instance/start`,
+    data: {
+      instance_id: instance_id,
+    },
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
 }
 
 export function getInfra() {
@@ -84,6 +112,9 @@ export async function getNestedInfra() {
           resource_type:
             response[`${vpc}`].children[`${subnet}`].children[`${instance}`]
               .resource_type,
+          state:
+            response[`${vpc}`].children[`${subnet}`].children[`${instance}`]
+              .State.Name,
         };
         subnetObj.children.push(instanceObj);
       }
