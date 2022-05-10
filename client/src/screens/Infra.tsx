@@ -77,7 +77,7 @@ const SidebarButtonBox = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 65px;
+  margin-top: 100px;
 `;
 
 export default function Infra({
@@ -407,7 +407,7 @@ export default function Infra({
               <ChartModal
                 instanceType={allInfra.data[`${sidebarItem}`].InstanceType}
                 resourceId={`${sidebarItem}`}
-                costHistory={costHistoryByResource.data}
+                costHistory={costHistoryByResource}
               />
             }
             handleModal={() => setOpenModal(false)}

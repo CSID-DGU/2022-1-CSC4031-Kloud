@@ -16,7 +16,7 @@ export interface TimePeriod {
 }
 
 export interface UnblendedCost {
-  Amount: string;
+  Amount: number;
   Unit: string;
 }
 
@@ -25,7 +25,7 @@ export interface Total {
 }
 
 export interface UnblendedCost2 {
-  Amount: string;
+  Amount: number;
   Unit: string;
 }
 
@@ -50,24 +50,6 @@ function Chart({
   resourceId,
   costHistory: { data: costHistory },
 }: IChartProps) {
-  const data = [
-    { price: 1, date: "5/1" },
-    { price: 2, date: "5/2" },
-    { price: 3, date: "5/3" },
-    { price: 4, date: "5/4" },
-    { price: 5, date: "5/5" },
-    { price: 5, date: "5/6" },
-    { price: 8, date: "5/7" },
-    { price: 13, date: "5/8" },
-    { price: 50, date: "5/9" },
-    { price: 4, date: "5/10" },
-    { price: 4, date: "5/10" },
-    { price: 4, date: "5/10" },
-    { price: 4, date: "5/10" },
-    { price: 4, date: "5/10" },
-    { price: 4, date: "5/10" },
-  ];
-  console.log(costHistory);
   return (
     <>
       <ApexChart
@@ -75,7 +57,10 @@ function Chart({
         series={[
           {
             name: "price",
-            data: data?.map((d) => d.price),
+            data: costHistory?.map((d) => {
+              const hit = d.Groups.filter((g) => g.Keys[0] === resourceId);
+              return hit.length === 0 ? 0 : hit[0].Metrics.UnblendedCost.Amount;
+            }),
           },
         ]}
         options={{
