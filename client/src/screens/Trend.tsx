@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { getProphetTrend, getSimilarityTrend } from "../api";
+import Loader from "../components/Loader";
 
 const Container = styled.div``;
 const Tmp = styled.span`
@@ -16,9 +17,15 @@ const Trend = () => {
     getProphetTrend
   );
   return (
-    <Container>
-      <Tmp>Trend</Tmp>
-    </Container>
+    <>
+      {isProphetLoading || isSimilarityLoading ? (
+        <Loader />
+      ) : (
+        <Container>
+          <Tmp>Trend</Tmp>
+        </Container>
+      )}
+    </>
   );
 };
 export default Trend;

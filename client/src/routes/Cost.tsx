@@ -40,7 +40,7 @@ const Cost = () => {
   return (
     <Container>
       <CostHeader>
-        <Title>Cost</Title>
+        {trendMatch ? <Title></Title> : <Title>Cost</Title>}
         <Nav>
           <Link to={"/cost/analysis"}>
             <NavItem isActive={analysisMatch ? true : false}>Analysis</NavItem>
