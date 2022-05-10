@@ -417,7 +417,7 @@ export default function Infra({
             content={
               <ChartModal
                 resourceId={`${sidebarItem}`}
-                costHistory={costHistoryByResource.data}
+                costHistory={costHistoryByResource}
               />
             }
             handleModal={() => setOpenModal(false)}

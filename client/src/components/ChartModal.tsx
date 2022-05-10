@@ -35,7 +35,7 @@ const ChartModal = ({ resourceId, costHistory, instanceType }: IChartModal) => {
       <Container>
         <Title>Cost Chart</Title>
         <ResourceInfoBox>
-          <ResourceInfo>{instanceType ? instanceType : null}</ResourceInfo>
+          {instanceType ? <ResourceInfo>{instanceType}</ResourceInfo> : null}
           <ResourceInfo>{resourceId}</ResourceInfo>
         </ResourceInfoBox>
         <Chart
