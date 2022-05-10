@@ -249,3 +249,16 @@ class KloudClient:
             elif resource_type not in POSSIBLE_ROOT_NODES and parent is None:
                 to_return['orphan'][k] = v
         return to_return
+
+    def start_instance(self, instance_id: str) -> None:
+        self._ec2_client.start_instances(
+            InstanceIds=[instance_id]
+        )
+
+    def stop_instance(self, instance_id: str, hibernate: bool, force: bool) -> None:
+        self._ec2_client.stop_instances(
+            InstanceIds=[instance_id],
+            Hibernate=hibernate,
+            DryRun=True,
+            Force=force
+        )

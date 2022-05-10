@@ -1,5 +1,3 @@
-import datetime
-
 import botocore.exceptions
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -192,6 +190,32 @@ async def logout(user_id=Depends(get_user_id), token=Depends(security)):
     return 'logout success'
 
 
+class InstanceStop(BaseModel):
+    instance_id: str
+    hibernate: bool
+    force: bool
+
+
+@app.post("/mod/instance/stop")
+async def stop_instance(req_body: InstanceStop, user_client: KloudClient = Depends(get_user_client)):
+    await asyncio.to_thread(user_client.stop_instance,
+                            instance_id=req_body.instance_id,
+                            hibernate=req_body.hibernate,
+                            force=req_body.force)
+    return 'request sent'  # todo 요청 결과 반환
+
+
+class InstanceStart(BaseModel):
+    instance_id: str
+
+
+@app.post("/mod/instance/start")
+async def start_instance(req_body: InstanceStart, user_client: KloudClient = Depends(get_user_client)):
+    await asyncio.to_thread(user_client.start_instance, instance_id=req_body.instance_id)
+
+    return 'request sent'
+
+
 @app.get("/cost/trend/similarity")
 async def pattern_finder(user_client=Depends(get_user_id), token=Depends(security)):
     task = da_app.send_task("/cost/trend/similarity", [token.credentials])
@@ -207,3 +231,4 @@ async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(securi
 @app.get("/res/{job_id}")
 async def check(job_id):
     return da_app.AsyncResult(job_id).get()  # 예시로, blocking io를 발생시킴.
+

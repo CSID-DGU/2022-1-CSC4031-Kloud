@@ -4,8 +4,9 @@ import json
 from fbprophet import Prophet
 import matplotlib.pyplot as plt
 class ProPhetPatternFinder:
-    def __init__(self,data):
+    def __init__(self,data, period):
         self.data = data
+        self.period = period
         self.cost = []
         for d in data["ResultsByTime"]:
             c = 0
@@ -19,12 +20,17 @@ class ProPhetPatternFinder:
         self.data_df.plot(x="ds", y="y",figsize=(16,8))
         
     # defalut로 이후 5일 예측
-    def model_fit(self,periods=5):
+    def model_fit(self):
         try:
-            self.model = Prophet()
+            self.model = Prophet(yearly_seasonality=True,
+                                weekly_seasonality=True,
+                                daily_seasonality=True,
+                                changepoint_prior_scale=0.8,
+                                seasonality_mode = 'multiplicative',
+                                n_changepoints=10)
             self.model.fit(self.data_df)
             # 앞으로 365일 뒤를 예측하겠다. 
-            future = self.model.make_future_dataframe(periods=periods)
+            future = self.model.make_future_dataframe(periods=self.period)
             # 예측 데이터가 df형태로 들어옴
             self.forecast = self.model.predict(future)
             return self.forecast
