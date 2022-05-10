@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { INestedInfra } from "./routes/Home";
+import { INestedInfra } from "./types";
 
 const BASE_URL = "http://localhost:8000";
 

@@ -175,7 +175,11 @@ export default function Infra({
                             width={width}
                             y={-height / 2}
                             x={-width / 2}
-                            fill="#272b4d"
+                            fill={
+                              node.data.resource_type === "ec2"
+                                ? "green"
+                                : "#272b4d"
+                            }
                             stroke={node.data.children ? "#03c0dc" : "#26deb0"}
                             strokeWidth={1}
                             strokeDasharray={node.data.children ? "0" : "2,2"}

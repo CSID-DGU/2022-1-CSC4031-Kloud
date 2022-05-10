@@ -7,16 +7,6 @@ import Infra from "../screens/Infra";
 import { useRecoilValue } from "recoil";
 import { regionAtom } from "../atoms";
 
-export interface INestedInfra {
-  resource_id: string;
-  resource_type: string;
-  children?: INestedInfra[];
-}
-interface INestedInfraResponse {
-  orphan?: INestedInfra[];
-  infra: INestedInfra;
-}
-
 const Container = styled.div`
   display: flex;
   flex-direction: row;
