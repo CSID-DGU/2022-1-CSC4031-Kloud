@@ -77,7 +77,7 @@ const SidebarButtonBox = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 100px;
+  margin-top: 20px;
 `;
 
 export default function Infra({
@@ -328,6 +328,10 @@ export default function Infra({
                   <strong>
                     {allInfra.data[`${sidebarItem}`].InstanceType}
                   </strong>
+                </SelectedInfraInfo>
+                <SelectedInfraInfo>
+                  State :{" "}
+                  <strong>{allInfra.data[`${sidebarItem}`].State.Name}</strong>
                 </SelectedInfraInfo>
                 <SelectedInfraInfo>
                   {allInfra.data[`${sidebarItem}`].LaunchTime}
