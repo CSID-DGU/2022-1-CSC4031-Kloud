@@ -1,13 +1,12 @@
+import { useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { getProphetTrend, getSimilarityTrend } from "../api";
 import Loader from "../components/Loader";
 
 const Container = styled.div``;
-const Tmp = styled.span`
-  font-size: 100px;
-  color: white;
-`;
+const SelectorBox = styled.div``;
+const Selector = styled.span``;
 const Trend = () => {
   const { isLoading: isSimilarityLoading, data: similarityTrend } =
     useQuery<any>("similarity", getSimilarityTrend);
@@ -21,9 +20,7 @@ const Trend = () => {
       {isProphetLoading || isSimilarityLoading ? (
         <Loader />
       ) : (
-        <Container>
-          <Tmp>Trend</Tmp>
-        </Container>
+        <Container></Container>
       )}
     </>
   );

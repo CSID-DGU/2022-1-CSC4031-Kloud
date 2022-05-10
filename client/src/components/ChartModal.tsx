@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import Chart, { ICostHistory } from "./Chart";
+import { ICostHistory } from "../types";
+import Chart from "./Chart";
 
 interface IChartModal {
   resourceId: string;
