@@ -14,6 +14,7 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
         series={[
           {
             name: "Real",
+            type: "line",
             data: prophet.slice(0, -5).map((d: any, idx: number) => {
               return d[1].real_data;
             }),
@@ -22,6 +23,20 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
             name: "Expected",
             data: prophet.map((d: any) => {
               return d[1].expected_data.yhat;
+            }),
+          },
+          {
+            name: "Min Error",
+            type: "area",
+            data: prophet.map((d: any) => {
+              return d[1].expected_data.yhat_lower;
+            }),
+          },
+          {
+            name: "Max Error",
+            type: "area",
+            data: prophet.map((d: any) => {
+              return d[1].expected_data.yhat_upper;
             }),
           },
         ]}
@@ -37,7 +52,6 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
               show: true,
             },
             background: "gray",
-            stacked: false,
           },
           stroke: {
             width: 2,
@@ -45,13 +59,17 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
           yaxis: {
             show: true,
             decimalsInFloat: 2,
+            min: 0,
           },
           xaxis: {
             labels: { show: true },
             categories: prophet.map((d: any) => d[0]),
             type: "datetime",
           },
-          fill: {},
+          fill: {
+            opacity: 0.9,
+            type: "solid",
+          },
           title: {
             text: "Cost Trends",
             align: "left",
@@ -65,6 +83,8 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
             y: {
               formatter: (value) => `$${value.toFixed(2)}`,
             },
+            shared: true,
+            intersect: false,
           },
           forecastDataPoints: {
             count: 5,
