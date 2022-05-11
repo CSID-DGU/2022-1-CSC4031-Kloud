@@ -1,5 +1,5 @@
 from celery import Celery
-from .redis_conf import HOST, PORT, CELERYDB
+from .conf.redis_conf import HOST, PORT, CELERYDB
 
 
 celery_task = Celery(

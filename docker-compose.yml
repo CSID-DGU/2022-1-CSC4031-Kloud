@@ -12,10 +12,10 @@ services:
     depends_on:
       - kloud_redis
       - kloud_celery
-    command: python /app/server.py
+    entrypoint: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
   kloud_celery:
     build: data_analysis
     depends_on:
       - kloud_redis
-    command: celery -A app.da_tasks worker --loglevel=info
+    entrypoint: celery -A app.da_tasks worker --loglevel=info
