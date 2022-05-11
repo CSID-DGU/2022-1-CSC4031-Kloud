@@ -100,6 +100,11 @@ async def wait_until_done(celery_task: da_app.AsyncResult, interval=0.3, timeout
     return celery_task.get()
 
 
+@app.get("/")
+async def health_check():
+    return 'healthy_as_hell'
+
+
 @app.post("/login", response_model=AccessTokenResponse)
 async def login(login_form: KloudLoginForm):
     try:
