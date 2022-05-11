@@ -13,13 +13,42 @@ from .config.cellery_app import da_app
 from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
     delete_cache_from_redis
 from pydantic.types import Optional
+import os
 
-app = FastAPI()
+app = FastAPI(
+    title="Kloud API",
+    contact={
+        "name": "Team Kloud",
+        "url": "https://github.com/CSID-DGU/2022-1-CSC4031-Kloud"
+    }
+)
 aws_info = boto3.Session()
 
 clients = dict()  # 수정 필요
 event_loop: asyncio.unix_events.SelectorEventLoop  # on_event('startup')시 오버라이드
 executor = concurrent.futures.ThreadPoolExecutor()  # boto3 io 작업이 실행될 스레드풀. KloudClient 객체 생성시 넘어감.
+
+# #### CORS #####
+# 개발 편의를 위해 모든 origin 허용. 배포시 수정 필요
+origins = [
+    "*"
+]
+
+if os.environ.get('IS_PRODUCTION') == "true":
+    origins = [os.environ.get('FRONT_END_URL'),  # https://something.com
+               os.environ.get('API_URL')]  # https://api.something.com
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+
+# #### CORS #####
 
 
 @app.on_event('startup')
@@ -46,24 +75,6 @@ def cache_user_client(user_id: str,
                       user_client: KloudClient) -> None:  # todo 유저 객체 캐시 구현
     # clients[user_id] = user_client
     pass
-
-
-# #### CORS #####
-# 개발 편의를 위해 모든 origin 허용. 배포시 수정 필요
-
-origins = [
-    "*"
-]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-# #### CORS #####
 
 
 class KloudLoginForm(BaseModel):
