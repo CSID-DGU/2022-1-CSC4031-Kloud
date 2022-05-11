@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import Chart from "./Chart";
 
 const Container = styled.div`
   position: absolute;
@@ -70,21 +69,19 @@ const Contents = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 60px;
 `;
 interface IHandleModal {
   handleModal: () => void;
+  content: JSX.Element;
 }
 
-const ModalFrame = ({ handleModal }: IHandleModal) => {
+const ModalFrame = ({ handleModal, content }: IHandleModal) => {
   return (
     <Container>
       <Background onClick={handleModal} />
       <ModalBlock>
         <Close onClick={handleModal}>X</Close>
-        <Contents>
-          <Chart size={"150%"} resourceId="123" costHistory={{}} />
-        </Contents>
+        <Contents>{content}</Contents>
       </ModalBlock>
     </Container>
   );

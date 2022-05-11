@@ -1,21 +1,27 @@
 import ApexChart from "react-apexcharts";
 import { IChartProps } from "../types";
 
-function Chart({
-  size,
-  resourceId,
-  costHistory: { data: costHistory },
-}: IChartProps) {
+interface IPredictChart {
+  size?: string;
+  similarity: any;
+  prophet: any;
+}
+function PredictChart({ size, similarity, prophet }: IPredictChart) {
   return (
     <>
       <ApexChart
         type="line"
         series={[
           {
-            name: "price",
-            data: costHistory?.map((d) => {
-              const hit = d.Groups.filter((g) => g.Keys[0] === resourceId);
-              return hit.length === 0 ? 0 : hit[0].Metrics.UnblendedCost.Amount;
+            name: "Real Data",
+            data: prophet.map((d: any) => {
+              return d[1].real_data;
+            }),
+          },
+          {
+            name: "Expected",
+            data: prophet.map((d: any) => {
+              return d[1].expected_data.yhat;
             }),
           },
         ]}
@@ -38,7 +44,7 @@ function Chart({
           },
           xaxis: {
             labels: { show: size ? true : false },
-            categories: costHistory?.map((d) => d.TimePeriod.Start),
+            categories: prophet.map((d: any) => d[0]),
             type: "datetime",
           },
           fill: {
@@ -50,10 +56,10 @@ function Chart({
             },
           },
         }}
-        width={size ? size : "100%"}
+        width={"300%"}
       />
     </>
   );
 }
 
-export default Chart;
+export default PredictChart;

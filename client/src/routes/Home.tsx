@@ -1,34 +1,11 @@
-import {
-  getCostHistory,
-  getCostHistoryByResource,
-  getInfra,
-  getNestedInfra,
-  getProphetTrend,
-  getSimilarityTrend,
-} from "../api";
 import styled from "styled-components";
-import { useQuery } from "react-query";
 import Header from "../components/Header";
 import MenuBar from "../components/MenuBar";
-import Loader from "../components/Loader";
 import { Switch, Route } from "react-router-dom";
-import Cost from "../screens/Cost";
+import Cost from "./Cost";
 import Infra from "../screens/Infra";
 import { useRecoilValue } from "recoil";
 import { regionAtom } from "../atoms";
-
-interface IInfra {
-  tmp: null;
-}
-export interface INestedInfra {
-  resource_id: string;
-  resource_type: string;
-  children?: INestedInfra[];
-}
-interface INestedInfraResponse {
-  orphan?: INestedInfra[];
-  infra: INestedInfra;
-}
 
 const Container = styled.div`
   display: flex;
@@ -43,50 +20,22 @@ const ContentBox = styled.div`
 
 const Home = () => {
   const region = useRecoilValue(regionAtom);
-  const { isLoading: isInfraLoading, data: allInfra } = useQuery<any>(
-    "allInfra",
-    getInfra
-  );
-  const { isLoading: isNestedInfraLoading, data: nestedInfra } =
-    useQuery<INestedInfraResponse>("nestedInfra", getNestedInfra);
-  const {
-    isLoading: isCostHistoryByResourceLoading,
-    data: costHistoryByResourceLoading,
-  } = useQuery<any>("costHistoryByResource", getCostHistoryByResource);
-  // const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
-  //   "costHistory",
-  //   getCostHistory
-  // );
-  // const { isLoading: isSimilarityLoading, data: similarityTrend } =
-  //   useQuery<any>("similarity", getSimilarityTrend);
 
-  // const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
-  //   "prophet",
-  //   getProphetTrend
-  // );
   return (
     <>
       <Header />
       <Container>
         <MenuBar />
-        {isInfraLoading ||
-        isNestedInfraLoading ||
-        isCostHistoryByResourceLoading ? (
-          <Loader />
-        ) : (
-          <>
-            <ContentBox>
-              <Switch>
-                <Route path={`/`} exact>
-                  <Infra width={800} height={600} />
-                </Route>
-                <Route path={`/cost`}>
-                  <Cost />
-                </Route>
-              </Switch>
-            </ContentBox>
-          </>
-        )}
+        <ContentBox>
+          <Switch>
+            <Route path={`/`} exact>
+              <Infra width={800} height={600} />
+            </Route>
+            <Route path={`/cost`}>
+              <Cost />
+            </Route>
+          </Switch>
+        </ContentBox>
       </Container>
     </>
   );

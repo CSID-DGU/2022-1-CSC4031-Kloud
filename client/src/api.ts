@@ -1,12 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { INestedInfra } from "./routes/Home";
+import { INestedInfra } from "./types";
 
 const BASE_URL = "http://localhost:8000";
 
 export async function login(
-  access_key_public: String,
-  access_key_secret: String,
-  region: String
+  access_key_public: string,
+  access_key_secret: string,
+  region: string
 ) {
   if (access_key_public) {
     return await axios({
@@ -19,6 +19,34 @@ export async function login(
       },
     });
   }
+}
+export async function stopInstance(instance_id: string) {
+  return await axios({
+    method: "POST",
+    url: `${BASE_URL}/mod/instance/stop`,
+    data: {
+      instance_id: instance_id,
+      hibernate: true,
+      force: true,
+    },
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+}
+export async function startInstance(instance_id: string) {
+  return await axios({
+    method: "POST",
+    url: `${BASE_URL}/mod/instance/start`,
+    data: {
+      instance_id: instance_id,
+    },
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
 }
 
 export function getInfra() {
@@ -59,7 +87,9 @@ export async function getNestedInfra() {
       resource_id: orphan,
       resource_type: response.orphan[`${orphan}`].resource_type,
     };
-    data.orphan.push(orphanObj);
+    if (orphanObj.resource_type !== "network_interface") {
+      data.orphan.push(orphanObj);
+    }
   }
 
   for (const vpc in response) {
@@ -82,6 +112,9 @@ export async function getNestedInfra() {
           resource_type:
             response[`${vpc}`].children[`${subnet}`].children[`${instance}`]
               .resource_type,
+          state:
+            response[`${vpc}`].children[`${subnet}`].children[`${instance}`]
+              .State.Name,
         };
         subnetObj.children.push(instanceObj);
       }
@@ -95,7 +128,7 @@ export async function getNestedInfra() {
 export function getCostHistory() {
   const data = axios({
     method: "GET",
-    url: `${BASE_URL}/cost/history/default`,
+    url: `${BASE_URL}/cost/history/param`,
     data: {},
     headers: {
       Accept: "application/json",
@@ -108,7 +141,7 @@ export function getCostHistory() {
 export function getCostHistoryByResource() {
   const data = axios({
     method: "GET",
-    url: `${BASE_URL}/cost/history/by-resource`,
+    url: `${BASE_URL}/cost/history/by-resource?granularity=DAILY`,
     data: {},
     headers: {
       Accept: "application/json",
@@ -130,8 +163,8 @@ export function getSimilarityTrend() {
   });
   return data;
 }
-export function getProphetTrend() {
-  const data = axios({
+export async function getProphetTrend() {
+  const response = await axios({
     method: "GET",
     url: `${BASE_URL}/cost/trend/prophet`,
     data: {},
@@ -140,7 +173,12 @@ export function getProphetTrend() {
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   });
-  return data;
+
+  const result = [];
+  for (const date in response.data) {
+    result.push([date, response.data[`${date}`]]);
+  }
+  return result;
 }
 
 export function logOut() {

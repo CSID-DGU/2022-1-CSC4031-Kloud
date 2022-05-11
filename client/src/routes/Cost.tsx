@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { Link, useRouteMatch, Switch, Route } from "react-router-dom";
-import Solution from "./Solution";
-import Analysis from "./Analysis";
-import Trend from "./Trend";
+import Solution from "../screens/Solution";
+import Analysis from "../screens/Analysis";
+import Trend from "../screens/Trend";
 
 const Container = styled.div`
   height: 100%;
@@ -40,7 +40,7 @@ const Cost = () => {
   return (
     <Container>
       <CostHeader>
-        <Title>Cost</Title>
+        {trendMatch ? <Title></Title> : <Title>Cost</Title>}
         <Nav>
           <Link to={"/cost/analysis"}>
             <NavItem isActive={analysisMatch ? true : false}>Analysis</NavItem>
