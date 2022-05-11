@@ -54,3 +54,5 @@ export interface IDayCost {
   Total: Total;
   TimePeriod: TimePeriod;
 }
+
+export interface Prophet {}

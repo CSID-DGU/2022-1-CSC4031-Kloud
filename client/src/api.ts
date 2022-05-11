@@ -163,8 +163,8 @@ export function getSimilarityTrend() {
   });
   return data;
 }
-export function getProphetTrend() {
-  const data = axios({
+export async function getProphetTrend() {
+  const response = await axios({
     method: "GET",
     url: `${BASE_URL}/cost/trend/prophet`,
     data: {},
@@ -173,7 +173,12 @@ export function getProphetTrend() {
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   });
-  return data;
+
+  const result = [];
+  for (const date in response.data) {
+    result.push([date, response.data[`${date}`]]);
+  }
+  return result;
 }
 
 export function logOut() {
