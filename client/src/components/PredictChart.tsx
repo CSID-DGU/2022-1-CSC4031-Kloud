@@ -13,7 +13,7 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
         type="line"
         series={[
           {
-            name: "Real Data",
+            name: "Real",
             data: prophet.map((d: any) => {
               return d[1].real_data;
             }),
@@ -31,19 +31,19 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
           },
           chart: {
             toolbar: {
-              show: false,
+              show: true,
             },
             background: "gray",
+            height: 350,
           },
           stroke: {
-            curve: "smooth",
-            width: 3,
+            width: 2,
           },
           yaxis: {
-            show: size ? true : false,
+            show: true,
           },
           xaxis: {
-            labels: { show: size ? true : false },
+            labels: { show: true },
             categories: prophet.map((d: any) => d[0]),
             type: "datetime",
           },
@@ -55,8 +55,12 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
               formatter: (value) => `$${value.toFixed(2)}`,
             },
           },
+          forecastDataPoints: {
+            count: 5,
+            dashArray: 5,
+          },
         }}
-        width={"300%"}
+        width={"280%"}
       />
     </>
   );
