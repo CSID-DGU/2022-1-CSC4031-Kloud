@@ -1,6 +1,11 @@
 import datetime
+import os
 
-HOST = 'kloud_redis'
+HOST = os.environ.get('REDIS_HOST')  # 환경변수로 redis 호스트 설정
+
+if HOST is None:
+    HOST = 'kloud_redis'  # docker-compose
+
 PORT = 6379
 CELERYDB = 0  # redis db num
 CREDDB = 1

@@ -1,7 +1,7 @@
 import requests
-from .conf.urls import SERVER, COST_HISTORY_DEFAULT
+from .conf.urls import API_SERVER, COST_HISTORY_DEFAULT
 
 
 def get_cost_info(token):
-    data = requests.get(url=SERVER + COST_HISTORY_DEFAULT, headers={'Authorization': f'Bearer {token}'}).json()
+    data = requests.get(url=API_SERVER + COST_HISTORY_DEFAULT, headers={'Authorization': f'Bearer {token}'}).json()
     return data
