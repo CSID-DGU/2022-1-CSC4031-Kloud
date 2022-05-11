@@ -14,7 +14,7 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
         series={[
           {
             name: "Real",
-            data: prophet.map((d: any) => {
+            data: prophet.slice(0, -5).map((d: any, idx: number) => {
               return d[1].real_data;
             }),
           },
@@ -29,26 +29,37 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
           theme: {
             mode: "dark",
           },
+          dataLabels: {
+            enabled: false,
+          },
           chart: {
             toolbar: {
               show: true,
             },
             background: "gray",
-            height: 350,
+            stacked: false,
           },
           stroke: {
             width: 2,
           },
           yaxis: {
             show: true,
+            decimalsInFloat: 2,
           },
           xaxis: {
             labels: { show: true },
             categories: prophet.map((d: any) => d[0]),
             type: "datetime",
           },
-          fill: {
-            type: "gradient",
+          fill: {},
+          title: {
+            text: "Cost Trends",
+            align: "left",
+            style: {
+              fontSize: "25px",
+              color: "#040959",
+              fontWeight: "lighter",
+            },
           },
           tooltip: {
             y: {
