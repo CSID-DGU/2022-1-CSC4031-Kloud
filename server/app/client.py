@@ -259,6 +259,5 @@ class KloudClient:
         self._ec2_client.stop_instances(
             InstanceIds=[instance_id],
             Hibernate=hibernate,
-            DryRun=True,
             Force=force
         )
