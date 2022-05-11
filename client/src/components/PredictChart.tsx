@@ -28,6 +28,7 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
           {
             name: "Min Error",
             type: "area",
+            color: "gray",
             data: prophet.map((d: any) => {
               return d[1].expected_data.yhat_lower;
             }),
@@ -35,6 +36,7 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
           {
             name: "Max Error",
             type: "area",
+            color: "#246c3849",
             data: prophet.map((d: any) => {
               return d[1].expected_data.yhat_upper;
             }),
@@ -52,6 +54,7 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
               show: true,
             },
             background: "gray",
+            stacked: true,
           },
           stroke: {
             width: 2,
@@ -79,6 +82,7 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
               fontWeight: "lighter",
             },
           },
+          colors: ["#0091ff", "#00E396", "#d2d2d2"],
           tooltip: {
             y: {
               formatter: (value) => `$${value.toFixed(2)}`,
