@@ -8,9 +8,7 @@ from .common_funcs import get_describing_methods_dict, fetch_and_process, PARENT
 
 
 class KloudResourceClient:
-    def __init__(self, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
-        self.loop = loop  # 비동기 이벤트 루프
-        self.executor = executor  # thread pool executor
+    def __init__(self, session_instance: boto3.Session):
         self._session = session_instance
 
 
@@ -18,8 +16,8 @@ class KloudEC2Client(KloudResourceClient):
     """
     boto3 ec2 클라이언트 래퍼
     """
-    def __init__(self, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
-        super().__init__(session_instance, loop, executor)
+    def __init__(self, session_instance: boto3.Session):
+        super().__init__(session_instance)
         self._ec2_client = session_instance.client(service_name="ec2")
         self._describing_methods = get_describing_methods_dict(ec2_client=self._ec2_client)
 
@@ -32,7 +30,7 @@ class KloudEC2Client(KloudResourceClient):
             # identifier: str, describing_method: function
             func = functools.partial(fetch_and_process, identifier=identifier,
                                      describing_method=describing_method)
-            future = self.loop.run_in_executor(executor=self.executor, func=func)
+            future = asyncio.to_thread(func)
             boto3_reqs.append(future)
         return boto3_reqs
 
@@ -72,8 +70,8 @@ class KloudEC2Client(KloudResourceClient):
 
 
 class KloudRDSClient(KloudResourceClient):
-    def __init__(self, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
-        super().__init__(session_instance, loop, executor)
+    def __init__(self, session_instance: boto3.Session):
+        super().__init__(session_instance)
         self._rds_client = session_instance.client(service_name="rds")
 
     async def describe_rds(self):
@@ -83,8 +81,8 @@ class KloudRDSClient(KloudResourceClient):
 
 
 class KloudInfraFetcher(KloudEC2Client, KloudRDSClient):
-    def __init__(self, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
-        super().__init__(session_instance, loop, executor)
+    def __init__(self, session_instance: boto3.Session):
+        super().__init__(session_instance)
         self.session_instance = session_instance
         self.describing_tasks = [
             self.get_current_ec2_cli_infra_dict(),

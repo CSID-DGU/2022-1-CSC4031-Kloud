@@ -8,7 +8,6 @@ from . import common_functions
 from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
 import boto3
 import asyncio
-import concurrent.futures
 from .config.cellery_app import da_app
 from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
     delete_cache_from_redis
@@ -25,8 +24,6 @@ app = FastAPI(
 aws_info = boto3.Session()
 
 clients = dict()  # 수정 필요
-event_loop: asyncio.unix_events.SelectorEventLoop  # on_event('startup')시 오버라이드
-executor = concurrent.futures.ThreadPoolExecutor()  # boto3 io 작업이 실행될 스레드풀. KloudClient 객체 생성시 넘어감.
 
 # #### CORS #####
 # 개발 편의를 위해 모든 origin 허용. 배포시 수정 필요
@@ -49,14 +46,6 @@ app.add_middleware(
 
 
 # #### CORS #####
-
-
-@app.on_event('startup')
-async def startup():
-    global event_loop
-    event_loop = asyncio.get_running_loop()  # KloudClient 객체 생성시 넘어감.
-
-
 async def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:
     """
     redis에서 임시 자격증명을 가져와 객체를 생성함.
@@ -66,7 +55,7 @@ async def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:
         raise UserNotInDBException  # 없는 유저
     else:
         session_instance = temp_session_create(cred)
-        kloud_client = KloudClient(user_id, session_instance, event_loop, executor)
+        kloud_client = KloudClient(user_id, session_instance)
         cache_user_client(user_id, kloud_client)
         return kloud_client
 
