@@ -26,8 +26,8 @@ export async function stopInstance(instance_id: string) {
     url: `${BASE_URL}/mod/instance/stop`,
     data: {
       instance_id: instance_id,
-      hibernate: true,
-      force: true,
+      hibernate: false,
+      force: false,
     },
     headers: {
       Accept: "application/json",

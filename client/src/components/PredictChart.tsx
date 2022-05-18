@@ -13,8 +13,9 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
         type="line"
         series={[
           {
-            name: "Real Data",
-            data: prophet.map((d: any) => {
+            name: "Real",
+            type: "line",
+            data: prophet.slice(0, -5).map((d: any, idx: number) => {
               return d[1].real_data;
             }),
           },
@@ -24,39 +25,77 @@ function PredictChart({ size, similarity, prophet }: IPredictChart) {
               return d[1].expected_data.yhat;
             }),
           },
+          {
+            name: "Min Error",
+            type: "area",
+            color: "gray",
+            data: prophet.map((d: any) => {
+              return d[1].expected_data.yhat_lower;
+            }),
+          },
+          {
+            name: "Max Error",
+            type: "area",
+            color: "#246c3849",
+            data: prophet.map((d: any) => {
+              return d[1].expected_data.yhat_upper;
+            }),
+          },
         ]}
         options={{
           theme: {
             mode: "dark",
           },
+          dataLabels: {
+            enabled: false,
+          },
           chart: {
             toolbar: {
-              show: false,
+              show: true,
             },
             background: "gray",
+            stacked: true,
           },
           stroke: {
-            curve: "smooth",
-            width: 3,
+            width: 2,
           },
           yaxis: {
-            show: size ? true : false,
+            show: true,
+            decimalsInFloat: 2,
+            min: 0,
           },
           xaxis: {
-            labels: { show: size ? true : false },
+            labels: { show: true },
             categories: prophet.map((d: any) => d[0]),
             type: "datetime",
           },
           fill: {
-            type: "gradient",
+            opacity: 0.9,
+            type: "solid",
           },
+          title: {
+            text: "Cost Trends",
+            align: "left",
+            style: {
+              fontSize: "25px",
+              color: "#040959",
+              fontWeight: "lighter",
+            },
+          },
+          colors: ["#0091ff", "#00E396", "#d2d2d2"],
           tooltip: {
             y: {
               formatter: (value) => `$${value.toFixed(2)}`,
             },
+            shared: true,
+            intersect: false,
+          },
+          forecastDataPoints: {
+            count: 5,
+            dashArray: 5,
           },
         }}
-        width={"300%"}
+        width={"280%"}
       />
     </>
   );

@@ -25,7 +25,7 @@ function Chart({
           },
           chart: {
             toolbar: {
-              show: false,
+              show: size ? true : false,
             },
             background: "gray",
           },
