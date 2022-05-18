@@ -32,7 +32,36 @@ def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
     return processed
 
 
-def get_describing_methods_dict(ec2_client, rds_client) -> dict:
+def response_process(identifier, describing_method) -> dict:  # 응답을 받아서 후처리함.
+    """
+    identifier: str
+    describing_method: function
+
+    응답을 받아서 후처리함.
+    resource_id와 resource_type 정보를 추가함.
+    boto3 조회 요청은 스레드에서 실행되어야하기 때문에 결과값을 받아서 넣지 않고 describing method를 인자로 넣음.
+    """
+    response: list = cut_useless_metadata(describing_method())
+    if identifier == 'InstanceId':  # ec2 인스턴스일 경우
+        try:
+            instances = list()
+            for group_dict in response:
+                for instance_dict in group_dict['Instances']:
+                    instances.append(instance_dict)
+
+            response = instances
+        except IndexError:  # ec2 인스턴스가 없을 경우
+            pass
+    to_return = dict()
+    for dic in response:  # 응답이 존재하지 않는 경우 for문이 실행되지 않고 넘어감.
+        primary_key = dic[identifier]
+        dic['resource_id'] = primary_key
+        dic['resource_type'] = RESOURCE_TYPE[identifier]
+        to_return[primary_key] = dic
+    return to_return
+
+
+def get_describing_methods_dict(ec2_client) -> dict:
     """
     client 인자는 boto3로 생성된 클라이언트 객체
 
@@ -45,74 +74,37 @@ def get_describing_methods_dict(ec2_client, rds_client) -> dict:
                           'InternetGatewayId': ec2_client.describe_internet_gateways,
                           'NatGatewayId': ec2_client.describe_nat_gateways,
                           'InstanceId': ec2_client.describe_instances,
-                          'DBInstanceIdentifier': rds_client.describe_db_instances
                           }
     return describing_methods
 
 
-class KloudClient:
-    def __init__(self, access_key_id: str, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
-        self.id = access_key_id
+class KloudResourceClient:
+    def __init__(self, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
         self.loop = loop  # 비동기 이벤트 루프
         self.executor = executor  # thread pool executor
 
         #### boto3 ####
         self._session = session_instance
-        self._ec2_client = session_instance.client(service_name="ec2")
-        self._rds_client = session_instance.client(service_name="rds")
-        self._ce_client = session_instance.client(service_name="ce")
         #### boto3 ####
 
-        self._resources = dict()
-        self._describing_methods = {'VpcId': self._ec2_client.describe_vpcs,
-                                    'SubnetId': self._ec2_client.describe_subnets,
-                                    'NetworkInterfaceId': self._ec2_client.describe_network_interfaces,
-                                    'InternetGatewayId': self._ec2_client.describe_internet_gateways,
-                                    'NatGatewayId': self._ec2_client.describe_nat_gateways,
-                                    'InstanceId': self._ec2_client.describe_instances,
-                                    'DBInstanceIdentifier': self._rds_client.describe_db_instances
-                                    }
+    async def describe_all(self) -> dict:
+        return dict()
 
-    def get_describing_methods_dict(self) -> dict:
-        return get_describing_methods_dict(self._ec2_client, self._rds_client)
 
-    @staticmethod
-    def _response_process(identifier, describing_method) -> dict:  # 응답을 받아서 후처리함.
-        """
-        identifier: str
-        describing_method: function
-
-        응답을 받아서 후처리함.
-        resource_id와 resource_type 정보를 추가함.
-        boto3 조회 요청은 스레드에서 실행되어야하기 때문에 결과값을 받아서 넣지 않고 describing method를 인자로 넣음.
-        """
-        response: list = cut_useless_metadata(describing_method())
-        if identifier == 'InstanceId':  # ec2 인스턴스일 경우
-            try:
-                instances = list()
-                for group_dict in response:
-                    for instance_dict in group_dict['Instances']:
-                        instances.append(instance_dict)
-
-                response = instances
-            except IndexError:  # ec2 인스턴스가 없을 경우
-                pass
-        to_return = dict()
-        for dic in response:  # 응답이 존재하지 않는 경우 for문이 실행되지 않고 넘어감.
-            primary_key = dic[identifier]
-            dic['resource_id'] = primary_key
-            dic['resource_type'] = RESOURCE_TYPE[identifier]
-            to_return[primary_key] = dic
-        return to_return
+class KloudEC2Client(KloudResourceClient):
+    def __init__(self, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
+        super().__init__(session_instance, loop, executor)
+        self._ec2_client = session_instance.client(service_name="ec2")
+        self._describing_methods = get_describing_methods_dict(ec2_client=self._ec2_client)
 
     async def _fetch_infra_info(self) -> list:
         """
         :return list 안에 dict 객체 포함. 각 dict 객체는 resource 하나에 대응됨.
         """
         boto3_reqs = list()  # run in executor 작업 목록
-        for identifier, describing_method in self.get_describing_methods_dict().items():
+        for identifier, describing_method in self._describing_methods.items():
             # identifier: str, describing_method: function
-            func = functools.partial(self._response_process, identifier=identifier,
+            func = functools.partial(response_process, identifier=identifier,
                                      describing_method=describing_method)
             future = self.loop.run_in_executor(executor=self.executor, func=func)
             boto3_reqs.append(future)
@@ -122,7 +114,6 @@ class KloudClient:
         """
         인프라 정보를 받고, 객체 멤버인 self._resources 에 저장한 후, 인프라 정보를 반환함.
         본래 인프라 정보를 캐시하려고 하였으나, thread unsafe 문제와 배포환경에서 발생 가능성 있는 몇 가지 문제에 대응하기 번거로움.
-        self._resource를 참조하지 않고 return 값을 받아 사용하는 것이 바람직함.
         """
         to_return = dict()
         reqs: list = await self._fetch_infra_info()  # boto3에 인프라 정보 요청
@@ -133,11 +124,43 @@ class KloudClient:
             if result is not None:  # 인프라가 없거나 하면 None
                 for key, val in result.items():
                     to_return[key] = val
-        self._resources = to_return
         return to_return
 
-    async def get_current_infra_dict(self) -> dict:
+    async def get_current_ec2_cli_infra_dict(self) -> dict:
         return await self._update_resource_dict()
+
+    def start_instance(self, instance_id: str) -> None:
+        self._ec2_client.start_instances(
+            InstanceIds=[instance_id]
+        )
+
+    def stop_instance(self, instance_id: str, hibernate: bool, force: bool) -> None:
+        self._ec2_client.stop_instances(
+            InstanceIds=[instance_id],
+            Hibernate=hibernate,
+            Force=force
+        )
+
+    async def describe_all(self) -> dict:
+        return await self.get_current_ec2_cli_infra_dict()
+
+
+class KloudRDSClient(KloudResourceClient):
+    def __init__(self, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
+        super().__init__(session_instance, loop, executor)
+        self._rds_client = session_instance.client(service_name="rds")
+
+    async def describe_all(self):
+        return await asyncio.to_thread(response_process,
+                                       identifier='DBInstanceIdentifier',
+                                       describing_method=self._rds_client.describe_db_instances)
+
+
+class KloudCostExplorer(KloudResourceClient):
+    def __init__(self, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
+        super().__init__(session_instance, loop, executor)
+        self._ce_client = session_instance.client(service_name="ce")
+        self.session_instance = session_instance
 
     async def get_cost_history(self, days: int = 90, granularity: str = None) -> dict:
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=days))),
@@ -157,9 +180,8 @@ class KloudClient:
     def get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str):
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
                        'End': str(datetime.date(datetime.now()))}
-
-        ec2_dict: dict = self._response_process(identifier='InstanceId',
-                                                describing_method=self._ec2_client.describe_instances)
+        ec2_dict: dict = response_process(identifier='InstanceId',
+                                          describing_method=self.session_instance.client("ec2").describe_instances)
         resource_id_list = list(ec2_dict.keys())  # ec2 이외 다른 리소스도 조회가 가능할 경우, 키만 가져와서 합치면 됨.
         metrics = ['UnblendedCost']
         group_by = [{'Type': 'DIMENSION', 'Key': 'RESOURCE_ID'}]
@@ -189,6 +211,7 @@ class KloudClient:
         :param granularity: MONTHLY|DAILY|HOURLY
         :return: dict
         """
+
         fun = functools.partial(self.get_ec2_instances_cost_history,
                                 show_usage_type_and_quantity=show_usage_type_and_quantity,
                                 granularity=granularity)
@@ -197,9 +220,31 @@ class KloudClient:
     async def get_default_cost_history(self) -> dict:
         return await self.get_cost_history()
 
+
+class KloudClient(KloudEC2Client, KloudRDSClient, KloudCostExplorer):
+    def __init__(self, access_key_id: str, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
+        super().__init__(session_instance, loop, executor)
+        self.id = access_key_id
+        self.session_instance = session_instance
+        self.loop = loop
+        self.executor = executor
+
     async def get_infra_tree(self) -> dict:
         resources = await self.get_current_infra_dict()
         return self._build_tree(resources)
+
+    async def get_current_infra_dict(self) -> dict:
+        to_return = dict()
+        kec = KloudEC2Client(session_instance=self.session_instance, loop=self.loop, executor=self.executor)
+        krdsc = KloudRDSClient(session_instance=self.session_instance, loop=self.loop, executor=self.executor)
+
+        tasks = []
+        for client in [kec, krdsc]:
+            tasks.append(client.describe_all())
+        done, pending = await asyncio.wait(tasks)
+        for task in done:
+            to_return.update(task.result())
+        return to_return
 
     @staticmethod
     def _get_parent(child: dict) -> str:
@@ -249,15 +294,3 @@ class KloudClient:
             elif resource_type not in POSSIBLE_ROOT_NODES and parent is None:
                 to_return['orphan'][k] = v
         return to_return
-
-    def start_instance(self, instance_id: str) -> None:
-        self._ec2_client.start_instances(
-            InstanceIds=[instance_id]
-        )
-
-    def stop_instance(self, instance_id: str, hibernate: bool, force: bool) -> None:
-        self._ec2_client.stop_instances(
-            InstanceIds=[instance_id],
-            Hibernate=hibernate,
-            Force=force
-        )
