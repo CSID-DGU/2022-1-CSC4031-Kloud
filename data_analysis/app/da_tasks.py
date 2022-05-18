@@ -15,7 +15,7 @@ def pattern_finder(token: str, start_date="2022-02-02", end_date="2022-05-10" , 
     data = get_cost_info(token)
     p = PatternFinder(data)
     # 날짜는 수정이 가능함 원하는 날짜가 들어오게 만들면 될 듯
-    result = p.search('2022-02-02', "2022-05-10", threshold=0.5)
+    result = p.search('2022-02-02', "2022-05-17", threshold=0.5)
     # 패턴을 못찾은 경우 추후에 try,except로 수정해야할듯
     if len(result) == 0:
         print("threshold 혹은 date범위를 바꿔주어야함")
