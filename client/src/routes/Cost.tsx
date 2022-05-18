@@ -29,7 +29,7 @@ const NavItem = styled.span<{ isActive: boolean }>`
   -webkit-transition: text-decoration 0.5s ease-in-out;
 `;
 const Title = styled.span`
-  font-size: 100px;
+  font-size: 80px;
   color: white;
 `;
 const Cost = () => {
@@ -40,7 +40,13 @@ const Cost = () => {
   return (
     <Container>
       <CostHeader>
-        {trendMatch ? <Title></Title> : <Title>Cost</Title>}
+        {trendMatch ? (
+          <Title>Cost Trends</Title>
+        ) : analysisMatch ? (
+          <Title>Cost Analysis</Title>
+        ) : (
+          <Title>Cost Solution</Title>
+        )}
         <Nav>
           <Link to={"/cost/analysis"}>
             <NavItem isActive={analysisMatch ? true : false}>Analysis</NavItem>
