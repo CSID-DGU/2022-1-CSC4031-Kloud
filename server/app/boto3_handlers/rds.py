@@ -2,8 +2,8 @@ import asyncio
 
 import boto3
 
-from server.app.boto3_handlers.common_funcs import fetch_and_process
-from server.app.boto3_handlers.kloud_resource_client import KloudResourceClient
+from .common_funcs import fetch_and_process
+from .kloud_resource_client import KloudResourceClient
 
 
 class KloudRDS(KloudResourceClient):
