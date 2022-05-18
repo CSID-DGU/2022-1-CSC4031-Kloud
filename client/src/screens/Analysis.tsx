@@ -1,29 +1,44 @@
 import styled from "styled-components";
+import BarChart from "../components/AnalChartBar";
+import PolarChart from "../components/AnalChartPolar";
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  width: auto;
+  height: auto;
+  padding-top: 18px;
 `;
 const ChartBoxContainer = styled.div`
   display: flex;
+  height: auto;
 `;
-const ChartBox = styled.div`
-  background-color: white;
-  height: 200px;
-  width: 200px;
+const ChartBox = styled.div<{ margin?: number }>`
+  height: auto;
+  width: auto;
+  margin-right: ${(props) => (props.margin ? props.margin : 0)}px;
+  margin-top: 10px;
 `;
 const Analysis = () => {
   return (
     <Container>
       <ChartBoxContainer>
-        <ChartBox></ChartBox>
-        <ChartBox></ChartBox>
+        <ChartBox margin={90}>
+          <PolarChart size={430}></PolarChart>
+        </ChartBox>
+        <ChartBox>
+          <BarChart size={430}></BarChart>
+        </ChartBox>
       </ChartBoxContainer>
       <ChartBoxContainer>
-        <ChartBox></ChartBox>
-        <ChartBox></ChartBox>
+        <ChartBox margin={90}>
+          <PolarChart size={430}></PolarChart>
+        </ChartBox>
+        <ChartBox>
+          <PolarChart size={430}></PolarChart>
+        </ChartBox>
       </ChartBoxContainer>
     </Container>
   );
