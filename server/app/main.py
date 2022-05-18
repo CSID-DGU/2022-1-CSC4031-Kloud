@@ -56,14 +56,7 @@ async def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:
     else:
         session_instance = temp_session_create(cred)
         kloud_client = KloudClient(user_id, session_instance)
-        cache_user_client(user_id, kloud_client)
         return kloud_client
-
-
-def cache_user_client(user_id: str,
-                      user_client: KloudClient) -> None:  # todo 유저 객체 캐시 구현
-    # clients[user_id] = user_client
-    pass
 
 
 class KloudLoginForm(BaseModel):
