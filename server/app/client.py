@@ -160,6 +160,7 @@ class KloudCostExplorer(KloudResourceClient):
     def __init__(self, session_instance: boto3.Session, loop, executor: ThreadPoolExecutor):
         super().__init__(session_instance, loop, executor)
         self._ce_client = session_instance.client(service_name="ce")
+        self.session_instance = session_instance
 
     async def get_cost_history(self, days: int = 90, granularity: str = None) -> dict:
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=days))),
@@ -176,14 +177,12 @@ class KloudCostExplorer(KloudResourceClient):
         res = await self.loop.run_in_executor(executor=self.executor, func=fun)
         return res
 
-    def get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str,
-                                       resource_id_list: list):
+    def get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str):
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
                        'End': str(datetime.date(datetime.now()))}
-        #
-        # ec2_dict: dict = self.response_process(identifier='InstanceId',
-        #                                         describing_method=self._ec2_client.describe_instances)
-        # resource_id_list = list(ec2_dict.keys())  # ec2 이외 다른 리소스도 조회가 가능할 경우, 키만 가져와서 합치면 됨.
+        ec2_dict: dict = response_process(identifier='InstanceId',
+                                          describing_method=self.session_instance.client("ec2").describe_instances)
+        resource_id_list = list(ec2_dict.keys())  # ec2 이외 다른 리소스도 조회가 가능할 경우, 키만 가져와서 합치면 됨.
         metrics = ['UnblendedCost']
         group_by = [{'Type': 'DIMENSION', 'Key': 'RESOURCE_ID'}]
 
@@ -212,6 +211,7 @@ class KloudCostExplorer(KloudResourceClient):
         :param granularity: MONTHLY|DAILY|HOURLY
         :return: dict
         """
+
         fun = functools.partial(self.get_ec2_instances_cost_history,
                                 show_usage_type_and_quantity=show_usage_type_and_quantity,
                                 granularity=granularity)
