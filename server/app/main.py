@@ -142,7 +142,7 @@ async def get_available_regions():
 
 @app.get("/infra/info")
 async def infra_info(user_client=Depends(get_user_client)):
-    return await user_client.get_current_infra_dict()
+    return await user_client.get_current_ec2_cli_infra_dict()
 
 
 @app.get("/cost/history/param")
