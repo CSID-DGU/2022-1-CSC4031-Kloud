@@ -1,9 +1,7 @@
 import asyncio
 import functools
 from datetime import datetime, timedelta
-
 import boto3
-
 from .common_funcs import fetch_and_process
 
 

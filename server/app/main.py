@@ -2,7 +2,7 @@ import botocore.exceptions
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from .client import KloudClient
+from .boto3_handlers.kloud_client import KloudClient
 from .response_exceptions import UserNotInDBException, CeleryTimeOutError
 from . import common_functions
 from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
