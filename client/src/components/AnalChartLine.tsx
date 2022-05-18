@@ -1,22 +1,19 @@
 import ApexChart from "react-apexcharts";
-import { IChartProps } from "../types";
 
-function Chart({
-  size,
-  resourceId,
-  costHistory: { data: costHistory },
-}: IChartProps) {
+interface ILineChart {
+  size: number;
+}
+function LineChart({ size }: ILineChart) {
   return (
     <>
       <ApexChart
         type="line"
         series={[
           {
-            name: "price",
-            data: costHistory?.map((d) => {
-              const hit = d.Groups.filter((g) => g.Keys[0] === resourceId);
-              return hit.length === 0 ? 0 : hit[0].Metrics.UnblendedCost.Amount;
-            }),
+            name: "Sales",
+            data: [
+              4, 3, 10, 9, 29, 19, 22, 9, 12, 7, 19, 5, 13, 9, 17, 2, 7, 5,
+            ],
           },
         ]}
         options={{
@@ -24,36 +21,58 @@ function Chart({
             mode: "dark",
           },
           chart: {
-            toolbar: {
-              show: size ? true : false,
-            },
-            background: "gray",
+            background: "#040959",
+            type: "line",
           },
           stroke: {
+            width: 5,
             curve: "smooth",
-            width: 3,
-          },
-          yaxis: {
-            show: size ? true : false,
           },
           xaxis: {
-            labels: { show: size ? true : false },
-            categories: costHistory?.map((d) => d.TimePeriod.Start),
             type: "datetime",
+            categories: [
+              "1/11/2000",
+              "2/11/2000",
+              "3/11/2000",
+              "4/11/2000",
+              "5/11/2000",
+              "6/11/2000",
+              "7/11/2000",
+              "8/11/2000",
+              "9/11/2000",
+              "10/11/2000",
+              "11/11/2000",
+              "12/11/2000",
+              "1/11/2001",
+              "2/11/2001",
+              "3/11/2001",
+              "4/11/2001",
+              "5/11/2001",
+              "6/11/2001",
+            ],
+            tickAmount: 10,
           },
           fill: {
             type: "gradient",
-          },
-          tooltip: {
-            y: {
-              formatter: (value) => `$${value.toFixed(2)}`,
+            gradient: {
+              shade: "dark",
+              gradientToColors: ["#FDD835"],
+              shadeIntensity: 1,
+              type: "horizontal",
+              opacityFrom: 1,
+              opacityTo: 1,
+              stops: [0, 100, 100, 100],
             },
           },
+          yaxis: {
+            min: -10,
+            max: 40,
+          },
         }}
-        width={size ? size : "100%"}
+        width="120%"
       />
     </>
   );
 }
 
-export default Chart;
+export default LineChart;

@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import BarChart from "../components/AnalChartBar";
+import DonutChart from "../components/AnalChartDonut";
+import LineChart from "../components/AnalChartLine";
 import PolarChart from "../components/AnalChartPolar";
 
 const Container = styled.div`
@@ -34,10 +36,10 @@ const Analysis = () => {
       </ChartBoxContainer>
       <ChartBoxContainer>
         <ChartBox margin={90}>
-          <PolarChart size={430}></PolarChart>
+          <LineChart size={430}></LineChart>
         </ChartBox>
         <ChartBox>
-          <PolarChart size={430}></PolarChart>
+          <DonutChart size={430}></DonutChart>
         </ChartBox>
       </ChartBoxContainer>
     </Container>
