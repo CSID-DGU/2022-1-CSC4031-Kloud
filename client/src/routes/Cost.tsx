@@ -3,6 +3,7 @@ import { Link, useRouteMatch, Switch, Route } from "react-router-dom";
 import Solution from "../screens/Solution";
 import Analysis from "../screens/Analysis";
 import Trend from "../screens/Trend";
+import Modal from "../components/Modal";
 
 const Container = styled.div`
   height: 100%;
