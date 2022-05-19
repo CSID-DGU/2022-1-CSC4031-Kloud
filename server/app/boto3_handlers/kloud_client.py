@@ -17,6 +17,8 @@ class KloudClient(KloudEC2, KloudRDS, KloudCostExplorer):
             self.get_current_ec2_cli_infra_dict(),
             self.describe_rds()
         ]
+        self._ce_client = self.session_instance.client(service_name="ce")  # 수정 필요
+
 
     async def get_current_infra_dict(self) -> dict:
         to_return = dict()
