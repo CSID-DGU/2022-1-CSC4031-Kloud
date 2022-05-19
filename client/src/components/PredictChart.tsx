@@ -1,5 +1,4 @@
 import ApexChart from "react-apexcharts";
-import { IChartProps } from "../types";
 
 interface IPredictChart {
   size?: string;
