@@ -13,16 +13,16 @@ class KloudClient(KloudEC2, KloudRDS, KloudCostExplorer):
         super().__init__(session_instance)
         self.id = access_key_id
         self.session_instance = session_instance
-        self.describing_tasks = [
-            self.get_current_ec2_cli_infra_dict(),
-            self.describe_rds()
+        self.describing_tasks = [  # async def 이기 때문에 await 하지 않을 시 awaitable 객체 반환
+            self.get_current_ec2_cli_infra_dict,
+            self.describe_rds
         ]
-        self._ce_client = self.session_instance.client(service_name="ce")  # 수정 필요
-
 
     async def get_current_infra_dict(self) -> dict:
         to_return = dict()
-        tasks = [self.get_current_ec2_cli_infra_dict(), self.describe_rds()]
+        tasks = list()
+        for task in self.describing_tasks:
+            tasks.append(task())
         done, pending = await asyncio.wait(tasks)
         for task in done:
             to_return.update(task.result())

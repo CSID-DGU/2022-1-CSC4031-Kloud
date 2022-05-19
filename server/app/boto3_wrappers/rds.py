@@ -3,10 +3,10 @@ import asyncio
 import boto3
 
 from .common_funcs import fetch_and_process
-from .kloud_resource_client import KloudResourceClient
+from .kloud_boto3_wrapper import KloudBoto3Wrapper
 
 
-class KloudRDS(KloudResourceClient):
+class KloudRDS(KloudBoto3Wrapper):
     def __init__(self, session_instance: boto3.Session):
         super().__init__(session_instance)
         self._rds_client = session_instance.client(service_name="rds")

@@ -4,10 +4,10 @@ import functools
 import boto3
 
 from .common_funcs import get_describing_methods_dict, fetch_and_process
-from .kloud_resource_client import KloudResourceClient
+from .kloud_boto3_wrapper import KloudBoto3Wrapper
 
 
-class KloudEC2(KloudResourceClient):
+class KloudEC2(KloudBoto3Wrapper):
     """
     boto3 ec2 클라이언트 래퍼
     """

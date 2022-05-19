@@ -3,10 +3,12 @@ import functools
 from datetime import datetime, timedelta
 import boto3
 from .common_funcs import fetch_and_process
+from .kloud_boto3_wrapper import KloudBoto3Wrapper
 
 
-class KloudCostExplorer:
+class KloudCostExplorer(KloudBoto3Wrapper):
     def __init__(self, session_instance: boto3.Session):
+        super().__init__(session_instance)
         self._ce_client = session_instance.client(service_name="ce")
         self.session_instance = session_instance
 
