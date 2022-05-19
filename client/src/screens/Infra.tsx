@@ -83,7 +83,7 @@ const SidebarButtonBox = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 50px;
+  margin-top: 30px;
 `;
 
 export default function Infra({
