@@ -59,6 +59,3 @@ class KloudEC2(KloudBoto3Wrapper):
             Hibernate=hibernate,
             Force=force
         )
-
-    async def describe_all(self) -> dict:
-        return await self.get_current_ec2_cli_infra_dict()

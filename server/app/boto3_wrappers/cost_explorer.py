@@ -10,7 +10,6 @@ class KloudCostExplorer(KloudBoto3Wrapper):
     def __init__(self, session_instance: boto3.Session):
         super().__init__(session_instance)
         self._ce_client = session_instance.client(service_name="ce")
-        self.session_instance = session_instance
 
     async def get_cost_history(self, days: int = 90, granularity: str = None) -> dict:
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=days))),
@@ -31,7 +30,7 @@ class KloudCostExplorer(KloudBoto3Wrapper):
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
                        'End': str(datetime.date(datetime.now()))}
         ec2_dict: dict = fetch_and_process(identifier='InstanceId',
-                                           describing_method=self.session_instance.client("ec2").describe_instances)
+                                           describing_method=self._session.client("ec2").describe_instances)
 
         resource_id_list = list(ec2_dict.keys())  # ec2 이외 다른 리소스도 조회가 가능할 경우, 키만 가져와서 합치면 됨.
         metrics = ['UnblendedCost']
