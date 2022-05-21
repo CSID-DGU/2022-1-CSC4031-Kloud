@@ -176,6 +176,11 @@ async def cost_history_by_resource(user_id=Depends(get_user_id),
                                                            granularity=granularity)
 
 
+@app.get("/cost/history/by-service")
+async def cost_history_by_service(user_client: KloudClient = Depends(get_user_client), days: Optional[int] = 90):
+    return await user_client.get_cost_history_by_service(days=days)
+
+
 @app.get("/infra/tree")
 async def infra_tree(user_client: KloudClient = Depends(get_user_client)):
     return await user_client.get_infra_tree()
