@@ -11,6 +11,7 @@ GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENT
 PARENT = {
     'subnet': 'VpcId',
     'ec2': 'SubnetId',
+    'ecs_service': 'ecs_cluster'
 }
 POSSIBLE_ROOT_NODES = {'vpc'}
 
