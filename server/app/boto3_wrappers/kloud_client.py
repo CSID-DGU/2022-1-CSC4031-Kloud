@@ -68,7 +68,6 @@ class KloudClient(KloudEC2, KloudRDS, KloudECS, KloudCostExplorer):
     def __init__(self, access_key_id: str, session_instance: boto3.Session):
         super().__init__(session_instance)
         self.id = access_key_id
-        self.session_instance = session_instance
         self.describing_tasks = [  # async def 이기 때문에 await 하지 않을 시 awaitable 객체 반환
             self.get_ec2_resources,
             self.get_rds_resources,
