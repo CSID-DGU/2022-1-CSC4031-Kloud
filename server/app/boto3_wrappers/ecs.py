@@ -39,6 +39,7 @@ class KloudECS(KloudBoto3Wrapper):
             service_list: list = described_services['services']
             for service in service_list:
                 service['resource_type'] = 'ecs_service'
+                service['parent'] = cluster_arn
                 to_return[service['serviceArn']] = service
         return to_return
 
