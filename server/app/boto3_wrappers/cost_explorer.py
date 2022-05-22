@@ -5,7 +5,6 @@ from collections import defaultdict
 
 import boto3
 
-from .common_funcs import fetch_and_process
 from .kloud_boto3_wrapper import KloudBoto3Wrapper
 
 DEFAULT_METRICS = ['UnblendedCost', 'UsageQuantity']
@@ -57,8 +56,8 @@ class KloudCostExplorer(KloudBoto3Wrapper):
     def get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str):
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
                        'End': str(datetime.date(datetime.now()))}
-        ec2_dict: dict = fetch_and_process(identifier='InstanceId',
-                                           describing_method=self.session.client("ec2").describe_instances)
+        ec2_dict: dict = self.fetch_and_process(identifier='InstanceId',
+                                                describing_method=self.session.client("ec2").describe_instances)
 
         resource_id_list = list(ec2_dict.keys())  # ec2 이외 다른 리소스도 조회가 가능할 경우, 키만 가져와서 합치면 됨.
         metrics = ['UnblendedCost']

@@ -1,6 +1,7 @@
 import boto3
 import asyncio
 from .kloud_boto3_wrapper import KloudBoto3Wrapper
+import functools
 
 
 class KloudELB(KloudBoto3Wrapper):
@@ -9,14 +10,6 @@ class KloudELB(KloudBoto3Wrapper):
         self._elb_cli = session_instance.client('elbv2')
 
     async def get_load_balancers(self) -> dict:
-        to_return = dict()
-        res: dict = await asyncio.to_thread(self._elb_cli.describe_load_balancers)
-        lbs: list = res['LoadBalancers']
-
-        for lb in lbs:
-            lb_name = lb['LoadBalancerArn']
-            lb['resource_type'] = 'elb'
-            to_return[lb_name] = lb
-
+        to_return = await self.fetch_and_process_async('LoadBalancerArn',
+                                                       self._elb_cli.describe_load_balancers)
         return to_return
-

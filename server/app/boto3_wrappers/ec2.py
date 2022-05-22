@@ -3,7 +3,7 @@ import functools
 
 import boto3
 
-from .common_funcs import get_describing_methods_dict, fetch_and_process
+from .common_funcs import get_describing_methods_dict
 from .kloud_boto3_wrapper import KloudBoto3Wrapper
 
 
@@ -11,6 +11,7 @@ class KloudEC2(KloudBoto3Wrapper):
     """
     boto3 ec2 클라이언트 래퍼
     """
+
     def __init__(self, session_instance: boto3.Session):
         super().__init__(session_instance)
         self._ec2_client = session_instance.client(service_name="ec2")
@@ -23,8 +24,7 @@ class KloudEC2(KloudBoto3Wrapper):
         boto3_reqs = list()  # run in executor 작업 목록
         for identifier, describing_method in self._describing_methods.items():
             # identifier: str, describing_method: function
-            func = functools.partial(fetch_and_process, identifier=identifier,
-                                     describing_method=describing_method)
+            func = functools.partial(self.fetch_and_process, identifier=identifier, describing_method=describing_method)
             future = asyncio.to_thread(func)
             boto3_reqs.append(future)
         return boto3_reqs

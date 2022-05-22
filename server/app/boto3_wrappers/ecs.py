@@ -1,4 +1,5 @@
 import asyncio
+import functools
 
 import boto3
 
@@ -15,14 +16,11 @@ class KloudECS(KloudBoto3Wrapper):
         return cluster_arns['clusterArns']
 
     async def _get_clusters(self) -> dict:
-        to_return = dict()
-        described_clusters = await asyncio.to_thread(self.ecs_cli.describe_clusters,
-                                                     clusters=await self._get_cluster_arns())
-        described_clusters = described_clusters['clusters']
-        for cluster in described_clusters:
-            cluster_name = cluster['clusterArn']
-            cluster['resource_type'] = 'ecs_cluster'
-            to_return[cluster_name] = cluster
+        describing_method = functools.partial(self.ecs_cli.describe_clusters,
+                                              clusters=await self._get_cluster_arns())
+
+        to_return = await self.fetch_and_process_async('clusterArn', describing_method)
+
         return to_return
 
     async def _get_service_arn_list(self, cluster_arn: str) -> list:
@@ -33,14 +31,10 @@ class KloudECS(KloudBoto3Wrapper):
         service_arn_list: list = await self._get_service_arn_list(cluster_arn)
         to_return = dict()
         if service_arn_list:
-            described_services: dict = await asyncio.to_thread(self.ecs_cli.describe_services,
-                                                               cluster=cluster_arn,
-                                                               services=service_arn_list)
-            service_list: list = described_services['services']
-            for service in service_list:
-                service['resource_type'] = 'ecs_service'
-                service['parent'] = cluster_arn
-                to_return[service['serviceArn']] = service
+            describing_method = functools.partial(self.ecs_cli.describe_services,
+                                                  cluster=cluster_arn,
+                                                  services=service_arn_list)
+            to_return = await self.fetch_and_process_async('serviceArn', describing_method)
         return to_return
 
     async def get_ecs_resources(self) -> dict:
