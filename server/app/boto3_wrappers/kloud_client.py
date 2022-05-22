@@ -1,12 +1,19 @@
 import asyncio
 import boto3
 
-from .common_funcs import PARENT, POSSIBLE_ROOT_NODES
 from .cost_explorer import KloudCostExplorer
 from .rds import KloudRDS
 from .ec2 import KloudEC2
 from .ecs import KloudECS
 from .elb import KloudELB
+
+POSSIBLE_ROOT_NODES = {'vpc', 'ecs_cluster'}
+PARENT = {
+    'subnet': 'VpcId',
+    'ec2': 'SubnetId',
+    'elb': 'VpcId',
+    'ecs_service': 'clusterArn'
+}
 
 
 class InfraTreeBuilder:
@@ -89,4 +96,3 @@ class KloudClient(KloudEC2, KloudRDS, KloudECS, KloudELB, KloudCostExplorer):
         resources = await self.get_current_infra_dict()
         tb = InfraTreeBuilder(resources)
         return tb.build_tree()
-

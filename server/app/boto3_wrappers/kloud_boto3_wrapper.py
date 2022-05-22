@@ -1,12 +1,30 @@
 import asyncio
 import boto3
 
-from .common_funcs import cut_useless_metadata, RESOURCE_TYPE
+RESOURCE_TYPE = {'VpcId': 'vpc',
+                 'SubnetId': 'subnet',
+                 'NetworkInterfaceId': 'network_interface',
+                 'InternetGatewayId': 'igw',
+                 'NatGatewayId': 'ngw',
+                 'InstanceId': 'ec2',  # todo ec2 이외에도 InstanceId인 경우 있는지 확인할 것
+                 'DBInstanceIdentifier': 'rds',
+                 'LoadBalancerArn': 'elb',
+                 'clusterArn': 'ecs_cluster',
+                 'serviceArn': 'ecs_service'
+                 }
 
 
 class KloudBoto3Wrapper:
     def __init__(self, session_instance: boto3.Session):
         self.session = session_instance
+
+    @staticmethod
+    def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
+        processed = dict()
+        for k, v in data.items():  # dict의 첫번째 값이 응답이고, 두번째가 메타데이터임.
+            processed = v
+            break
+        return processed
 
     @staticmethod
     def fetch_and_process(identifier, describing_method) -> dict:  # 응답을 받아서 후처리함.
@@ -18,7 +36,7 @@ class KloudBoto3Wrapper:
         resource_id와 resource_type 정보를 추가함.
         boto3 조회 요청은 스레드에서 실행되어야하기 때문에 결과값을 받아서 넣지 않고 describing method를 인자로 넣음.
         """
-        response: list = cut_useless_metadata(describing_method())
+        response: list = KloudBoto3Wrapper.cut_useless_metadata(describing_method())
         if identifier == 'InstanceId':  # ec2 인스턴스일 경우
             try:
                 instances = list()
@@ -41,3 +59,5 @@ class KloudBoto3Wrapper:
     async def fetch_and_process_async(identifier, describing_method) -> dict:
         res = await asyncio.to_thread(KloudBoto3Wrapper.fetch_and_process, identifier, describing_method)
         return res
+
+

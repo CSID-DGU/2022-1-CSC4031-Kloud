@@ -9,6 +9,8 @@ from .kloud_boto3_wrapper import KloudBoto3Wrapper
 DEFAULT_METRICS = ['UnblendedCost', 'UsageQuantity']
 DEFAULT_GROUP_BY = [{'Type': 'DIMENSION', 'Key': 'SERVICE'},
                     {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}]
+GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENTITY", "LINKED_ACCOUNT", "OPERATION",
+                      "PLATFORM", "PURCHASE_TYPE", "SERVICE", "TENANCY", "RECORD_TYPE", "USAGE_TYPE"]
 
 
 class KloudCostExplorer(KloudBoto3Wrapper):
@@ -95,3 +97,5 @@ class KloudCostExplorer(KloudBoto3Wrapper):
 
     async def get_default_cost_history(self) -> dict:
         return await self.get_cost_history()
+
+

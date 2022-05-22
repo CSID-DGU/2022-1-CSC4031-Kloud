@@ -2,8 +2,24 @@ import asyncio
 import functools
 import boto3
 
-from .common_funcs import get_describing_methods_dict
 from .kloud_boto3_wrapper import KloudBoto3Wrapper
+
+
+def get_describing_methods_dict(ec2_client) -> dict:
+    """
+    client 인자는 boto3로 생성된 클라이언트 객체
+
+    key: resource identifier
+    value: function
+    """
+    describing_methods = {'VpcId': ec2_client.describe_vpcs,
+                          'SubnetId': ec2_client.describe_subnets,
+                          'NetworkInterfaceId': ec2_client.describe_network_interfaces,
+                          'InternetGatewayId': ec2_client.describe_internet_gateways,
+                          'NatGatewayId': ec2_client.describe_nat_gateways,
+                          'InstanceId': ec2_client.describe_instances,
+                          }
+    return describing_methods
 
 
 class KloudEC2(KloudBoto3Wrapper):
@@ -31,7 +47,6 @@ class KloudEC2(KloudBoto3Wrapper):
     async def _update_resource_dict(self) -> dict:
         """
         인프라 정보를 받고, 객체 멤버인 self._resources 에 저장한 후, 인프라 정보를 반환함.
-        본래 인프라 정보를 캐시하려고 하였으나, thread unsafe 문제와 배포환경에서 발생 가능성 있는 몇 가지 문제에 대응하기 번거로움.
         """
         to_return = dict()
         reqs: list = await self._fetch_infra_info()  # boto3에 인프라 정보 요청
@@ -58,3 +73,5 @@ class KloudEC2(KloudBoto3Wrapper):
             Hibernate=hibernate,
             Force=force
         )
+
+
