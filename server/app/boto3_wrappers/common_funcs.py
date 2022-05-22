@@ -14,7 +14,7 @@ PARENT = {
     'elb': 'VpcId',
     'ecs_service': 'clusterArn'
 }
-POSSIBLE_ROOT_NODES = {'vpc'}
+POSSIBLE_ROOT_NODES = {'vpc', 'ecs_cluster'}
 
 
 def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
