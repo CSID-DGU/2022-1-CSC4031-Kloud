@@ -11,9 +11,10 @@ GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENT
 PARENT = {
     'subnet': 'VpcId',
     'ec2': 'SubnetId',
+    'elb': 'VpcId',
     'ecs_service': 'clusterArn'
 }
-POSSIBLE_ROOT_NODES = {'vpc', 'ecs_cluster'}
+POSSIBLE_ROOT_NODES = {'vpc'}
 
 
 def cut_useless_metadata(data: dict) -> list:  # todo 예외 있는지 확인
