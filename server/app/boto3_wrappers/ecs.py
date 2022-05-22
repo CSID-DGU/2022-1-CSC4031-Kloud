@@ -8,7 +8,7 @@ from .kloud_boto3_wrapper import KloudBoto3Wrapper
 class KloudECS(KloudBoto3Wrapper):
     def __init__(self, session_instance: boto3.Session):
         super().__init__(session_instance)
-        self.ecs_cli = session_instance.client("ecs", region_name="ap-northeast-2")
+        self.ecs_cli = session_instance.client("ecs")
 
     async def _get_cluster_arns(self) -> list:
         cluster_arns = await asyncio.to_thread(self.ecs_cli.list_clusters)
