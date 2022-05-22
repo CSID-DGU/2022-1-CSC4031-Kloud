@@ -1,5 +1,4 @@
 import asyncio
-
 import boto3
 
 from .common_funcs import cut_useless_metadata, RESOURCE_TYPE

@@ -2,7 +2,6 @@ import asyncio
 import functools
 from datetime import datetime, timedelta
 from collections import defaultdict
-
 import boto3
 
 from .kloud_boto3_wrapper import KloudBoto3Wrapper

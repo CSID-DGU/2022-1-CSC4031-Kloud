@@ -1,5 +1,3 @@
-import asyncio
-
 import boto3
 
 from .kloud_boto3_wrapper import KloudBoto3Wrapper

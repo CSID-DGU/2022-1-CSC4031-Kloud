@@ -1,7 +1,5 @@
 import boto3
-import asyncio
 from .kloud_boto3_wrapper import KloudBoto3Wrapper
-import functools
 
 
 class KloudELB(KloudBoto3Wrapper):
