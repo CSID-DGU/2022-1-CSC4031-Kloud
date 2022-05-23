@@ -1,4 +1,5 @@
 from celery import Celery
+
 from .redis_conf import HOST, PORT, CELERYDB
 
 da_app = Celery(

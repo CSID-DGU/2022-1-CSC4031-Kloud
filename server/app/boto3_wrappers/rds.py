@@ -1,8 +1,5 @@
-import asyncio
-
 import boto3
 
-from .common_funcs import fetch_and_process
 from .kloud_boto3_wrapper import KloudBoto3Wrapper
 
 
@@ -11,7 +8,7 @@ class KloudRDS(KloudBoto3Wrapper):
         super().__init__(session_instance)
         self._rds_client = session_instance.client(service_name="rds")
 
-    async def describe_rds(self):
-        return await asyncio.to_thread(fetch_and_process,
-                                       identifier='DBInstanceIdentifier',
-                                       describing_method=self._rds_client.describe_db_instances)
+    async def get_rds_resources(self):
+        to_return = await self.fetch_and_process_async(identifier='DBInstanceIdentifier',
+                                                       describing_method=self._rds_client.describe_db_instances)
+        return to_return

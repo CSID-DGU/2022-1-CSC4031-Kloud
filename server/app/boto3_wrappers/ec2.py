@@ -1,16 +1,32 @@
 import asyncio
 import functools
-
 import boto3
 
-from .common_funcs import get_describing_methods_dict, fetch_and_process
 from .kloud_boto3_wrapper import KloudBoto3Wrapper
+
+
+def get_describing_methods_dict(ec2_client) -> dict:
+    """
+    client 인자는 boto3로 생성된 클라이언트 객체
+
+    key: resource identifier
+    value: function
+    """
+    describing_methods = {'VpcId': ec2_client.describe_vpcs,
+                          'SubnetId': ec2_client.describe_subnets,
+                          'NetworkInterfaceId': ec2_client.describe_network_interfaces,
+                          'InternetGatewayId': ec2_client.describe_internet_gateways,
+                          'NatGatewayId': ec2_client.describe_nat_gateways,
+                          'InstanceId': ec2_client.describe_instances,
+                          }
+    return describing_methods
 
 
 class KloudEC2(KloudBoto3Wrapper):
     """
     boto3 ec2 클라이언트 래퍼
     """
+
     def __init__(self, session_instance: boto3.Session):
         super().__init__(session_instance)
         self._ec2_client = session_instance.client(service_name="ec2")
@@ -23,8 +39,7 @@ class KloudEC2(KloudBoto3Wrapper):
         boto3_reqs = list()  # run in executor 작업 목록
         for identifier, describing_method in self._describing_methods.items():
             # identifier: str, describing_method: function
-            func = functools.partial(fetch_and_process, identifier=identifier,
-                                     describing_method=describing_method)
+            func = functools.partial(self.fetch_and_process, identifier=identifier, describing_method=describing_method)
             future = asyncio.to_thread(func)
             boto3_reqs.append(future)
         return boto3_reqs
@@ -32,7 +47,6 @@ class KloudEC2(KloudBoto3Wrapper):
     async def _update_resource_dict(self) -> dict:
         """
         인프라 정보를 받고, 객체 멤버인 self._resources 에 저장한 후, 인프라 정보를 반환함.
-        본래 인프라 정보를 캐시하려고 하였으나, thread unsafe 문제와 배포환경에서 발생 가능성 있는 몇 가지 문제에 대응하기 번거로움.
         """
         to_return = dict()
         reqs: list = await self._fetch_infra_info()  # boto3에 인프라 정보 요청
@@ -45,7 +59,7 @@ class KloudEC2(KloudBoto3Wrapper):
                     to_return[key] = val
         return to_return
 
-    async def get_current_ec2_cli_infra_dict(self) -> dict:
+    async def get_ec2_resources(self) -> dict:
         return await self._update_resource_dict()
 
     def start_instance(self, instance_id: str) -> None:
@@ -59,3 +73,5 @@ class KloudEC2(KloudBoto3Wrapper):
             Hibernate=hibernate,
             Force=force
         )
+
+

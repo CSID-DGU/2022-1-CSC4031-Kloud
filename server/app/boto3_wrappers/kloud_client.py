@@ -1,11 +1,19 @@
 import asyncio
-
 import boto3
 
-from .common_funcs import PARENT, POSSIBLE_ROOT_NODES
 from .cost_explorer import KloudCostExplorer
 from .rds import KloudRDS
 from .ec2 import KloudEC2
+from .ecs import KloudECS
+from .elb import KloudELB
+
+POSSIBLE_ROOT_NODES = {'vpc', 'ecs_cluster'}
+PARENT = {
+    'subnet': 'VpcId',
+    'ec2': 'SubnetId',
+    'elb': 'VpcId',
+    'ecs_service': 'clusterArn'
+}
 
 
 class InfraTreeBuilder:
@@ -63,14 +71,15 @@ class InfraTreeBuilder:
         return to_return
 
 
-class KloudClient(KloudEC2, KloudRDS, KloudCostExplorer):
+class KloudClient(KloudEC2, KloudRDS, KloudECS, KloudELB, KloudCostExplorer):
     def __init__(self, access_key_id: str, session_instance: boto3.Session):
         super().__init__(session_instance)
         self.id = access_key_id
-        self.session_instance = session_instance
         self.describing_tasks = [  # async def 이기 때문에 await 하지 않을 시 awaitable 객체 반환
-            self.get_current_ec2_cli_infra_dict,
-            self.describe_rds
+            self.get_ec2_resources,
+            self.get_rds_resources,
+            self.get_ecs_resources,
+            self.get_load_balancers
         ]
 
     async def get_current_infra_dict(self) -> dict:
@@ -87,4 +96,3 @@ class KloudClient(KloudEC2, KloudRDS, KloudCostExplorer):
         resources = await self.get_current_infra_dict()
         tb = InfraTreeBuilder(resources)
         return tb.build_tree()
-

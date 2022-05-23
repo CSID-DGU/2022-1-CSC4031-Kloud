@@ -1,18 +1,20 @@
+import asyncio
+import os
+
+import boto3
 import botocore.exceptions
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from .boto3_wrappers.kloud_client import KloudClient
-from .response_exceptions import UserNotInDBException, CeleryTimeOutError
+from pydantic.types import Optional
+
 from . import common_functions
 from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
-import boto3
-import asyncio
+from .boto3_wrappers.kloud_client import KloudClient
 from .config.cellery_app import da_app
 from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
     delete_cache_from_redis
-from pydantic.types import Optional
-import os
+from .response_exceptions import UserNotInDBException, CeleryTimeOutError
 
 app = FastAPI(
     title="Kloud API",
@@ -34,7 +36,6 @@ origins = [
 if os.environ.get('IS_PRODUCTION') == "true":
     origins = [os.environ.get('FRONT_END_URL'),  # https://something.com
                os.environ.get('API_URL')]  # https://api.something.com
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -123,8 +124,8 @@ async def get_available_regions():
 
 
 @app.get("/infra/info")
-async def infra_info(user_client=Depends(get_user_client)):
-    return await user_client.get_current_ec2_cli_infra_dict()
+async def infra_info(user_client: KloudClient = Depends(get_user_client)):
+    return await user_client.get_current_infra_dict()
 
 
 @app.get("/cost/history/param")
@@ -175,8 +176,13 @@ async def cost_history_by_resource(user_id=Depends(get_user_id),
                                                            granularity=granularity)
 
 
+@app.get("/cost/history/by-service")
+async def cost_history_by_service(user_client: KloudClient = Depends(get_user_client), days: Optional[int] = 90):
+    return await user_client.get_cost_history_by_service(days=days)
+
+
 @app.get("/infra/tree")
-async def infra_tree(user_client=Depends(get_user_client)):
+async def infra_tree(user_client: KloudClient = Depends(get_user_client)):
     return await user_client.get_infra_tree()
 
 
