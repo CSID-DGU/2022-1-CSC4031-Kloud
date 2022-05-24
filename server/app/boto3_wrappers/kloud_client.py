@@ -1,34 +1,24 @@
 import asyncio
-
 import boto3
 
-from .common_funcs import PARENT, POSSIBLE_ROOT_NODES
 from .cost_explorer import KloudCostExplorer
 from .rds import KloudRDS
 from .ec2 import KloudEC2
+from .ecs import KloudECS
+from .elb import KloudELB
+
+POSSIBLE_ROOT_NODES = {'vpc', 'ecs_cluster'}
+PARENT = {
+    'subnet': 'VpcId',
+    'ec2': 'SubnetId',
+    'elb': 'VpcId',
+    'ecs_service': 'clusterArn'
+}
 
 
-class KloudClient(KloudEC2, KloudRDS, KloudCostExplorer):
-    def __init__(self, access_key_id: str, session_instance: boto3.Session):
-        super().__init__(session_instance)
-        self.id = access_key_id
-        self.session_instance = session_instance
-        self.describing_tasks = [
-            self.get_current_ec2_cli_infra_dict(),
-            self.describe_rds()
-        ]
-
-    async def get_current_infra_dict(self) -> dict:
-        to_return = dict()
-        tasks = [self.get_current_ec2_cli_infra_dict(), self.describe_rds()]
-        done, pending = await asyncio.wait(tasks)
-        for task in done:
-            to_return.update(task.result())
-        return to_return
-
-    async def get_infra_tree(self) -> dict:
-        resources = await self.get_current_infra_dict()
-        return self._build_tree(resources)
+class InfraTreeBuilder:
+    def __init__(self, infra_data: dict):
+        self.infra_data = infra_data
 
     @staticmethod
     def _get_parent(child: dict) -> str:
@@ -53,10 +43,11 @@ class KloudClient(KloudEC2, KloudRDS, KloudCostExplorer):
                     if vpcs['VpcId'] == vpc_id:
                         return key
 
-    def _build_tree(self, infra_data: dict) -> dict:
+    def build_tree(self) -> dict:
         """
         가공된 인프라 데이터를 기반으로 부모 자식 관계 정보를 설정하여 nested dictionary 형태로 만듦.
         """
+        infra_data = self.infra_data
         for key, val in infra_data.items():
             parent = self._get_parent(val)
             if parent:
@@ -80,3 +71,28 @@ class KloudClient(KloudEC2, KloudRDS, KloudCostExplorer):
         return to_return
 
 
+class KloudClient(KloudEC2, KloudRDS, KloudECS, KloudELB, KloudCostExplorer):
+    def __init__(self, access_key_id: str, session_instance: boto3.Session):
+        super().__init__(session_instance)
+        self.id = access_key_id
+        self.describing_tasks = [  # async def 이기 때문에 await 하지 않을 시 awaitable 객체 반환
+            self.get_ec2_resources,
+            self.get_rds_resources,
+            self.get_ecs_resources,
+            self.get_load_balancers
+        ]
+
+    async def get_current_infra_dict(self) -> dict:
+        to_return = dict()
+        tasks = list()
+        for task in self.describing_tasks:
+            tasks.append(task())
+        done, pending = await asyncio.wait(tasks)
+        for task in done:
+            to_return.update(task.result())
+        return to_return
+
+    async def get_infra_tree(self) -> dict:
+        resources = await self.get_current_infra_dict()
+        tb = InfraTreeBuilder(resources)
+        return tb.build_tree()
