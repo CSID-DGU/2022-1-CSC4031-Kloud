@@ -6,7 +6,6 @@ import botocore.exceptions
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-<<<<<<< HEAD
 from .client import KloudClient
 from .response_exceptions import UserNotInDBException, CeleryTimeOutError
 from . import common_functions
@@ -14,13 +13,8 @@ from .auth import create_access_token, get_user_id, request_temp_cred_async, tem
 import boto3
 import asyncio
 import concurrent.futures
-=======
 from pydantic.types import Optional
 
-from . import common_functions
-from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
-from .boto3_wrappers.kloud_client import KloudClient
->>>>>>> 21e0dc28756f8378fe0a8e45f41a1423a0e0e7e9
 from .config.cellery_app import da_app
 from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
     delete_cache_from_redis

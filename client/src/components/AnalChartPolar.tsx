@@ -51,7 +51,7 @@ function PolarChart({ size }: IPolarChart) {
             },
           },
         }}
-        width="120%"
+        width={`${size}px`}
       />
     </>
   );

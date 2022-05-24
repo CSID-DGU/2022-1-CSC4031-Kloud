@@ -34,18 +34,18 @@ const Analysis = () => {
     <Container>
       <ChartBoxContainer>
         <ChartBox margin={180} onClick={() => setOpenModal((prev) => !prev)}>
-          <PolarChart size={430}></PolarChart>
+          <PolarChart size={400}></PolarChart>
         </ChartBox>
         <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
-          <BarChart size={430}></BarChart>
+          <BarChart size={20}></BarChart>
         </ChartBox>
       </ChartBoxContainer>
       <ChartBoxContainer>
         <ChartBox margin={180} onClick={() => setOpenModal((prev) => !prev)}>
-          <LineChart size={430}></LineChart>
+          <LineChart size={20}></LineChart>
         </ChartBox>
         <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
-          <DonutChart size={430}></DonutChart>
+          <DonutChart size={20}></DonutChart>
         </ChartBox>
       </ChartBoxContainer>
       {openModal ? (
