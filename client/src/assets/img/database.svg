@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>Icon-Architecture-Category/16/Database_16</title>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Icon-Architecture-Category/32/Database_32</title>
     <defs>
         <linearGradient x1="0%" y1="100%" x2="100%" y2="0%" id="linearGradient-1">
             <stop stop-color="#2E27AD" offset="0%"></stop>
             <stop stop-color="#527FFF" offset="100%"></stop>
         </linearGradient>
     </defs>
-    <g id="Icon-Architecture-Category/16/Database_16" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect id="Rectangle" fill="url(#linearGradient-1)" x="4" y="4" width="24" height="24"></rect>
-        <rect id="#879196-Border-Copy-9" stroke="#879196" stroke-width="2" x="1" y="1" width="30" height="30"></rect>
-        <g id="Icon-Category/16/Database_16" transform="translate(8.000000, 8.000000)" fill="#FFFFFF">
-            <path d="M8,7.736 C4.765,7.736 3,6.782 3,6.293 L3,3.814 C4.133,4.496 6.071,4.849 8,4.849 C9.929,4.849 11.867,4.496 13,3.814 L13,6.293 C13,6.782 11.235,7.736 8,7.736 M8,11.554 C4.765,11.554 3,10.601 3,10.111 L3,7.7 C4.133,8.383 6.071,8.736 8,8.736 C9.929,8.736 11.867,8.383 13,7.7 L13,10.111 C13,10.601 11.235,11.554 8,11.554 M8,14.963 C4.765,14.963 3,14.009 3,13.52 L3,11.519 C4.133,12.201 6.071,12.554 8,12.554 C9.929,12.554 11.867,12.201 13,11.519 L13,13.52 C13,14.009 11.235,14.963 8,14.963 M8,0.963 C11.235,0.963 13,1.917 13,2.406 C13,2.896 11.235,3.849 8,3.849 C4.765,3.849 3,2.896 3,2.406 C3,1.917 4.765,0.963 8,0.963 M2,2.406 L2,13.52 C2,15.124 5.019,15.963 8,15.963 C10.981,15.963 14,15.124 14,13.52 L14,2.406 C14,-0.802 2,-0.802 2,2.406" id="Database_Category-Icon_16_Squid--"></path>
+    <g id="Icon-Architecture-Category/32/Database_32" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" fill="url(#linearGradient-1)" x="4" y="4" width="40" height="40" rx="10"></rect>
+        <g id="Icon-Category/32/Database_32" transform="translate(8.000000, 8.000000)" fill="#FFFFFF">
+            <path d="M16,15.991 C10.696,15.991 7,14.411 7,12.993 L7,7.81 C8.729,9.239 12.442,9.996 16,9.996 C19.558,9.996 23.271,9.239 25,7.81 L25,12.993 C25,14.411 21.304,15.991 16,15.991 M16,22.864 C10.696,22.864 7,21.284 7,19.866 L7,14.806 C8.729,16.234 12.442,16.991 16,16.991 C19.558,16.991 23.271,16.234 25,14.806 L25,19.866 C25,21.284 21.304,22.864 16,22.864 M16,29 C10.696,29 7,27.421 7,26.003 L7,21.678 C8.729,23.107 12.442,23.864 16,23.864 C19.558,23.864 23.271,23.107 25,21.678 L25,26.003 C25,27.421 21.304,29 16,29 M16,3 C21.304,3 25,4.58 25,5.998 C25,7.416 21.304,8.996 16,8.996 C10.696,8.996 7,7.416 7,5.998 C7,4.58 10.696,3 16,3 M16,2 C11.152,2 6,3.401 6,5.998 L6,26.003 C6,28.599 11.152,30 16,30 C20.848,30 26,28.599 26,26.003 L26,5.998 C26,3.401 20.848,2 16,2" id="Database_Category-Icon_32_Squid--"></path>
         </g>
     </g>
 </svg>

@@ -138,6 +138,11 @@ export default function Infra({
   ) : (
     <Container>
       <div>
+        <RdsSvg></RdsSvg>
+        <InstanceSvg></InstanceSvg>
+        <SubnetSvg></SubnetSvg>
+        <IgwSvg></IgwSvg>
+        <VpcSvg></VpcSvg>
         <LinkControls layout={layout} setLayout={setLayout} />
         <svg width="60vw" height="80vh">
           <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
