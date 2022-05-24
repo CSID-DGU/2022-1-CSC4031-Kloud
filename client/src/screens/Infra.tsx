@@ -138,11 +138,6 @@ export default function Infra({
   ) : (
     <Container>
       <div>
-        <RdsSvg></RdsSvg>
-        <InstanceSvg></InstanceSvg>
-        <SubnetSvg></SubnetSvg>
-        <IgwSvg></IgwSvg>
-        <VpcSvg></VpcSvg>
         <LinkControls layout={layout} setLayout={setLayout} />
         <svg width="60vw" height="80vh">
           <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
@@ -314,6 +309,11 @@ export default function Infra({
                           >
                             {d.resource_type}
                           </text>
+                          {d.resource_type === "rds" ? (
+                            <RdsSvg></RdsSvg>
+                          ) : d.resource_type === "igw" ? (
+                            <IgwSvg></IgwSvg>
+                          ) : null}
                         </Group>
                       );
                     }
