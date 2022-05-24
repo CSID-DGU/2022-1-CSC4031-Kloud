@@ -294,3 +294,4 @@ class KloudClient(KloudEC2Client, KloudRDSClient, KloudCostExplorer):
             elif resource_type not in POSSIBLE_ROOT_NODES and parent is None:
                 to_return['orphan'][k] = v
         return to_return
+

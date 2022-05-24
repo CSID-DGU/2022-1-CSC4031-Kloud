@@ -8,7 +8,7 @@ function DonutChart({ size }: IDonutChart) {
     <>
       <ApexChart
         type="radialBar"
-        series={[44, 55, 67, 83]}
+        series={[20, 55, 67, 83]}
         options={{
           theme: {
             mode: "dark",

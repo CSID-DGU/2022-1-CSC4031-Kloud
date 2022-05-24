@@ -10,9 +10,9 @@ function LineChart({ size }: ILineChart) {
         type="line"
         series={[
           {
-            name: "Sales",
+            name: "Cost",
             data: [
-              4, 3, 10, 9, 29, 19, 22, 9, 12, 7, 19, 5, 13, 9, 17, 2, 7, 5,
+              4, 3, 10, 9, 9, 19, 12, 9, 12, 7, 10, 8, 18, 19, 20, 22, 27, 25,
             ],
           },
         ]}
