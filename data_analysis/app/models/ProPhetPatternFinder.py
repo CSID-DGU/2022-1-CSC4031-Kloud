@@ -3,6 +3,9 @@ import pandas as pd
 import json
 from fbprophet import Prophet
 import matplotlib.pyplot as plt
+from fbprophet.diagnostics import cross_validation
+from fbprophet.diagnostics import performance_metrics
+
 class ProPhetPatternFinder:
     def __init__(self,data, period):
         self.data = data
@@ -36,7 +39,13 @@ class ProPhetPatternFinder:
             return self.forecast
         except:
             return print("Fitting 실패")
-    
+
+    def performance(self):
+        df_cv = cross_validation(self.model,initial="20 days" ,period = "20 days", horizon = '7 days')
+        df_p = performance_metrics(df_cv)
+        performance = round(df_p["mape"].mean(),3)
+        return performance
+
     def show_expect_plot(self):
         fig2 = self.model.plot(self.forecast)
     
