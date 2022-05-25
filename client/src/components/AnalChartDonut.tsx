@@ -11,17 +11,19 @@ function DonutChart({ size, modal }: IDonutChart) {
         type="radialBar"
         series={[20, 55, 67, 83]}
         options={{
-          title: {
-            text: "[ 인프라 사용률 ]",
-            style: {
-              fontSize: "16px",
-              fontWeight: "lighter",
-              color: "white",
-            },
-            align: "left",
-            offsetX: 15,
-            offsetY: 10,
-          },
+          title: modal
+            ? {}
+            : {
+                text: "[ 인프라 사용률 ]",
+                style: {
+                  fontSize: "16px",
+                  fontWeight: "lighter",
+                  color: "white",
+                },
+                align: "left",
+                offsetX: 15,
+                offsetY: 10,
+              },
           theme: {
             mode: "dark",
           },

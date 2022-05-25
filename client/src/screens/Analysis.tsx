@@ -42,7 +42,7 @@ const Analysis = () => {
           margin={180}
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<PolarChart modal={true} size={600}></PolarChart>);
+            setSelectedChart(<PolarChart modal={true} size={480}></PolarChart>);
             setSelected("polar");
           }}
         >
