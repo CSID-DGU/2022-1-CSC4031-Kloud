@@ -1,7 +1,3 @@
-import PolarChart from "./AnalChartPolar";
-import LineChart from "./AnalChartLine";
-import DonutChart from "./AnalChartDonut";
-import BarChart from "./AnalChartBar";
 import styled from "styled-components";
 
 interface IChartModal {

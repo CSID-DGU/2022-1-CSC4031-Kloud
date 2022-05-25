@@ -62,7 +62,7 @@ function BarChart({ size, modal }: IBarChart) {
             enabled: false,
           },
         }}
-        width="120%"
+        width={`${size}px`}
       />
     </>
   );

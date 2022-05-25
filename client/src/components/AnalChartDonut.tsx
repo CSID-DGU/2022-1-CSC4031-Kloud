@@ -50,7 +50,7 @@ function DonutChart({ size, modal }: IDonutChart) {
           },
           labels: ["RDS", "EC2", "ECS", "S3"],
         }}
-        width="110%"
+        width={`${size}px`}
       />
     </>
   );

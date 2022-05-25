@@ -81,7 +81,7 @@ function LineChart({ size, modal }: ILineChart) {
             max: 40,
           },
         }}
-        width="120%"
+        width={`${size}px`}
       />
     </>
   );

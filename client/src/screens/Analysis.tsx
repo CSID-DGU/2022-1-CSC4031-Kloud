@@ -52,7 +52,7 @@ const Analysis = () => {
             setSelectedChart(<BarChart modal={true} size={600}></BarChart>);
           }}
         >
-          <BarChart modal={false} size={20}></BarChart>
+          <BarChart modal={false} size={350}></BarChart>
         </ChartBox>
       </ChartBoxContainer>
       <ChartBoxContainer>
@@ -63,7 +63,7 @@ const Analysis = () => {
             setSelectedChart(<LineChart modal={true} size={600}></LineChart>);
           }}
         >
-          <LineChart modal={false} size={20}></LineChart>
+          <LineChart modal={false} size={350}></LineChart>
         </ChartBox>
         <ChartBox
           onClick={() => {
@@ -71,12 +71,12 @@ const Analysis = () => {
             setSelectedChart(<DonutChart modal={true} size={600}></DonutChart>);
           }}
         >
-          <DonutChart modal={false} size={20}></DonutChart>
+          <DonutChart modal={false} size={330}></DonutChart>
         </ChartBox>
       </ChartBoxContainer>
       {openModal ? (
         <ModalFrame
-          content={<AnalysisModal selectedChart={<></>} />}
+          content={<AnalysisModal selectedChart={selectedChart} />}
           handleModal={() => setOpenModal(false)}
         />
       ) : null}
