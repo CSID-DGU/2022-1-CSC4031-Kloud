@@ -4,7 +4,7 @@ interface IBarChart {
   size: number;
   modal: boolean;
 }
-function BarChart({ size }: IBarChart) {
+function BarChart({ size, modal }: IBarChart) {
   return (
     <>
       <ApexChart
@@ -43,7 +43,7 @@ function BarChart({ size }: IBarChart) {
             mode: "dark",
           },
           chart: {
-            background: "#040959",
+            background: modal ? "gray" : "#040959",
             type: "polarArea",
           },
           stroke: {

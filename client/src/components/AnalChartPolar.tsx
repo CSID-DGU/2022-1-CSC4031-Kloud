@@ -4,7 +4,7 @@ interface IPolarChart {
   size: number;
   modal: boolean;
 }
-function PolarChart({ size }: IPolarChart) {
+function PolarChart({ size, modal }: IPolarChart) {
   return (
     <>
       <ApexChart
@@ -26,7 +26,7 @@ function PolarChart({ size }: IPolarChart) {
             mode: "dark",
           },
           chart: {
-            background: "#040959",
+            background: modal ? "gray" : "#040959",
             type: "polarArea",
           },
           stroke: {

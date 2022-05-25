@@ -4,7 +4,7 @@ interface IDonutChart {
   size: number;
   modal: boolean;
 }
-function DonutChart({ size }: IDonutChart) {
+function DonutChart({ size, modal }: IDonutChart) {
   return (
     <>
       <ApexChart
@@ -26,7 +26,7 @@ function DonutChart({ size }: IDonutChart) {
             mode: "dark",
           },
           chart: {
-            background: "#040959",
+            background: modal ? "gray" : "#040959",
             type: "radialBar",
             offsetY: -30,
           },

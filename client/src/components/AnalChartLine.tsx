@@ -4,7 +4,7 @@ interface ILineChart {
   size: number;
   modal: boolean;
 }
-function LineChart({ size }: ILineChart) {
+function LineChart({ size, modal }: ILineChart) {
   return (
     <>
       <ApexChart
@@ -33,7 +33,7 @@ function LineChart({ size }: ILineChart) {
             mode: "dark",
           },
           chart: {
-            background: "#040959",
+            background: modal ? "gray" : "#040959",
             type: "line",
           },
           stroke: {
