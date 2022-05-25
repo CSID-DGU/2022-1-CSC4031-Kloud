@@ -2,6 +2,7 @@ import ApexChart from "react-apexcharts";
 
 interface IPolarChart {
   size: number;
+  modal: boolean;
 }
 function PolarChart({ size }: IPolarChart) {
   return (

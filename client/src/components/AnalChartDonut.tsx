@@ -2,6 +2,7 @@ import ApexChart from "react-apexcharts";
 
 interface IDonutChart {
   size: number;
+  modal: boolean;
 }
 function DonutChart({ size }: IDonutChart) {
   return (

@@ -2,6 +2,7 @@ import ApexChart from "react-apexcharts";
 
 interface IBarChart {
   size: number;
+  modal: boolean;
 }
 function BarChart({ size }: IBarChart) {
   return (

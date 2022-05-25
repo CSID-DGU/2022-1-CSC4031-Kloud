@@ -5,6 +5,7 @@ import DonutChart from "../components/AnalChartDonut";
 import LineChart from "../components/AnalChartLine";
 import PolarChart from "../components/AnalChartPolar";
 import ModalFrame from "../components/Modal";
+import AnalysisModal from "../components/AnalysisModal";
 
 const Container = styled.div`
   display: flex;
@@ -35,27 +36,23 @@ const Analysis = () => {
     <Container>
       <ChartBoxContainer>
         <ChartBox margin={180} onClick={() => setOpenModal((prev) => !prev)}>
-          <PolarChart size={400}></PolarChart>
+          <PolarChart modal={false} size={400}></PolarChart>
         </ChartBox>
         <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
-          <BarChart size={20}></BarChart>
+          <BarChart modal={false} size={20}></BarChart>
         </ChartBox>
       </ChartBoxContainer>
       <ChartBoxContainer>
         <ChartBox margin={180} onClick={() => setOpenModal((prev) => !prev)}>
-          <LineChart size={20}></LineChart>
+          <LineChart modal={false} size={20}></LineChart>
         </ChartBox>
         <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
-          <DonutChart size={20}></DonutChart>
+          <DonutChart modal={false} size={20}></DonutChart>
         </ChartBox>
       </ChartBoxContainer>
       {openModal ? (
         <ModalFrame
-          content={
-            <ChartBox>
-              <PolarChart size={400}></PolarChart>
-            </ChartBox>
-          }
+          content={<AnalysisModal selectedChart={<></>} />}
           handleModal={() => setOpenModal(false)}
         />
       ) : null}

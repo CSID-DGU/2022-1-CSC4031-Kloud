@@ -2,6 +2,7 @@ import ApexChart from "react-apexcharts";
 
 interface ILineChart {
   size: number;
+  modal: boolean;
 }
 function LineChart({ size }: ILineChart) {
   return (
