@@ -30,7 +30,7 @@ function DonutChart({ size, modal }: IDonutChart) {
           chart: {
             background: modal ? "gray" : "#040959",
             type: "radialBar",
-            offsetY: -30,
+            offsetY: modal ? 0 : -30,
           },
           stroke: {
             colors: ["#fff"],

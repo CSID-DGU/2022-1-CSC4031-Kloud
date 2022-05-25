@@ -51,7 +51,7 @@ const Analysis = () => {
         <ChartBox
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<BarChart modal={true} size={600}></BarChart>);
+            setSelectedChart(<BarChart modal={true} size={450}></BarChart>);
             setSelected("bar");
           }}
         >
@@ -63,7 +63,7 @@ const Analysis = () => {
           margin={180}
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<LineChart modal={true} size={600}></LineChart>);
+            setSelectedChart(<LineChart modal={true} size={450}></LineChart>);
             setSelected("line");
           }}
         >
@@ -72,7 +72,7 @@ const Analysis = () => {
         <ChartBox
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<DonutChart modal={true} size={600}></DonutChart>);
+            setSelectedChart(<DonutChart modal={true} size={400}></DonutChart>);
             setSelected("donut");
           }}
         >

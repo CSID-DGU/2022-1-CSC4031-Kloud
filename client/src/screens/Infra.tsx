@@ -317,9 +317,9 @@ export default function Infra({
                             {d.resource_type}
                           </text>
                           {d.resource_type === "rds" ? (
-                            <RdsSvg></RdsSvg>
+                            <RdsSvg />
                           ) : d.resource_type === "igw" ? (
-                            <IgwSvg></IgwSvg>
+                            <IgwSvg />
                           ) : null}
                         </Group>
                       );
