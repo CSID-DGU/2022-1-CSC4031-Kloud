@@ -47,6 +47,7 @@ def pattern_finder2(token: str, period=5):
     expected_data = p.expected_data()
     real_data = p.real_data()
     answer = {}
+    answer["Performance"] = p.performance()
     for i in range(len(expected_data)):
         date = str(expected_data.ds.iloc[i]).split()[0]
         if i < len(real_data):
