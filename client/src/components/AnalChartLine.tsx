@@ -2,26 +2,40 @@ import ApexChart from "react-apexcharts";
 
 interface ILineChart {
   size: number;
+  modal: boolean;
 }
-function LineChart({ size }: ILineChart) {
+function LineChart({ size, modal }: ILineChart) {
   return (
     <>
       <ApexChart
         type="line"
         series={[
           {
-            name: "Sales",
+            name: "Cost",
             data: [
-              4, 3, 10, 9, 29, 19, 22, 9, 12, 7, 19, 5, 13, 9, 17, 2, 7, 5,
+              4, 3, 10, 9, 9, 19, 12, 9, 12, 7, 10, 8, 18, 19, 20, 22, 27, 25,
             ],
           },
         ]}
         options={{
+          title: modal
+            ? {}
+            : {
+                text: "[ 전체 비용 차트 ]",
+                style: {
+                  fontSize: "16px",
+                  fontWeight: "lighter",
+                  color: "white",
+                },
+                align: "left",
+                offsetX: 15,
+                offsetY: -5,
+              },
           theme: {
             mode: "dark",
           },
           chart: {
-            background: "#040959",
+            background: modal ? "gray" : "#040959",
             type: "line",
           },
           stroke: {
@@ -69,7 +83,7 @@ function LineChart({ size }: ILineChart) {
             max: 40,
           },
         }}
-        width="120%"
+        width={`${size}px`}
       />
     </>
   );

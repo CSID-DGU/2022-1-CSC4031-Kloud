@@ -2,20 +2,35 @@ import ApexChart from "react-apexcharts";
 
 interface IDonutChart {
   size: number;
+  modal: boolean;
 }
-function DonutChart({ size }: IDonutChart) {
+function DonutChart({ size, modal }: IDonutChart) {
   return (
     <>
       <ApexChart
         type="radialBar"
-        series={[44, 55, 67, 83]}
+        series={[20, 55, 67, 83]}
         options={{
+          title: modal
+            ? {}
+            : {
+                text: "[ 인프라 사용률 ]",
+                style: {
+                  fontSize: "16px",
+                  fontWeight: "lighter",
+                  color: "white",
+                },
+                align: "left",
+                offsetX: 15,
+                offsetY: 10,
+              },
           theme: {
             mode: "dark",
           },
           chart: {
-            background: "#040959",
+            background: modal ? "gray" : "#040959",
             type: "radialBar",
+            offsetY: modal ? 0 : -30,
           },
           stroke: {
             colors: ["#fff"],
@@ -37,7 +52,7 @@ function DonutChart({ size }: IDonutChart) {
           },
           labels: ["RDS", "EC2", "ECS", "S3"],
         }}
-        width="110%"
+        width={`${size}px`}
       />
     </>
   );

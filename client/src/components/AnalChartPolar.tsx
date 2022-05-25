@@ -2,19 +2,33 @@ import ApexChart from "react-apexcharts";
 
 interface IPolarChart {
   size: number;
+  modal: boolean;
 }
-function PolarChart({ size }: IPolarChart) {
+function PolarChart({ size, modal }: IPolarChart) {
   return (
     <>
       <ApexChart
         type="polarArea"
         series={[14, 23, 21, 17, 15, 10]}
         options={{
+          title: modal
+            ? {}
+            : {
+                text: "[ 인프라별 지출 비율 ]",
+                style: {
+                  fontSize: "16px",
+                  fontWeight: "lighter",
+                  color: "white",
+                },
+                align: "left",
+                offsetX: 50,
+                offsetY: -5,
+              },
           theme: {
             mode: "dark",
           },
           chart: {
-            background: "#040959",
+            background: modal ? "gray" : "#040959",
             type: "polarArea",
           },
           stroke: {
@@ -51,7 +65,7 @@ function PolarChart({ size }: IPolarChart) {
             },
           },
         }}
-        width="120%"
+        width={`${size}px`}
       />
     </>
   );

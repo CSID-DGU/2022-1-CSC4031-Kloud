@@ -19,6 +19,12 @@ import Modal from "../components/Modal";
 import Chart from "../components/Chart";
 import ChartModal from "../components/ChartModal";
 import Loader from "../components/Loader";
+import { ReactComponent as RegionSvg } from "../assets/img/region.svg";
+import { ReactComponent as VpcSvg } from "../assets/img/vpc.svg";
+import { ReactComponent as SubnetSvg } from "../assets/img/subnet.svg";
+import { ReactComponent as InstanceSvg } from "../assets/img/instance.svg";
+import { ReactComponent as RdsSvg } from "../assets/img/database.svg";
+import { ReactComponent as IgwSvg } from "../assets/img/igw.svg";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
@@ -136,6 +142,7 @@ export default function Infra({
         <svg width="60vw" height="80vh">
           <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
           <rect width="100%" height="80vh" rx={14} fill={"gainsboro"} />
+          {/* 전체 배경 */}
           <Group top={margin.top} left={margin.left}>
             <Tree
               root={hierarchy(infra, (d) => (d.isExpanded ? null : d.children))}
@@ -151,6 +158,7 @@ export default function Infra({
                       stroke={"#040959"}
                       strokeWidth="1"
                       fill="none"
+                      // 연결선
                     />
                   ))}
 
@@ -166,14 +174,18 @@ export default function Infra({
                     return (
                       <Group top={top} left={left} key={key}>
                         {node.depth === 0 && (
-                          <circle
-                            r={22}
-                            fill="url('#links-gradient')"
-                            onClick={() => {
-                              node.data.isExpanded = !node.data.isExpanded;
-                              forceUpdate();
-                            }}
-                          />
+                          <>
+                            {/* 트리 시작점 */}
+                            <circle
+                              r={25}
+                              fill="url('#links-gradient')"
+                              onClick={() => {
+                                node.data.isExpanded = !node.data.isExpanded;
+                                forceUpdate();
+                              }}
+                            />
+                            <RegionSvg />
+                          </>
                         )}
                         {node.depth !== 0 && (
                           <rect
@@ -193,6 +205,7 @@ export default function Infra({
                             strokeDasharray={node.data.children ? "0" : "2,2"}
                             strokeOpacity={node.data.children ? 1 : 0.6}
                             rx={node.data.children ? 0 : 10}
+                            // 마지막 노드
                             onClick={() => {
                               node.data.isExpanded = !node.data.isExpanded;
                               forceUpdate();
@@ -222,13 +235,20 @@ export default function Infra({
                         >
                           {node.data.resource_type}
                         </text>
+                        {node.data.resource_type === "ec2" ? (
+                          <InstanceSvg />
+                        ) : node.data.resource_type === "subnet" ? (
+                          <SubnetSvg />
+                        ) : node.data.resource_type === "vpc" ? (
+                          <VpcSvg />
+                        ) : null}
                       </Group>
                     );
                   })}
                   {orphan?.map((d, key) => {
+                    var orphan_top = 500;
+                    var orphan_left = 30;
                     if (d.resource_type === "network_interface") {
-                      var orphan_top = 500;
-                      var orphan_left = 30;
                       return (
                         <Group
                           top={orphan_top}
@@ -264,8 +284,6 @@ export default function Infra({
                         </Group>
                       );
                     } else {
-                      var orphan_top = 500;
-                      var orphan_left = 30;
                       return (
                         <Group
                           top={orphan_top}
@@ -298,6 +316,11 @@ export default function Infra({
                           >
                             {d.resource_type}
                           </text>
+                          {d.resource_type === "rds" ? (
+                            <RdsSvg />
+                          ) : d.resource_type === "igw" ? (
+                            <IgwSvg />
+                          ) : null}
                         </Group>
                       );
                     }
