@@ -50,7 +50,14 @@ const Analysis = () => {
         </ChartBox>
       </ChartBoxContainer>
       {openModal ? (
-        <ModalFrame content={<></>} handleModal={() => setOpenModal(false)} />
+        <ModalFrame
+          content={
+            <ChartBox>
+              <PolarChart size={400}></PolarChart>
+            </ChartBox>
+          }
+          handleModal={() => setOpenModal(false)}
+        />
       ) : null}
     </Container>
   );
