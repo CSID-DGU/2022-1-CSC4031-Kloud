@@ -27,6 +27,17 @@ function BarChart({ size }: IBarChart) {
           },
         ]}
         options={{
+          title: {
+            text: "[ 인프라별 지출 내역 ]",
+            style: {
+              fontSize: "16px",
+              fontWeight: "lighter",
+              color: "white",
+            },
+            align: "left",
+            offsetX: 15,
+            offsetY: -5,
+          },
           theme: {
             mode: "dark",
           },

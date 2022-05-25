@@ -10,6 +10,17 @@ function PolarChart({ size }: IPolarChart) {
         type="polarArea"
         series={[14, 23, 21, 17, 15, 10]}
         options={{
+          title: {
+            text: "[ 인프라별 지출 비율 ]",
+            style: {
+              fontSize: "16px",
+              fontWeight: "lighter",
+              color: "white",
+            },
+            align: "left",
+            offsetX: 50,
+            offsetY: -5,
+          },
           theme: {
             mode: "dark",
           },

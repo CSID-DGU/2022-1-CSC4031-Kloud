@@ -28,6 +28,7 @@ const ChartBox = styled.div<{ margin?: number }>`
     cursor: pointer;
   }
 `;
+
 const Analysis = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   return (

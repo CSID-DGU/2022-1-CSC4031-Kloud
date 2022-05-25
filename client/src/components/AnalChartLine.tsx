@@ -17,6 +17,17 @@ function LineChart({ size }: ILineChart) {
           },
         ]}
         options={{
+          title: {
+            text: "[ 전체 비용 차트 ]",
+            style: {
+              fontSize: "16px",
+              fontWeight: "lighter",
+              color: "white",
+            },
+            align: "left",
+            offsetX: 15,
+            offsetY: -5,
+          },
           theme: {
             mode: "dark",
           },
