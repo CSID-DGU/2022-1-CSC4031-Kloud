@@ -236,7 +236,7 @@ export default function Infra({
                           {node.data.resource_type}
                         </text>
                         {node.data.resource_type === "ec2" ? (
-                          <InstanceSvg></InstanceSvg>
+                          <InstanceSvg />
                         ) : node.data.resource_type === "subnet" ? (
                           <SubnetSvg />
                         ) : node.data.resource_type === "vpc" ? (
