@@ -33,6 +33,7 @@ const ChartBox = styled.div<{ margin?: number }>`
 const Analysis = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedChart, setSelectedChart] = useState<JSX.Element>(<></>);
+  const [selected, setSelected] = useState<string>("");
 
   return (
     <Container>
@@ -42,6 +43,7 @@ const Analysis = () => {
           onClick={() => {
             setOpenModal((prev) => !prev);
             setSelectedChart(<PolarChart modal={true} size={600}></PolarChart>);
+            setSelected("polar");
           }}
         >
           <PolarChart modal={false} size={400}></PolarChart>
@@ -50,6 +52,7 @@ const Analysis = () => {
           onClick={() => {
             setOpenModal((prev) => !prev);
             setSelectedChart(<BarChart modal={true} size={600}></BarChart>);
+            setSelected("bar");
           }}
         >
           <BarChart modal={false} size={350}></BarChart>
@@ -61,6 +64,7 @@ const Analysis = () => {
           onClick={() => {
             setOpenModal((prev) => !prev);
             setSelectedChart(<LineChart modal={true} size={600}></LineChart>);
+            setSelected("line");
           }}
         >
           <LineChart modal={false} size={350}></LineChart>
@@ -69,6 +73,7 @@ const Analysis = () => {
           onClick={() => {
             setOpenModal((prev) => !prev);
             setSelectedChart(<DonutChart modal={true} size={600}></DonutChart>);
+            setSelected("donut");
           }}
         >
           <DonutChart modal={false} size={330}></DonutChart>
@@ -76,7 +81,9 @@ const Analysis = () => {
       </ChartBoxContainer>
       {openModal ? (
         <ModalFrame
-          content={<AnalysisModal selectedChart={selectedChart} />}
+          content={
+            <AnalysisModal selectedChart={selectedChart} selected={selected} />
+          }
           handleModal={() => setOpenModal(false)}
         />
       ) : null}
