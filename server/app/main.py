@@ -2,7 +2,7 @@ import botocore.exceptions
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from .boto3_handlers.kloud_client import KloudClient
+from .boto3_wrappers.kloud_client import KloudClient
 from .response_exceptions import UserNotInDBException, CeleryTimeOutError
 from . import common_functions
 from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
@@ -34,7 +34,6 @@ origins = [
 if os.environ.get('IS_PRODUCTION') == "true":
     origins = [os.environ.get('FRONT_END_URL'),  # https://something.com
                os.environ.get('API_URL')]  # https://api.something.com
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -123,8 +122,8 @@ async def get_available_regions():
 
 
 @app.get("/infra/info")
-async def infra_info(user_client=Depends(get_user_client)):
-    return await user_client.get_current_ec2_cli_infra_dict()
+async def infra_info(user_client: KloudClient = Depends(get_user_client)):
+    return await user_client.get_current_infra_dict()
 
 
 @app.get("/cost/history/param")
@@ -175,8 +174,13 @@ async def cost_history_by_resource(user_id=Depends(get_user_id),
                                                            granularity=granularity)
 
 
+@app.get("/cost/history/by-service")
+async def cost_history_by_service(user_client: KloudClient = Depends(get_user_client), days: Optional[int] = 90):
+    return await user_client.get_cost_history_by_service(days=days)
+
+
 @app.get("/infra/tree")
-async def infra_tree(user_client=Depends(get_user_client)):
+async def infra_tree(user_client: KloudClient = Depends(get_user_client)):
     return await user_client.get_infra_tree()
 
 
@@ -229,4 +233,3 @@ async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(securi
 @app.get("/res/{job_id}")
 async def check(job_id):
     return da_app.AsyncResult(job_id).get()  # 예시로, blocking io를 발생시킴.
-
