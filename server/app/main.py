@@ -1,24 +1,20 @@
-import asyncio
 import os
+import asyncio
 
-import boto3
-import botocore.exceptions
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from .client import KloudClient
+from pydantic.types import Optional
+import boto3
+import botocore.exceptions
+
+from .boto3_wrappers.kloud_client import KloudClient
 from .response_exceptions import UserNotInDBException, CeleryTimeOutError
 from . import common_functions
 from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
-import boto3
-import asyncio
-import concurrent.futures
-from pydantic.types import Optional
-
 from .config.cellery_app import da_app
 from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
     delete_cache_from_redis
-from .response_exceptions import UserNotInDBException, CeleryTimeOutError
 
 app = FastAPI(
     title="Kloud API",
@@ -27,11 +23,6 @@ app = FastAPI(
         "url": "https://github.com/CSID-DGU/2022-1-CSC4031-Kloud"
     }
 )
-aws_info = boto3.Session()
-
-clients = dict()  # 수정 필요
-event_loop: asyncio.unix_events.SelectorEventLoop  # on_event('startup')시 오버라이드
-executor = concurrent.futures.ThreadPoolExecutor()  # boto3 io 작업이 실행될 스레드풀. KloudClient 객체 생성시 넘어감.
 
 # #### CORS #####
 # 개발 편의를 위해 모든 origin 허용. 배포시 수정 필요
@@ -50,15 +41,7 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
-
-
 # #### CORS #####
-
-
-@app.on_event('startup')
-async def startup():
-    global event_loop
-    event_loop = asyncio.get_running_loop()  # KloudClient 객체 생성시 넘어감.
 
 
 async def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:
@@ -70,15 +53,8 @@ async def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:
         raise UserNotInDBException  # 없는 유저
     else:
         session_instance = temp_session_create(cred)
-        kloud_client = KloudClient(user_id, session_instance, event_loop, executor)
-        cache_user_client(user_id, kloud_client)
+        kloud_client = KloudClient(user_id, session_instance)
         return kloud_client
-
-
-def cache_user_client(user_id: str,
-                      user_client: KloudClient) -> None:  # todo 유저 객체 캐시 구현
-    # clients[user_id] = user_client
-    pass
 
 
 class KloudLoginForm(BaseModel):
@@ -91,7 +67,7 @@ class AccessTokenResponse(BaseModel):
     access_token: str
 
 
-BREAK_LOOP_STATE = {'SUCCESS', 'REVOKED', 'FAILURE'}
+LOOP_BREAKING_STATE = {'SUCCESS', 'REVOKED', 'FAILURE'}
 
 
 async def wait_until_done(celery_task: da_app.AsyncResult, interval=0.3, timeout=10.0):
@@ -105,11 +81,11 @@ async def wait_until_done(celery_task: da_app.AsyncResult, interval=0.3, timeout
     :return: 셀러리 태스크의 return 값
     """
     time_passed = 0
-    while celery_task.state not in BREAK_LOOP_STATE:
+    while celery_task.state not in LOOP_BREAKING_STATE:
         await asyncio.sleep(interval)
         time_passed += interval
         if time_passed >= timeout:
-            celery_task.forget()
+            celery_task.forget()  # forget() 혹은 get() 하지 않으면 메모리 누수 가능성 있음.
             da_app.control.revoke(celery_task.id)
             raise CeleryTimeOutError
     return celery_task.get()
@@ -139,6 +115,14 @@ async def login(login_form: KloudLoginForm):
         raise HTTPException(status_code=400, detail="invalid_region")
 
 
+@app.post("/logout")
+async def logout(user_id=Depends(get_user_id), token=Depends(security)):
+    asyncio.create_task(revoke_token(token.credentials))  # 서버에서 발급한 jwt 무효화
+    asyncio.create_task(delete_cred_from_redis(user_id))  # 서버에 저장된 aws sts 토큰 삭제
+    asyncio.create_task(delete_cache_from_redis(user_id))  # 캐시 제거
+    return 'logout success'
+
+
 @app.get("/available-regions")  # 가능한 aws 지역 목록, 가장 기본적이고 보편적인 서비스인 ec2를 기본값으로 요청.
 async def get_available_regions():
     return await common_functions.get_available_regions()
@@ -147,6 +131,11 @@ async def get_available_regions():
 @app.get("/infra/info")
 async def infra_info(user_client: KloudClient = Depends(get_user_client)):
     return await user_client.get_current_infra_dict()
+
+
+@app.get("/infra/tree")
+async def infra_tree(user_client: KloudClient = Depends(get_user_client)):
+    return await user_client.get_infra_tree()
 
 
 @app.get("/cost/history/param")
@@ -202,19 +191,6 @@ async def cost_history_by_service(user_client: KloudClient = Depends(get_user_cl
     return await user_client.get_cost_history_by_service(days=days)
 
 
-@app.get("/infra/tree")
-async def infra_tree(user_client: KloudClient = Depends(get_user_client)):
-    return await user_client.get_infra_tree()
-
-
-@app.post("/logout")
-async def logout(user_id=Depends(get_user_id), token=Depends(security)):
-    asyncio.create_task(revoke_token(token.credentials))  # 서버에서 발급한 jwt 무효화
-    asyncio.create_task(delete_cred_from_redis(user_id))  # 서버에 저장된 aws sts 토큰 삭제
-    asyncio.create_task(delete_cache_from_redis(user_id))  # 캐시 제거
-    return 'logout success'
-
-
 class InstanceStop(BaseModel):
     instance_id: str
     hibernate: bool
@@ -256,4 +232,3 @@ async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(securi
 @app.get("/res/{job_id}")
 async def check(job_id):
     return da_app.AsyncResult(job_id).get()  # 예시로, blocking io를 발생시킴.
-
