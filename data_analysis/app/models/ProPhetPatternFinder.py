@@ -3,11 +3,20 @@ import pandas as pd
 import json
 from fbprophet import Prophet
 import matplotlib.pyplot as plt
+from fbprophet.diagnostics import performance_metrics
+from fbprophet.diagnostics import cross_validation
+
 class ProPhetPatternFinder:
-    def __init__(self,data, period):
+    def __init__(self,data, yearly_seasonality : bool, weekly_seasonality : bool ,daily_seasonality : bool, changepoint_prior_scale : float, n_changepoints : int, period : int):
         self.data = data
-        self.period = period
         self.cost = []
+        self.yearly_seasonality = yearly_seasonality
+        self.daily_seasonality = daily_seasonality
+        self.weekly_seasonality = weekly_seasonality
+        self.changepoint_prior_scale = changepoint_prior_scale
+        self.n_changepoints = n_changepoints
+        self.period = period
+
         for d in data["ResultsByTime"]:
             c = 0
             for d2 in d["Groups"]:
@@ -22,12 +31,12 @@ class ProPhetPatternFinder:
     # defalut로 이후 5일 예측
     def model_fit(self):
         try:
-            self.model = Prophet(yearly_seasonality=True,
-                                weekly_seasonality=True,
-                                daily_seasonality=True,
-                                changepoint_prior_scale=0.8,
+            self.model = Prophet(yearly_seasonality=self.yearly_seasonality,
+                                weekly_seasonality=self.weekly_seasonality,
+                                daily_seasonality=self.daily_seasonality,
+                                changepoint_prior_scale=self.changepoint_prior_scale,
                                 seasonality_mode = 'multiplicative',
-                                n_changepoints=10)
+                                n_changepoints=self.n_changepoints)
             self.model.fit(self.data_df)
             # 앞으로 365일 뒤를 예측하겠다. 
             future = self.model.make_future_dataframe(periods=self.period)
@@ -42,7 +51,12 @@ class ProPhetPatternFinder:
     
     def expected_data(self):
         return self.forecast
-
+    
+    def performance(self):
+        df_cv = cross_validation(self.model,initial="1 days" ,period = "20 days", horizon = '7 days')
+        df_p = performance_metrics(df_cv)
+        performance = 100 - round(df_p["mape"].mean(),3)
+        return performance
     # 예측에 영향을 준 요소를 출력
     # 어떤 근거를 가지고 예측을 했는지 
     # 트랜드를 분석해보니 ~~경향을 가지더라
