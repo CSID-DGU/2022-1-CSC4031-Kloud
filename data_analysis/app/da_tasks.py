@@ -39,13 +39,12 @@ def pattern_finder(token: str, start_date="2022-02-02", end_date="2022-05-10" , 
 
 
 @celery_task.task(name="/cost/trend/prophet")
-def pattern_finder2(token: str, yearly_seasonality, weekly_seasonality , daily_seasonality, changepoint_prior_scale, n_changepoints, period):
+def pattern_finder2(token: str, yearly_seasonality, weekly_seasonality , daily_seasonality, n_changepoints, period):
     data = get_cost_info(token)
     p = ProPhetPatternFinder(data=data,
                             yearly_seasonality = yearly_seasonality,
                             weekly_seasonality = weekly_seasonality,
                             daily_seasonality = daily_seasonality,
-                            changepoint_prior_scale = changepoint_prior_scale,
                             n_changepoints = n_changepoints,
                             period = period)
 
