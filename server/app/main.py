@@ -235,14 +235,14 @@ async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(securi
                                 n_changepoints : Optional[int] = 10,
                                 period : Optional[int] = 5):
     """
-    yearly_seasonality :  
-    weekly_seasonality :  
-    daily_seasonality : 
+    yearly_seasonality : 연 계절성
+    weekly_seasonality : 주 계절성 
+    daily_seasonality : 일 계절성
     changepoint_prior_scale : changepoint(trend) 의 유연성 조절
     n_changepoints : 트렌드가 변하는 changepoint 의 개수(갑작스럽게 변하는 시점의 수)
     period : 예측 일수
     """
-    task = da_app.send_task("/cost/trend/prophet", [token.credentials, yearly_seasonality, weekly_seasonality, daily_seasonality, changepoint_prior_scale, n_changepoints, period])
+    task = da_app.send_task("/cost/trend/prophet", [token.credentials, yearly_seasonality, weekly_seasonality, daily_seasonality, n_changepoints, period])
     return await wait_until_done(task, timeout = 1000)  # 비동기 실행, 결과값 체크 예시
 
 
