@@ -16,6 +16,9 @@ from .config.cellery_app import da_app
 from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
     delete_cache_from_redis
 
+from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request
+
 app = FastAPI(
     title="Kloud API",
     contact={
@@ -65,6 +68,8 @@ class KloudLoginForm(BaseModel):
 
 class AccessTokenResponse(BaseModel):
     access_token: str
+
+
 
 
 LOOP_BREAKING_STATE = {'SUCCESS', 'REVOKED', 'FAILURE'}
@@ -222,11 +227,23 @@ async def pattern_finder(user_client=Depends(get_user_id), token=Depends(securit
     task = da_app.send_task("/cost/trend/similarity", [token.credentials])
     return await wait_until_done(task)  # 비동기 실행, 결과값 체크 예시
 
-
 @app.get("/cost/trend/prophet")
-async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(security)):
-    task = da_app.send_task("/cost/trend/prophet", [token.credentials])
-    return await wait_until_done(task, interval=0.5)  # 비동기 실행, 결과값 체크 예시
+async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(security),
+                                yearly_seasonality :  Optional[bool] = True,
+                                weekly_seasonality :  Optional[bool] = True,
+                                daily_seasonality : Optional[bool] =True,
+                                n_changepoints : Optional[int] = 10,
+                                period : Optional[int] = 5):
+    """
+    yearly_seasonality : 연 계절성
+    weekly_seasonality : 주 계절성 
+    daily_seasonality : 일 계절성
+    changepoint_prior_scale : changepoint(trend) 의 유연성 조절
+    n_changepoints : 트렌드가 변하는 changepoint 의 개수(갑작스럽게 변하는 시점의 수)
+    period : 예측 일수
+    """
+    task = da_app.send_task("/cost/trend/prophet", [token.credentials, yearly_seasonality, weekly_seasonality, daily_seasonality, n_changepoints, period])
+    return await wait_until_done(task, timeout = 1000)  # 비동기 실행, 결과값 체크 예시
 
 
 @app.get("/res/{job_id}")
