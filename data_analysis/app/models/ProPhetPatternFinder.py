@@ -7,13 +7,12 @@ from fbprophet.diagnostics import performance_metrics
 from fbprophet.diagnostics import cross_validation
 
 class ProPhetPatternFinder:
-    def __init__(self,data, yearly_seasonality : bool, weekly_seasonality : bool ,daily_seasonality : bool, changepoint_prior_scale : float, n_changepoints : int, period : int):
+    def __init__(self,data, yearly_seasonality : bool, weekly_seasonality : bool ,daily_seasonality : bool, n_changepoints : int, period : int):
         self.data = data
         self.cost = []
         self.yearly_seasonality = yearly_seasonality
         self.daily_seasonality = daily_seasonality
         self.weekly_seasonality = weekly_seasonality
-        self.changepoint_prior_scale = changepoint_prior_scale
         self.n_changepoints = n_changepoints
         self.period = period
 
@@ -34,7 +33,7 @@ class ProPhetPatternFinder:
             self.model = Prophet(yearly_seasonality=self.yearly_seasonality,
                                 weekly_seasonality=self.weekly_seasonality,
                                 daily_seasonality=self.daily_seasonality,
-                                changepoint_prior_scale=self.changepoint_prior_scale,
+                                changepoint_prior_scale=0.8,
                                 seasonality_mode = 'multiplicative',
                                 n_changepoints=self.n_changepoints)
             self.model.fit(self.data_df)
