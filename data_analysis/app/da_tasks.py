@@ -1,3 +1,4 @@
+from copyreg import pickle
 from .da_worker import celery_task
 from .models.PatternFinder import PatternFinder
 from .models.ProPhetPatternFinder import ProPhetPatternFinder
@@ -38,15 +39,23 @@ def pattern_finder(token: str, start_date="2022-02-02", end_date="2022-05-10" , 
 
 
 @celery_task.task(name="/cost/trend/prophet")
-def pattern_finder2(token: str, period=5):
+def pattern_finder2(token: str, yearly_seasonality, weekly_seasonality , daily_seasonality, changepoint_prior_scale, n_changepoints, period):
     data = get_cost_info(token)
-    p = ProPhetPatternFinder(data=data, period=period)
-    # 이후 5일 예측, default = 10
-    periods = 5
+    p = ProPhetPatternFinder(data=data,
+                            yearly_seasonality = yearly_seasonality,
+                            weekly_seasonality = weekly_seasonality,
+                            daily_seasonality = daily_seasonality,
+                            changepoint_prior_scale = changepoint_prior_scale,
+                            n_changepoints = n_changepoints,
+                            period = period)
+
     p.model_fit()
     expected_data = p.expected_data()
     real_data = p.real_data()
+    performance = p.performance()
     answer = {}
+    answer["Performance"] = performance
+    print(performance)
     for i in range(len(expected_data)):
         date = str(expected_data.ds.iloc[i]).split()[0]
         if i < len(real_data):
