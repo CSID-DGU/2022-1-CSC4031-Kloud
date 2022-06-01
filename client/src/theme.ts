@@ -7,5 +7,5 @@ export const defaultTheme: DefaultTheme = {
   accentColor: "#baac2f",
   navHeight: "7vh",
   menuHeight: "93vh",
-  menuWidth: "215px",
+  menuWidth: "200px",
 };
