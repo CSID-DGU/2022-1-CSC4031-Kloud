@@ -8,8 +8,8 @@ function PolarChart({ size, modal }: IPolarChart) {
   return (
     <>
       <ApexChart
-        type="polarArea"
-        series={[14, 23, 21, 17, 15, 10]}
+        type="donut"
+        series={[14, 23, 21, 17, 10]}
         options={{
           title: modal
             ? {}
@@ -32,7 +32,7 @@ function PolarChart({ size, modal }: IPolarChart) {
             type: "polarArea",
           },
           stroke: {
-            colors: ["#fff"],
+            colors: modal ? ["gray"] : ["#040959"],
           },
           fill: {
             opacity: 0.8,
@@ -45,25 +45,12 @@ function PolarChart({ size, modal }: IPolarChart) {
                   width: 200,
                 },
                 legend: {
-                  position: "bottom",
+                  position: "top",
                 },
               },
             },
           ],
-          xaxis: {
-            categories: ["a", "b", "c", "d", "e", "f"],
-          },
-          labels: ["RDS", "EC2", "IGW", "S3", "LightSail", "ECS"],
-          plotOptions: {
-            polarArea: {
-              rings: {
-                strokeWidth: 0,
-              },
-              spokes: {
-                strokeWidth: 0,
-              },
-            },
-          },
+          labels: ["RDS", "EC2", "IGW", "S3", "ECS"],
         }}
         width={`${size}px`}
       />
