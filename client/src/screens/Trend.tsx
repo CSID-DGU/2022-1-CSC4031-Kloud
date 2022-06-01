@@ -38,10 +38,10 @@ const InfoTitle = styled.span<{ marginBottom?: string }>`
   margin-bottom: ${(props) =>
     props.marginBottom ? props.marginBottom : "10px"};
 `;
-const Info = styled.p`
+const Info = styled.p<{ font?: string; color?: string }>`
   font-weight: lighter;
-  font-size: 16px;
-  color: white;
+  font-size: ${(props) => (props.font ? props.font : "16px")};
+  color: ${(props) => (props.color ? props.color : "white")};
   margin-bottom: 20px;
 `;
 const InfoLink = styled.a`
@@ -71,7 +71,7 @@ const Trend = () => {
     "prophet",
     getProphetTrend
   );
-  const [unitDuration, setUnitDuration] = useState<string>("day");
+  const [unitDuration, setUnitDuration] = useState<string>("일");
   const onUnitClick = (selected: string) => {
     setUnitDuration(selected);
   };
@@ -98,32 +98,38 @@ const Trend = () => {
             <InfoBox>
               <UnitBox>
                 <Unit
-                  selected={unitDuration === "day"}
+                  selected={unitDuration === "일"}
                   onClick={() => {
-                    onUnitClick("day");
+                    onUnitClick("일");
                   }}
                 >
                   일별
                 </Unit>
                 <Unit
-                  selected={unitDuration === "week"}
+                  selected={unitDuration === "주"}
                   onClick={() => {
-                    onUnitClick("week");
+                    onUnitClick("주");
                   }}
                 >
                   주별
                 </Unit>
                 <Unit
-                  selected={unitDuration === "month"}
+                  selected={unitDuration === "월"}
                   onClick={() => {
-                    onUnitClick("month");
+                    onUnitClick("월");
                   }}
                 >
                   월별
                 </Unit>
               </UnitBox>
               <InfoTitle>예측 정확도</InfoTitle>
-              <InfoTitle marginBottom={"100px"}>78%</InfoTitle>
+              <InfoTitle marginBottom={"50px"}>78%</InfoTitle>
+              <Info color={"yellow"} font={"20px"}>
+                최근 한달간 비용 20.3$
+              </Info>
+              <Info color={"yellow"} font={"20px"}>
+                이후 5{unitDuration} 예측비용 8.1$
+              </Info>
               <Info>녹색은 예측 데이터, 파란색은 실제 데이터입니다.</Info>
               <Info>
                 회색 범위는 예측 오차를, 점선은 앞으로 5일 후의 비용 예측을
