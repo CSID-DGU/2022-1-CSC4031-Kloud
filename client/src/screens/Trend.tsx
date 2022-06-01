@@ -12,7 +12,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const ChartSidebarBox = styled.div`
+const ChartAndInfoBox = styled.div`
   width: auto;
   height: auto;
   justify-content: center;
@@ -51,6 +51,19 @@ const InfoLink = styled.a`
   margin-bottom: 20px;
   color: ${(props) => props.theme.bgColor};
 `;
+const UnitBox = styled.div`
+  margin-bottom: 20px;
+`;
+const Unit = styled.span<{ selected: boolean }>`
+  color: ${(props) => (props.selected ? "yellow" : "white")};
+  font-weight: lighter;
+  font-size: 25px;
+  margin: 0px 5px;
+  :hover {
+    cursor: pointer;
+  }
+`;
+
 const Trend = () => {
   // const { isLoading: isSimilarityLoading, data: similarityTrend } =
   //   useQuery<any>("similarity", getSimilarityTrend);
@@ -59,7 +72,9 @@ const Trend = () => {
     getProphetTrend
   );
   const [unitDuration, setUnitDuration] = useState<string>("day");
-
+  const onUnitClick = (selected: string) => {
+    setUnitDuration(selected);
+  };
   return (
     <>
       {isProphetLoading ? (
@@ -72,7 +87,7 @@ const Trend = () => {
               "과거 과금 패턴에 기반한 시계열 예측으로 단위 기간별 예측 비용을 제공합니다.",
             ]}
           />
-          <ChartSidebarBox>
+          <ChartAndInfoBox>
             <div>
               <PredictChart
                 size="300%"
@@ -81,8 +96,34 @@ const Trend = () => {
               ></PredictChart>
             </div>
             <InfoBox>
+              <UnitBox>
+                <Unit
+                  selected={unitDuration === "day"}
+                  onClick={() => {
+                    onUnitClick("day");
+                  }}
+                >
+                  일별
+                </Unit>
+                <Unit
+                  selected={unitDuration === "week"}
+                  onClick={() => {
+                    onUnitClick("week");
+                  }}
+                >
+                  주별
+                </Unit>
+                <Unit
+                  selected={unitDuration === "month"}
+                  onClick={() => {
+                    onUnitClick("month");
+                  }}
+                >
+                  월별
+                </Unit>
+              </UnitBox>
               <InfoTitle>예측 정확도</InfoTitle>
-              <InfoTitle marginBottom={"110px"}>78%</InfoTitle>
+              <InfoTitle marginBottom={"100px"}>78%</InfoTitle>
               <Info>녹색은 예측 데이터, 파란색은 실제 데이터입니다.</Info>
               <Info>
                 회색 범위는 예측 오차를, 점선은 앞으로 5일 후의 비용 예측을
@@ -98,7 +139,7 @@ const Trend = () => {
                 무슨 라이브러리가 사용되나요?
               </InfoLink>
             </InfoBox>
-          </ChartSidebarBox>
+          </ChartAndInfoBox>
         </Container>
       )}
     </>
