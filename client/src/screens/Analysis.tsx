@@ -35,7 +35,7 @@ const InfoBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 30px 0;
+  margin: 20px 0;
 `;
 const Info = styled.span`
   color: white;
