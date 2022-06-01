@@ -1,19 +1,21 @@
 import styled from "styled-components";
 import SolutionChart from "../components/SolutionChart";
+import Info from "../components/Info";
 
 const Container = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
   padding-top: 20px;
+  flex-direction: column;
+  align-items: center;
 `;
 const SolutionBox = styled.div`
-  width: 75vw;
-  height: 72vh;
+  width: 80vw;
+  height: 82vh;
   border-radius: 10px;
   background-color: gray;
   display: flex;
-  justify-content: space-space-between;
 `;
 const Partition = styled.div<{ partitionWidth: string }>`
   width: ${(props) => props.partitionWidth};
@@ -43,6 +45,12 @@ const SolutionTitle = styled.p`
 const Solution = () => {
   return (
     <Container>
+      <Info
+        contents={[
+          "비용 솔루션 페이지입니다.",
+          "인프라 사용량에 근거하여 비용 솔루션을 제시합니다.",
+        ]}
+      />
       <SolutionBox>
         <Partition partitionWidth="50vw">
           <ChartBox>
