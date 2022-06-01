@@ -6,7 +6,6 @@ const Container = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  padding-top: 20px;
   flex-direction: column;
   align-items: center;
 `;
@@ -19,6 +18,11 @@ const SolutionBox = styled.div`
 `;
 const Partition = styled.div<{ partitionWidth: string }>`
   width: ${(props) => props.partitionWidth};
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 const ChartBox = styled.div`
   height: 100%;
@@ -26,18 +30,19 @@ const ChartBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  padding-right: 70px;
 `;
 
 const SolutionTextBox = styled.div`
-  height: 100%;
-  width: 37vw;
+  width: auto;
   display: flex;
-  align-items: center;
   justify-content: center;
+  flex-direction: column;
 `;
 
 const SolutionTitle = styled.p`
-  font-size: 30px;
+  font-size: 25px;
   color: white;
   font-weight: lighter;
 `;
@@ -54,15 +59,16 @@ const Solution = () => {
       <SolutionBox>
         <Partition partitionWidth="50vw">
           <ChartBox>
-            <SolutionChart size={400} />
+            <SolutionChart size={500} />
           </ChartBox>
           <SolutionTextBox>
+            <SolutionTitle>현재 RDS1은</SolutionTitle>
             <SolutionTitle>
-              현재 RDS1 은 db.t3.medium 사이즈로 4G 의 메모리중 75% 를
-              사용중입니다.
+              db.t3.medium 사이즈로 4G 의 메모리중 75% 를 사용중입니다.
             </SolutionTitle>
           </SolutionTextBox>
         </Partition>
+        <Partition partitionWidth="25vw"></Partition>
         <Partition partitionWidth="25vw"></Partition>
       </SolutionBox>
     </Container>

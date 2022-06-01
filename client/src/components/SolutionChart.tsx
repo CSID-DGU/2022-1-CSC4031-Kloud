@@ -42,10 +42,10 @@ function SolutionChart({ size }: ISolutionChart) {
             radialBar: {
               dataLabels: {
                 name: {
-                  fontSize: "22px",
+                  fontSize: "30px",
                 },
                 value: {
-                  fontSize: "16px",
+                  fontSize: "20px",
                 },
               },
             },

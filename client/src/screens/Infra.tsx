@@ -4,7 +4,6 @@ import { Group } from "@visx/group";
 import { hierarchy, Tree } from "@visx/hierarchy";
 import { LinearGradient } from "@visx/gradient";
 import useForceUpdate from "../visualization/useForceUpdate";
-import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
 import { useQuery } from "react-query";
 import { INestedInfra, INestedInfraResponse, ICostHistory } from "../types";
@@ -128,9 +127,6 @@ export default function Infra({
   height: totalHeight,
   margin = defaultMargin,
 }: LinkTypesProps) {
-  const [layout, setLayout] = useState<string>("cartesian");
-  const [orientation, setOrientation] = useState<string>("수평 보기");
-  const [linkType, setLinkType] = useState<string>("step");
   const forceUpdate = useForceUpdate();
   const [sidebarItem, setSidebarItem] = useState<string>();
   const [sidebarItemType, setSidebarItemType] = useState<string>();
@@ -161,7 +157,11 @@ export default function Infra({
   let origin: { x: number; y: number };
   origin = { x: 0, y: 0 };
 
-  const LinkComponent = getLinkComponent({ layout, linkType, orientation });
+  const LinkComponent = getLinkComponent({
+    layout: "cartesian",
+    linkType: "step",
+    orientation: "수평 보기",
+  });
 
   return totalWidth < 10 ? null : isInfraLoading ||
     isNestedInfraLoading ||

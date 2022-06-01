@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { getProphetTrend, getSimilarityTrend } from "../api";
+import { getProphetTrend } from "../api";
 import Loader from "../components/Loader";
 import PredictChart from "../components/PredictChart";
 import InfoComponents from "../components/Info";
