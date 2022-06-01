@@ -16,7 +16,7 @@ function SolutionChart({ size }: ISolutionChart) {
             toolbar: {
               show: false,
             },
-            background: "gray",
+            background: "transparent",
           },
           theme: {
             mode: "dark",

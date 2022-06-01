@@ -13,7 +13,7 @@ const SolutionBox = styled.div`
   width: 80vw;
   height: 82vh;
   border-radius: 10px;
-  background-color: gray;
+  background-color: transparent;
   display: flex;
 `;
 const Partition = styled.div<{ partitionWidth: string }>`
@@ -31,7 +31,7 @@ const ChartBox = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding-right: 70px;
+  padding-right: 100px;
 `;
 
 const SolutionTextBox = styled.div`
@@ -46,6 +46,29 @@ const SolutionTitle = styled.p`
   color: white;
   font-weight: lighter;
 `;
+const CompareSection = styled.div`
+  width: 100%;
+  height: 90px;
+  display: flex;
+  padding: 0 90px;
+  justify-content: space-between;
+  border-top: 0.3px solid white;
+`;
+const CompareBox = styled.div`
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+`;
+const CompareText = styled.span<{
+  color: string;
+  size: string;
+  weight?: string;
+}>`
+  color: ${(props) => props.color};
+  font-size: ${(props) => props.size};
+  font-weight: ${(props) => (props.weight ? props.weight : "lighter")};
+  margin-top: 10px;
+`;
 
 const Solution = () => {
   return (
@@ -56,6 +79,41 @@ const Solution = () => {
           "인프라 사용량에 근거하여 비용 솔루션을 제시합니다.",
         ]}
       />
+      <CompareSection>
+        <CompareBox>
+          <CompareText weight={"normal"} color={"white"} size={"25px"}>
+            최근 한달 비용
+          </CompareText>
+          <CompareText color={"yellow"} size={"25px"}>
+            32.3$
+          </CompareText>
+          <CompareText color={"white"} size={"15px"}>
+            최근 한달간의 전체 비용입니다.
+          </CompareText>
+        </CompareBox>
+        <CompareBox>
+          <CompareText weight={"normal"} color={"white"} size={"25px"}>
+            솔루션 제안 인프라
+          </CompareText>
+          <CompareText color={"red"} size={"25px"}>
+            3개
+          </CompareText>
+          <CompareText color={"white"} size={"15px"}>
+            Kloud 에서 제안하는 변경사항에 해당하는 인프라의 개수입니다.
+          </CompareText>
+        </CompareBox>
+        <CompareBox>
+          <CompareText weight={"normal"} color={"white"} size={"25px"}>
+            절감 가능 금액
+          </CompareText>
+          <CompareText color={"yellowgreen"} size={"25px"}>
+            5.03$ &darr;
+          </CompareText>
+          <CompareText color={"white"} size={"15px"}>
+            한달 동안 절감 가능한 최대 금액입니다.
+          </CompareText>
+        </CompareBox>
+      </CompareSection>
       <SolutionBox>
         <Partition partitionWidth="50vw">
           <ChartBox>
