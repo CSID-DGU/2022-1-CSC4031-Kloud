@@ -25,11 +25,12 @@ const InfoBox = styled.div`
   flex-direction: column;
   padding: 20px;
 `;
-const InfoTitle = styled.span`
+const InfoTitle = styled.span<{ marginBottom?: string }>`
   font-weight: lighter;
-  font-size: 50px;
+  font-size: 40px;
   color: white;
-  margin-bottom: 150px;
+  margin-bottom: ${(props) =>
+    props.marginBottom ? props.marginBottom : "10px"};
 `;
 const Info = styled.p`
   font-weight: lighter;
@@ -66,7 +67,8 @@ const Trend = () => {
             ></PredictChart>
           </div>
           <InfoBox>
-            <InfoTitle>?</InfoTitle>
+            <InfoTitle>예측 정확도</InfoTitle>
+            <InfoTitle marginBottom={"110px"}>78%</InfoTitle>
             <Info>녹색은 예측 데이터, 파란색은 실제 데이터입니다.</Info>
             <Info>
               회색 범위는 예측 오차를, 점선은 앞으로 5일 후의 비용 예측을

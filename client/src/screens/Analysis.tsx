@@ -24,10 +24,23 @@ const ChartBox = styled.div<{ margin?: number }>`
   height: auto;
   width: auto;
   margin-right: ${(props) => (props.margin ? props.margin : 0)}px;
-  margin-top: 10px;
+  margin-top: 30px;
   :hover {
     cursor: pointer;
   }
+`;
+const InfoBox = styled.div`
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 30px 0;
+`;
+const Info = styled.span`
+  color: white;
+  font-weight: lighter;
+  font-size: 30px;
 `;
 
 const Analysis = () => {
@@ -37,9 +50,15 @@ const Analysis = () => {
 
   return (
     <Container>
+      <InfoBox>
+        <Info>
+          비용 분석 페이지입니다. 차트를 클릭하여 세부 내용 및 정보를
+          확인합니다.
+        </Info>
+      </InfoBox>
       <ChartBoxContainer>
         <ChartBox
-          margin={180}
+          margin={130}
           onClick={() => {
             setOpenModal((prev) => !prev);
             setSelectedChart(<PolarChart modal={true} size={480}></PolarChart>);
@@ -55,19 +74,19 @@ const Analysis = () => {
             setSelected("bar");
           }}
         >
-          <BarChart modal={false} size={350}></BarChart>
+          <BarChart modal={false} size={480}></BarChart>
         </ChartBox>
       </ChartBoxContainer>
       <ChartBoxContainer>
         <ChartBox
-          margin={180}
+          margin={130}
           onClick={() => {
             setOpenModal((prev) => !prev);
             setSelectedChart(<LineChart modal={true} size={450}></LineChart>);
             setSelected("line");
           }}
         >
-          <LineChart modal={false} size={350}></LineChart>
+          <LineChart modal={false} size={480}></LineChart>
         </ChartBox>
         <ChartBox
           onClick={() => {
@@ -76,7 +95,7 @@ const Analysis = () => {
             setSelected("donut");
           }}
         >
-          <DonutChart modal={false} size={330}></DonutChart>
+          <DonutChart modal={false} size={430}></DonutChart>
         </ChartBox>
       </ChartBoxContainer>
       {openModal ? (

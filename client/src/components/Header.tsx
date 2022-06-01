@@ -13,6 +13,9 @@ const HeaderContainer = styled.header`
   background-color: gainsboro;
   padding: 1rem;
   width: 100%;
+  z-index: 100;
+  position: fixed;
+  top: 0;
 `;
 const Logo = styled.span`
   font-size: 24px;

@@ -33,7 +33,7 @@ function BarChart({ size, modal }: IBarChart) {
             : {
                 text: "[ 인프라별 지출 내역 ]",
                 style: {
-                  fontSize: "16px",
+                  fontSize: "20px",
                   fontWeight: "lighter",
                   color: "white",
                 },

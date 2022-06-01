@@ -10,8 +10,7 @@ import { regionAtom } from "../atoms";
 const Container = styled.div`
   display: flex;
   flex-direction: row;
-  width: 100vw;
-  overflow: hidden;
+  padding-top: ${(props) => props.theme.navHeight}; ;
 `;
 const ContentBox = styled.div`
   padding-left: ${(props) => props.theme.menuWidth};
