@@ -6,12 +6,14 @@ const InfoBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 20px 0;
+  margin: 10px 0 20px 0;
+  flex-direction: column;
 `;
 const Content = styled.span`
   color: white;
   font-weight: lighter;
   font-size: 30px;
+  margin-bottom: 10px;
 `;
 
 interface IInfo {

@@ -6,6 +6,7 @@ import LineChart from "../components/AnalChartLine";
 import PolarChart from "../components/AnalChartPolar";
 import ModalFrame from "../components/Modal";
 import AnalysisModal from "../components/AnalysisModal";
+import Info from "../components/Info";
 
 const Container = styled.div`
   display: flex;
@@ -29,19 +30,6 @@ const ChartBox = styled.div<{ margin?: number }>`
     cursor: pointer;
   }
 `;
-const InfoBox = styled.div`
-  width: 100%;
-  height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 20px 0;
-`;
-const Info = styled.span`
-  color: white;
-  font-weight: lighter;
-  font-size: 30px;
-`;
 
 const Analysis = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -50,12 +38,11 @@ const Analysis = () => {
 
   return (
     <Container>
-      <InfoBox>
-        <Info>
-          비용 분석 페이지입니다. 차트를 클릭하여 세부 내용 및 정보를
-          확인합니다.
-        </Info>
-      </InfoBox>
+      <Info
+        contents={[
+          "비용 분석 페이지입니다. 차트를 클릭하여 세부 내용 및 정보를 확인합니다.",
+        ]}
+      />
       <ChartBoxContainer>
         <ChartBox
           margin={130}
