@@ -24,7 +24,7 @@ const ChartBox = styled.div<{ margin?: number }>`
   height: auto;
   width: auto;
   margin-right: ${(props) => (props.margin ? props.margin : 0)}px;
-  margin-top: 10px;
+  margin-top: 30px;
   :hover {
     cursor: pointer;
   }
@@ -39,7 +39,7 @@ const Analysis = () => {
     <Container>
       <ChartBoxContainer>
         <ChartBox
-          margin={180}
+          margin={130}
           onClick={() => {
             setOpenModal((prev) => !prev);
             setSelectedChart(<PolarChart modal={true} size={480}></PolarChart>);
@@ -55,7 +55,7 @@ const Analysis = () => {
             setSelected("bar");
           }}
         >
-          <BarChart modal={false} size={350}></BarChart>
+          <BarChart modal={false} size={480}></BarChart>
         </ChartBox>
       </ChartBoxContainer>
       <ChartBoxContainer>
@@ -67,7 +67,7 @@ const Analysis = () => {
             setSelected("line");
           }}
         >
-          <LineChart modal={false} size={350}></LineChart>
+          <LineChart modal={false} size={480}></LineChart>
         </ChartBox>
         <ChartBox
           onClick={() => {
@@ -76,7 +76,7 @@ const Analysis = () => {
             setSelected("donut");
           }}
         >
-          <DonutChart modal={false} size={330}></DonutChart>
+          <DonutChart modal={false} size={430}></DonutChart>
         </ChartBox>
       </ChartBoxContainer>
       {openModal ? (

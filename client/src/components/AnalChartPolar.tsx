@@ -16,12 +16,12 @@ function PolarChart({ size, modal }: IPolarChart) {
             : {
                 text: "[ 인프라별 지출 비율 ]",
                 style: {
-                  fontSize: "16px",
+                  fontSize: "20px",
                   fontWeight: "lighter",
                   color: "white",
                 },
                 align: "left",
-                offsetX: 50,
+                offsetX: -10,
                 offsetY: -5,
               },
           theme: {

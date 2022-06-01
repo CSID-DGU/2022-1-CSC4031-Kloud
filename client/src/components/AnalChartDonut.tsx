@@ -16,7 +16,7 @@ function DonutChart({ size, modal }: IDonutChart) {
             : {
                 text: "[ 인프라 사용률 ]",
                 style: {
-                  fontSize: "16px",
+                  fontSize: "20px",
                   fontWeight: "lighter",
                   color: "white",
                 },

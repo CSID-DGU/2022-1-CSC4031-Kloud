@@ -23,7 +23,7 @@ function LineChart({ size, modal }: ILineChart) {
             : {
                 text: "[ 전체 비용 차트 ]",
                 style: {
-                  fontSize: "16px",
+                  fontSize: "20px",
                   fontWeight: "lighter",
                   color: "white",
                 },
