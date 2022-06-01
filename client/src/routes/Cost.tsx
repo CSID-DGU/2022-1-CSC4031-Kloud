@@ -17,9 +17,9 @@ const Nav = styled.div`
 `;
 const NavItem = styled.span<{ isActive: boolean }>`
   color: gainsboro;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: lighter;
-  margin-right: 1rem;
+  margin-right: 1.2rem;
   text-decoration: ${(props) =>
     props.isActive ? "underline yellow" : "underline"};
   :hover {
