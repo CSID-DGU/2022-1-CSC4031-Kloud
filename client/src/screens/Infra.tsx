@@ -233,6 +233,21 @@ export default function Infra({
                             } = node;
                             setSidebarItem(resource_id);
                             setSidebarItemType(resource_type);
+                            const costs = costHistoryByResource?.data.map(
+                              (d) => {
+                                const hit = d.Groups.filter(
+                                  (g) => g.Keys[0] === resource_id
+                                );
+                                return hit.length === 0
+                                  ? 0
+                                  : hit[0].Metrics.UnblendedCost.Amount;
+                              }
+                            );
+                            let sum = 0;
+                            costs?.forEach((n) => {
+                              sum += Number(n);
+                            });
+                            setSelectedInstanceCost(Number(sum.toFixed(2)));
                           }}
                         >
                           {node.data.resource_type}
@@ -375,7 +390,7 @@ export default function Infra({
             {sidebarItemType === "ec2" ? (
               <>
                 <SelectedInfraInfo>
-                  <strong>최근 2주간 비용 $</strong>
+                  <strong>최근 2주간 비용 {selectedInstanceCost}$</strong>
                 </SelectedInfraInfo>
                 <SelectedInfraInfo>
                   Instance Size :{" "}
