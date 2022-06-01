@@ -7,7 +7,7 @@ import useForceUpdate from "../visualization/useForceUpdate";
 import LinkControls from "../visualization/LinkControls";
 import getLinkComponent from "../visualization/getLinkComponent";
 import { useQuery } from "react-query";
-import { INestedInfra, INestedInfraResponse } from "../types";
+import { INestedInfra, INestedInfraResponse, ICostHistory } from "../types";
 import {
   getCostHistoryByResource,
   getInfra,
@@ -68,6 +68,7 @@ const ChartBox = styled.button`
 `;
 const SelectedInfraInfo = styled.span`
   margin-bottom: 20px;
+  font-weight: lighter;
 `;
 const SidebarButton = styled.button<{ buttonType: string }>`
   width: 13vw;
@@ -103,6 +104,7 @@ export default function Infra({
   const forceUpdate = useForceUpdate();
   const [sidebarItem, setSidebarItem] = useState<string>();
   const [sidebarItemType, setSidebarItemType] = useState<string>();
+  const [selectedInstanceCost, setSelectedInstanceCost] = useState<number>();
   const [openModal, setOpenModal] = useState<boolean>(false);
 
   const innerWidth = totalWidth - margin.left - margin.right;
@@ -116,7 +118,7 @@ export default function Infra({
   const {
     isLoading: isCostHistoryByResourceLoading,
     data: costHistoryByResource,
-  } = useQuery<any>("costHistoryByResource", getCostHistoryByResource);
+  } = useQuery<ICostHistory>("costHistoryByResource", getCostHistoryByResource);
 
   const orphan = nestedInfra?.orphan;
   const infra: INestedInfra = nestedInfra?.infra
@@ -312,6 +314,15 @@ export default function Infra({
                               const { resource_id, resource_type } = d;
                               setSidebarItem(resource_id);
                               setSidebarItemType(resource_type);
+                              costHistoryByResource?.data.map((d) => {
+                                const hit = d.Groups.filter(
+                                  (g) => g.Keys[0] === resource_id
+                                );
+                                console.log(hit);
+                                return hit.length === 0
+                                  ? 0
+                                  : hit[0].Metrics.UnblendedCost.Amount;
+                              });
                             }}
                           >
                             {d.resource_type}
@@ -342,22 +353,30 @@ export default function Infra({
               <SelectedInfra>{sidebarItem}</SelectedInfra>
             )}
             <ChartBox onClick={() => setOpenModal((prev) => !prev)}>
-              <Chart
-                resourceId={sidebarItem}
-                costHistory={costHistoryByResource}
-              />
+              {costHistoryByResource ? (
+                <Chart
+                  resourceId={sidebarItem}
+                  costHistory={costHistoryByResource}
+                />
+              ) : null}
             </ChartBox>
             {sidebarItemType === "network_interface" ? (
               <SelectedInfraInfo>
                 Type : <strong>{sidebarItemType}</strong>
               </SelectedInfraInfo>
-            ) : (
+            ) : sidebarItemType !== "ec2" ? (
               <SelectedInfraInfo>
                 Resource Type : <strong>{sidebarItemType}</strong>
               </SelectedInfraInfo>
+            ) : (
+              <></>
             )}
+
             {sidebarItemType === "ec2" ? (
               <>
+                <SelectedInfraInfo>
+                  <strong>최근 2주간 비용 $</strong>
+                </SelectedInfraInfo>
                 <SelectedInfraInfo>
                   Instance Size :{" "}
                   <strong>
@@ -445,29 +464,31 @@ export default function Infra({
           </>
         ) : null}
       </Sidebar>
-      {openModal ? (
-        sidebarItemType === "ec2" ? (
-          <Modal
-            content={
-              <ChartModal
-                instanceType={allInfra.data[`${sidebarItem}`].InstanceType}
-                resourceId={`${sidebarItem}`}
-                costHistory={costHistoryByResource}
-              />
-            }
-            handleModal={() => setOpenModal(false)}
-          />
-        ) : (
-          <Modal
-            content={
-              <ChartModal
-                resourceId={`${sidebarItem}`}
-                costHistory={costHistoryByResource}
-              />
-            }
-            handleModal={() => setOpenModal(false)}
-          />
-        )
+      {costHistoryByResource ? (
+        openModal ? (
+          sidebarItemType === "ec2" ? (
+            <Modal
+              content={
+                <ChartModal
+                  instanceType={allInfra.data[`${sidebarItem}`].InstanceType}
+                  resourceId={`${sidebarItem}`}
+                  costHistory={costHistoryByResource}
+                />
+              }
+              handleModal={() => setOpenModal(false)}
+            />
+          ) : (
+            <Modal
+              content={
+                <ChartModal
+                  resourceId={`${sidebarItem}`}
+                  costHistory={costHistoryByResource}
+                />
+              }
+              handleModal={() => setOpenModal(false)}
+            />
+          )
+        ) : null
       ) : null}
     </Container>
   );

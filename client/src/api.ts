@@ -138,8 +138,8 @@ export function getCostHistory() {
   return data;
 }
 
-export function getCostHistoryByResource() {
-  const data = axios({
+export async function getCostHistoryByResource() {
+  const data = await axios({
     method: "GET",
     url: `${BASE_URL}/cost/history/by-resource?granularity=DAILY`,
     data: {},
