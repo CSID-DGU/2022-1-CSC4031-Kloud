@@ -53,12 +53,15 @@ const InfoLink = styled.a`
 `;
 const UnitBox = styled.div`
   margin-bottom: 20px;
+  display: flex;
 `;
 const Unit = styled.span<{ selected: boolean }>`
   color: ${(props) => (props.selected ? "yellow" : "white")};
+  display: block;
   font-weight: lighter;
   font-size: 25px;
   margin: 0px 5px;
+  border-bottom: ${(props) => (props.selected ? "0.8px solid yellow" : "none")};
   :hover {
     cursor: pointer;
   }
