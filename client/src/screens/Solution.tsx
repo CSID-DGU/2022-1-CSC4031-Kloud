@@ -3,6 +3,7 @@ import SolutionChart from "../components/SolutionChart";
 import Info from "../components/Info";
 import HorizontalMenu from "../components/HorizontalMenu/index";
 import { useState } from "react";
+import SolutionCompareChart from "../components/SolutionCompareChart";
 
 const Container = styled.div`
   width: 100%;
@@ -60,12 +61,20 @@ const SolutionContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 90px;
+  margin-bottom: 100px;
 `;
 const SolutionText = styled.span<{ size: string; color: string }>`
   font-weight: lighter;
   font-size: ${(props) => props.size};
   color: ${(props) => props.color};
   margin-right: 8px;
+`;
+
+const ChartContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Solution = () => {
@@ -156,27 +165,30 @@ const Solution = () => {
               direction={"left"}
             />
             <div>
-              <SolutionText color={"white"} size={"20px"}>
+              <SolutionText color={"white"} size={"25px"}>
                 t2.micro 인스턴스로 최근 한 달간 비용은
               </SolutionText>
               <SolutionText color={"yellow"} size={"30px"}>
                 16.4$
               </SolutionText>
-              <SolutionText color={"white"} size={"20px"}>
+              <SolutionText color={"white"} size={"25px"}>
                 입니다.
               </SolutionText>
             </div>
+            <ChartContainer>
+              <SolutionCompareChart />
+            </ChartContainer>
             <div>
-              <SolutionText color={"yellow"} size={"20px"}>
+              <SolutionText color={"yellow"} size={"25px"}>
                 t2.nano
               </SolutionText>
-              <SolutionText color={"white"} size={"20px"}>
+              <SolutionText color={"white"} size={"25px"}>
                 로 사이즈 변경시 예상 절감 금액은
               </SolutionText>
               <SolutionText color={"yellowgreen"} size={"30px"}>
                 +4.3$
               </SolutionText>
-              <SolutionText color={"white"} size={"20px"}>
+              <SolutionText color={"white"} size={"25px"}>
                 입니다.
               </SolutionText>
             </div>

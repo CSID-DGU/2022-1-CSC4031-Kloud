@@ -3,56 +3,69 @@ import ApexChart from "react-apexcharts";
 interface ISolutionCompareChart {}
 
 function SolutionCompareChart() {
+  const test = [
+    28, 29, 33, 36, 32, 32, 33, 28, 29, 33, 36, 32, 32, 33, 28, 29, 33, 36, 32,
+    32, 33,
+  ];
   return (
     <>
       <ApexChart
-        type="radialBar"
-        series={[]}
-        options={{
-          chart: {
-            height: 350,
-            type: "radialBar",
-            toolbar: {
-              show: false,
-            },
-            background: "transparent",
+        type="line"
+        series={[
+          {
+            name: "Real",
+            type: "line",
+            data: test,
           },
+          {
+            name: "Solution",
+            data: test.map((d) => d - 4),
+          },
+        ]}
+        options={{
           theme: {
             mode: "dark",
           },
+          dataLabels: {
+            enabled: false,
+          },
+          chart: {
+            toolbar: {
+              show: true,
+            },
+            background: "transparent",
+            stacked: true,
+          },
           stroke: {
-            lineCap: "round",
+            width: 2,
           },
-          labels: [],
+          yaxis: {
+            show: true,
+            decimalsInFloat: 2,
+            min: 0,
+          },
+          xaxis: {
+            labels: { show: true },
+            type: "datetime",
+          },
           fill: {
-            type: "gradient",
-            gradient: {
-              shade: "dark",
-              type: "horizontal",
-              shadeIntensity: 0.5,
-              gradientToColors: ["#ABE5A1"],
-              inverseColors: true,
-              opacityFrom: 1,
-              opacityTo: 1,
-              stops: [0, 100],
-            },
+            opacity: 0.9,
+            type: "solid",
           },
-          plotOptions: {
-            radialBar: {
-              dataLabels: {
-                name: {
-                  fontSize: "30px",
-                  fontWeight: "lighter",
-                },
-                value: {
-                  fontSize: "20px",
-                  fontWeight: "lighter",
-                },
-              },
+          colors: ["#0091ff", "yellow", "#d2d2d2"],
+          tooltip: {
+            y: {
+              formatter: (value) => `$${value.toFixed(2)}`,
             },
+            shared: true,
+            intersect: false,
+          },
+          forecastDataPoints: {
+            count: 5,
+            dashArray: 5,
           },
         }}
-        width={`500px`}
+        width={"300%"}
       />
     </>
   );
