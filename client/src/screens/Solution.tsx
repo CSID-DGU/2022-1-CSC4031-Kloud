@@ -2,6 +2,7 @@ import styled from "styled-components";
 import SolutionChart from "../components/SolutionChart";
 import Info from "../components/Info";
 import HorizontalMenu from "../components/HorizontalMenu/index";
+import { useState } from "react";
 
 const Container = styled.div`
   width: 100%;
@@ -11,7 +12,7 @@ const Container = styled.div`
   align-items: center;
 `;
 const SolutionBox = styled.div`
-  width: 80vw;
+  width: 85vw;
   height: 82vh;
   border-radius: 10px;
   background-color: transparent;
@@ -26,6 +27,9 @@ const ChartBox = styled.div`
   flex-direction: column;
   margin-right: -100px;
   margin-left: -120px;
+  :hover {
+    cursor: pointer;
+  }
 `;
 
 const CompareSection = styled.div`
@@ -53,6 +57,10 @@ const CompareText = styled.span<{
 `;
 
 const Solution = () => {
+  const [selectedInfra, setSelectedInfra] = useState<string>();
+  const onChartClick = (infra: string) => {
+    setSelectedInfra(infra);
+  };
   return (
     <Container>
       <Info
@@ -99,17 +107,17 @@ const Solution = () => {
       <SolutionBox>
         <HorizontalMenu
           contents={[
-            <ChartBox>
-              <SolutionChart />
+            <ChartBox onClick={() => onChartClick("testing")}>
+              <SolutionChart infra={"RDS1"} percent={20} />
             </ChartBox>,
-            <ChartBox>
-              <SolutionChart />
+            <ChartBox onClick={() => onChartClick("testing")}>
+              <SolutionChart infra={"EC2"} percent={34} />
             </ChartBox>,
-            <ChartBox>
-              <SolutionChart />
+            <ChartBox onClick={() => onChartClick("testing")}>
+              <SolutionChart infra={"EC2"} percent={22} />
             </ChartBox>,
-            <ChartBox>
-              <SolutionChart />
+            <ChartBox onClick={() => onChartClick("testing")}>
+              <SolutionChart infra={"EC2"} percent={15} />
             </ChartBox>,
           ]}
         />

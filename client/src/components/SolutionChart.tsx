@@ -1,11 +1,18 @@
 import ApexChart from "react-apexcharts";
 
-function SolutionChart() {
+interface ISolutionChart {
+  infra: string;
+  percent: number;
+}
+
+function SolutionChart({ infra, percent }: ISolutionChart) {
+  const COLOR_1 = `#${Math.round(Math.random() * 0xffffff).toString(16)}`;
+  const COLOR_2 = `#${Math.round(Math.random() * 0xffffff).toString(16)}`;
   return (
     <>
       <ApexChart
         type="radialBar"
-        series={[75]}
+        series={[percent]}
         options={{
           chart: {
             height: 350,
@@ -21,14 +28,14 @@ function SolutionChart() {
           stroke: {
             lineCap: "round",
           },
-          labels: ["RDS1"],
+          labels: [infra],
           fill: {
             type: "gradient",
             gradient: {
               shade: "dark",
               type: "horizontal",
               shadeIntensity: 0.5,
-              gradientToColors: ["#ABE5A1"],
+              gradientToColors: [COLOR_1, COLOR_2],
               inverseColors: true,
               opacityFrom: 1,
               opacityTo: 1,
@@ -40,6 +47,7 @@ function SolutionChart() {
               dataLabels: {
                 name: {
                   fontSize: "30px",
+                  color: "white",
                 },
                 value: {
                   fontSize: "20px",
