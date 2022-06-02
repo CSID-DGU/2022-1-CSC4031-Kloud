@@ -3,11 +3,10 @@ import ApexChart from "react-apexcharts";
 interface ISolutionChart {
   infra: string;
   percent: number;
+  selected: boolean;
 }
 
-function SolutionChart({ infra, percent }: ISolutionChart) {
-  const COLOR_1 = `#${Math.round(Math.random() * 0xffffff).toString(16)}`;
-  const COLOR_2 = `#${Math.round(Math.random() * 0xffffff).toString(16)}`;
+function SolutionChart({ infra, percent, selected }: ISolutionChart) {
   return (
     <>
       <ApexChart
@@ -35,7 +34,7 @@ function SolutionChart({ infra, percent }: ISolutionChart) {
               shade: "dark",
               type: "horizontal",
               shadeIntensity: 0.5,
-              gradientToColors: [COLOR_1, COLOR_2],
+              gradientToColors: ["#ABE5A1"],
               inverseColors: true,
               opacityFrom: 1,
               opacityTo: 1,
@@ -47,10 +46,12 @@ function SolutionChart({ infra, percent }: ISolutionChart) {
               dataLabels: {
                 name: {
                   fontSize: "30px",
-                  color: "white",
+                  color: selected ? "yellow" : "white",
+                  fontWeight: "lighter",
                 },
                 value: {
                   fontSize: "20px",
+                  fontWeight: "lighter",
                 },
               },
             },
