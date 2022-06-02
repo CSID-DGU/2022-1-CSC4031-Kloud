@@ -5,28 +5,44 @@ import { VisibilityContext } from "react-horizontal-scrolling-menu";
 function Arrow({
   children,
   disabled,
-  onClick
+  onClick,
 }: {
   children: React.ReactNode;
   disabled: boolean;
   onClick: VoidFunction;
 }) {
   return (
-    <button
-      disabled={disabled}
-      onClick={onClick}
+    <div
       style={{
-        cursor: "pointer",
         display: "flex",
-        flexDirection: "column",
         justifyContent: "center",
-        right: "1%",
-        opacity: disabled ? "0" : "1",
-        userSelect: "none"
+        alignItems: "center",
       }}
     >
-      {children}
-    </button>
+      <button
+        disabled={disabled}
+        onClick={onClick}
+        style={{
+          cursor: "pointer",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          opacity: disabled ? "0" : "1",
+          userSelect: "none",
+          backgroundColor: "transparent",
+          border: "none",
+          fontWeight: "lighter",
+          color: "white",
+          borderRadius: "15px",
+          width: "100px",
+          height: "100px",
+          alignItems: "center",
+          fontSize: "30px",
+        }}
+      >
+        {children}
+      </button>
+    </div>
   );
 }
 
@@ -35,7 +51,7 @@ export function LeftArrow() {
     isFirstItemVisible,
     scrollPrev,
     visibleItemsWithoutSeparators,
-    initComplete
+    initComplete,
   } = React.useContext(VisibilityContext);
 
   const [disabled, setDisabled] = React.useState(
@@ -50,17 +66,14 @@ export function LeftArrow() {
 
   return (
     <Arrow disabled={disabled} onClick={() => scrollPrev()}>
-      Left
+      {"<"}
     </Arrow>
   );
 }
 
 export function RightArrow() {
-  const {
-    isLastItemVisible,
-    scrollNext,
-    visibleItemsWithoutSeparators
-  } = React.useContext(VisibilityContext);
+  const { isLastItemVisible, scrollNext, visibleItemsWithoutSeparators } =
+    React.useContext(VisibilityContext);
 
   // console.log({ isLastItemVisible });
   const [disabled, setDisabled] = React.useState(
@@ -74,7 +87,7 @@ export function RightArrow() {
 
   return (
     <Arrow disabled={disabled} onClick={() => scrollNext()}>
-      Right
+      {">"}
     </Arrow>
   );
 }

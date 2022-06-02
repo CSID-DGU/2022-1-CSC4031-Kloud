@@ -10,7 +10,7 @@ import "./hideScrollbar.css";
 type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
 
 const Container = styled.div`
-  width: 95%;
+  width: 100%;
   margin-top: 100px;
 `;
 
