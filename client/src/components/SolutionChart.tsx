@@ -1,9 +1,6 @@
 import ApexChart from "react-apexcharts";
 
-interface ISolutionChart {
-  size: number;
-}
-function SolutionChart({ size }: ISolutionChart) {
+function SolutionChart() {
   return (
     <>
       <ApexChart
@@ -51,7 +48,7 @@ function SolutionChart({ size }: ISolutionChart) {
             },
           },
         }}
-        width={`${size}px`}
+        width={`500px`}
       />
     </>
   );

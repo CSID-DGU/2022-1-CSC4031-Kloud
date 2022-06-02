@@ -24,6 +24,8 @@ const ChartBox = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  margin-right: -100px;
+  margin-left: -120px;
 `;
 
 const CompareSection = styled.div`
@@ -98,13 +100,16 @@ const Solution = () => {
         <HorizontalMenu
           contents={[
             <ChartBox>
-              <SolutionChart size={550} />
+              <SolutionChart />
             </ChartBox>,
             <ChartBox>
-              <SolutionChart size={550} />
+              <SolutionChart />
             </ChartBox>,
             <ChartBox>
-              <SolutionChart size={550} />
+              <SolutionChart />
+            </ChartBox>,
+            <ChartBox>
+              <SolutionChart />
             </ChartBox>,
           ]}
         />
