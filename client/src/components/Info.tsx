@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
-const InfoBox = styled.div`
+const InfoBox = styled.div<{ direction?: string }>`
   width: 100%;
   height: auto;
   display: flex;
-  align-items: center;
+  align-items: ${(props) => (props.direction ? null : "center")};
   justify-content: center;
   margin: 10px 0 20px 0;
   flex-direction: column;
@@ -18,10 +18,11 @@ const Content = styled.span`
 
 interface IInfo {
   contents: string[];
+  direction?: string;
 }
-const Info = ({ contents }: IInfo) => {
+const Info = ({ contents, direction }: IInfo) => {
   return (
-    <InfoBox>
+    <InfoBox direction={direction}>
       {contents.map((content) => (
         <Content>{content}</Content>
       ))}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { getProphetTrend, getSimilarityTrend } from "../api";
+import { getProphetTrend } from "../api";
 import Loader from "../components/Loader";
 import PredictChart from "../components/PredictChart";
 import InfoComponents from "../components/Info";
@@ -53,12 +53,15 @@ const InfoLink = styled.a`
 `;
 const UnitBox = styled.div`
   margin-bottom: 20px;
+  display: flex;
 `;
 const Unit = styled.span<{ selected: boolean }>`
   color: ${(props) => (props.selected ? "yellow" : "white")};
+  display: block;
   font-weight: lighter;
   font-size: 25px;
   margin: 0px 5px;
+  border-bottom: ${(props) => (props.selected ? "0.8px solid yellow" : "none")};
   :hover {
     cursor: pointer;
   }

@@ -1,14 +1,17 @@
 import ApexChart from "react-apexcharts";
 
 interface ISolutionChart {
-  size: number;
+  infra: string;
+  percent: number;
+  selected: boolean;
 }
-function SolutionChart({ size }: ISolutionChart) {
+
+function SolutionChart({ infra, percent, selected }: ISolutionChart) {
   return (
     <>
       <ApexChart
         type="radialBar"
-        series={[75]}
+        series={[percent]}
         options={{
           chart: {
             height: 350,
@@ -16,7 +19,7 @@ function SolutionChart({ size }: ISolutionChart) {
             toolbar: {
               show: false,
             },
-            background: "gray",
+            background: "transparent",
           },
           theme: {
             mode: "dark",
@@ -24,7 +27,7 @@ function SolutionChart({ size }: ISolutionChart) {
           stroke: {
             lineCap: "round",
           },
-          labels: ["RDS1"],
+          labels: [infra],
           fill: {
             type: "gradient",
             gradient: {
@@ -42,16 +45,19 @@ function SolutionChart({ size }: ISolutionChart) {
             radialBar: {
               dataLabels: {
                 name: {
-                  fontSize: "22px",
+                  fontSize: "30px",
+                  color: selected ? "yellow" : "white",
+                  fontWeight: "lighter",
                 },
                 value: {
-                  fontSize: "16px",
+                  fontSize: "20px",
+                  fontWeight: "lighter",
                 },
               },
             },
           },
         }}
-        width={`${size}px`}
+        width={`500px`}
       />
     </>
   );
