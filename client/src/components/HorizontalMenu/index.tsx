@@ -9,24 +9,16 @@ import "./hideScrollbar.css";
 
 type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
 
-const elemPrefix = "test";
-const getId = (index: number) => `${elemPrefix}${index}`;
 const Container = styled.div`
-  width: 100%;
+  width: 95%;
+  margin-top: 100px;
 `;
-
-const getItems = () =>
-  Array(20)
-    .fill(0)
-    .map((_, ind) => ({ id: getId(ind) }));
 
 interface IHorizontalMenu {
   contents: JSX.Element[];
 }
 
 function HorizontalMenu({ contents }: IHorizontalMenu) {
-  const [items] = React.useState(getItems);
-
   return (
     <Container>
       <ScrollMenu
@@ -34,11 +26,11 @@ function HorizontalMenu({ contents }: IHorizontalMenu) {
         RightArrow={RightArrow}
         onWheel={onWheel}
       >
-        {items.map(({ id }) => (
+        {contents.map((content, idx) => (
           <Card
-            title={id}
-            itemId={id} // NOTE: itemId is required for track items
-            key={id}
+            itemId={idx} // NOTE: itemId is required for track items
+            key={idx}
+            content={content}
           />
         ))}
       </ScrollMenu>

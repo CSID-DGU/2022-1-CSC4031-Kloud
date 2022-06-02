@@ -95,11 +95,20 @@ const Solution = () => {
         </CompareBox>
       </CompareSection>
       <SolutionBox>
-        <ChartBox>
-          <SolutionChart size={550} />
-        </ChartBox>
+        <HorizontalMenu
+          contents={[
+            <ChartBox>
+              <SolutionChart size={550} />
+            </ChartBox>,
+            <ChartBox>
+              <SolutionChart size={550} />
+            </ChartBox>,
+            <ChartBox>
+              <SolutionChart size={550} />
+            </ChartBox>,
+          ]}
+        />
       </SolutionBox>
-      <HorizontalMenu />
     </Container>
   );
 };
