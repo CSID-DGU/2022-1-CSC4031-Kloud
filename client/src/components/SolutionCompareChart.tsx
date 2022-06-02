@@ -19,7 +19,9 @@ function SolutionCompareChart() {
           },
           {
             name: "Solution",
-            data: test.map((d) => d - 4),
+            type: "line",
+            data: test.map((d) => d - Math.random() * 3),
+            color: "yellow",
           },
         ]}
         options={{
@@ -37,7 +39,8 @@ function SolutionCompareChart() {
             stacked: true,
           },
           stroke: {
-            width: 2,
+            width: 3,
+            colors: ["#0091ff", "yellow"],
           },
           yaxis: {
             show: true,
@@ -47,12 +50,13 @@ function SolutionCompareChart() {
           xaxis: {
             labels: { show: true },
             type: "datetime",
+            categories: test.map((d, idx) => idx),
           },
           fill: {
             opacity: 0.9,
             type: "solid",
           },
-          colors: ["#0091ff", "yellow", "#d2d2d2"],
+          colors: ["#0091ff", "yellow", "yellow"],
           tooltip: {
             y: {
               formatter: (value) => `$${value.toFixed(2)}`,
