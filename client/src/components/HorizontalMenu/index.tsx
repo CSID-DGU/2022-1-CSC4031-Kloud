@@ -1,53 +1,48 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
+import styled from "styled-components";
 
 import { LeftArrow, RightArrow } from "./arrows";
 import { Card } from "./card";
-import { Footer } from "./footer";
-import { Header } from "./header";
 import "./globalStyles.css";
-
-// NOTE: embrace power of CSS flexbox!
-// import "./arrowsOnBottomOrTop.css";
 import "./hideScrollbar.css";
-// import "./firstItemMargin.css";
 
 type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
 
 const elemPrefix = "test";
 const getId = (index: number) => `${elemPrefix}${index}`;
+const Container = styled.div`
+  width: 100%;
+`;
 
 const getItems = () =>
   Array(20)
     .fill(0)
     .map((_, ind) => ({ id: getId(ind) }));
 
-function HorizontalMenu() {
+interface IHorizontalMenu {
+  contents: JSX.Element[];
+}
+
+function HorizontalMenu({ contents }: IHorizontalMenu) {
   const [items] = React.useState(getItems);
 
   return (
-    <>
-      <Header />
-      <div className="example" style={{ paddingTop: "100px" }}>
-        <div>
-          <ScrollMenu
-            LeftArrow={LeftArrow}
-            RightArrow={RightArrow}
-            onWheel={onWheel}
-          >
-            {items.map(({ id }) => (
-              <Card
-                title={id}
-                itemId={id} // NOTE: itemId is required for track items
-                key={id}
-              />
-            ))}
-          </ScrollMenu>
-        </div>
-        <Footer />
-      </div>
-    </>
+    <Container>
+      <ScrollMenu
+        LeftArrow={LeftArrow}
+        RightArrow={RightArrow}
+        onWheel={onWheel}
+      >
+        {items.map(({ id }) => (
+          <Card
+            title={id}
+            itemId={id} // NOTE: itemId is required for track items
+            key={id}
+          />
+        ))}
+      </ScrollMenu>
+    </Container>
   );
 }
 export default HorizontalMenu;

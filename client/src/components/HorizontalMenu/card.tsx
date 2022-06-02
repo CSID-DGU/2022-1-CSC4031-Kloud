@@ -4,7 +4,6 @@ import { VisibilityContext } from "react-horizontal-scrolling-menu";
 
 export function Card({ title, itemId }: { title: string; itemId: string }) {
   const visibility = React.useContext(VisibilityContext);
-
   const visible = visibility.isItemVisible(itemId);
 
   return (
@@ -15,7 +14,7 @@ export function Card({ title, itemId }: { title: string; itemId: string }) {
         display: "inline-block",
         margin: "0 10px",
         width: "160px",
-        userSelect: "none"
+        userSelect: "none",
       }}
       tabIndex={0}
       className="card"
@@ -29,7 +28,7 @@ export function Card({ title, itemId }: { title: string; itemId: string }) {
       <div
         style={{
           backgroundColor: "bisque",
-          height: "200px"
+          height: "200px",
         }}
       />
     </div>
