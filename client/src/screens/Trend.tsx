@@ -95,7 +95,7 @@ const Trend = () => {
               <PredictChart
                 size="300%"
                 similarity={{}}
-                prophet={prophetTrend}
+                prophet={prophetTrend.slice(1)}
               ></PredictChart>
             </div>
             <InfoBox>
@@ -126,7 +126,7 @@ const Trend = () => {
                 </Unit>
               </UnitBox>
               <InfoTitle>예측 정확도</InfoTitle>
-              <InfoTitle marginBottom={"50px"}>78%</InfoTitle>
+              <InfoTitle marginBottom={"50px"}>{prophetTrend[0][1]}%</InfoTitle>
               <Info color={"yellow"} font={"20px"}>
                 최근 한달간 비용 20.3$
               </Info>

@@ -167,7 +167,6 @@ export async function getProphetTrend() {
   const response = await axios({
     method: "GET",
     url: `${BASE_URL}/cost/trend/prophet`,
-    data: {},
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
