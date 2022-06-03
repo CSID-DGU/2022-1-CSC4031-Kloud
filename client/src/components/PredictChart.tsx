@@ -2,10 +2,9 @@ import ApexChart from "react-apexcharts";
 
 interface IPredictChart {
   size?: string;
-  similarity: any;
   prophet: any;
 }
-function PredictChart({ size, similarity, prophet }: IPredictChart) {
+function PredictChart({ size, prophet }: IPredictChart) {
   return (
     <>
       <ApexChart

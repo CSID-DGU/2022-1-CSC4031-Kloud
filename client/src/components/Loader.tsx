@@ -6,6 +6,9 @@ const Container = styled.div`
   left: 50%;
   margin-top: -33px;
   margin-left: -33px;
+  color: white;
+  font-size: 30px;
+  font-weight: lighter;
 `;
 const Circle = styled.span<{
   duration: string;

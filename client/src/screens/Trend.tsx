@@ -5,6 +5,7 @@ import { getProphetTrend } from "../api";
 import Loader from "../components/Loader";
 import PredictChart from "../components/PredictChart";
 import InfoComponents from "../components/Info";
+import ReactToolTip from "react-tooltip";
 
 const Container = styled.div`
   justify-content: center;
@@ -94,8 +95,7 @@ const Trend = () => {
             <div>
               <PredictChart
                 size="300%"
-                similarity={{}}
-                prophet={prophetTrend}
+                prophet={prophetTrend.slice(1)}
               ></PredictChart>
             </div>
             <InfoBox>
@@ -105,6 +105,8 @@ const Trend = () => {
                   onClick={() => {
                     onUnitClick("일");
                   }}
+                  data-tip
+                  data-for="day"
                 >
                   일별
                 </Unit>
@@ -113,6 +115,8 @@ const Trend = () => {
                   onClick={() => {
                     onUnitClick("주");
                   }}
+                  data-tip
+                  data-for="week"
                 >
                   주별
                 </Unit>
@@ -121,17 +125,37 @@ const Trend = () => {
                   onClick={() => {
                     onUnitClick("월");
                   }}
+                  data-tip
+                  data-for="month"
                 >
                   월별
                 </Unit>
               </UnitBox>
               <InfoTitle>예측 정확도</InfoTitle>
-              <InfoTitle marginBottom={"50px"}>78%</InfoTitle>
+              <InfoTitle marginBottom={"50px"}>{prophetTrend[0][1]}%</InfoTitle>
               <Info color={"yellow"} font={"20px"}>
-                최근 한달간 비용 20.3$
+                최근 한달간 비용{" "}
+                {prophetTrend
+                  .slice(-36, -5)
+                  .map((d: any) => d[1].real_data)
+                  .reduce((sum: number, val: number) => {
+                    return sum + val;
+                  }, 0)
+                  .toFixed(1)}
+                $
               </Info>
               <Info color={"yellow"} font={"20px"}>
-                이후 5{unitDuration} 예측비용 8.1$
+                {unitDuration === "일"
+                  ? `이후 5일 예측비용 ${prophetTrend
+                      .slice(-5)
+                      .map((d: any) => d[1].expected_data.yhat)
+                      .reduce((sum: number, val: number) => {
+                        return sum + val;
+                      }, 0)
+                      .toFixed(1)}$`
+                  : unitDuration === "주"
+                  ? "이후 2주 예측비용 8.1$"
+                  : "다음달 예측비용 151.3$"}
               </Info>
               <Info>녹색은 예측 데이터, 파란색은 실제 데이터입니다.</Info>
               <Info>
@@ -149,6 +173,15 @@ const Trend = () => {
               </InfoLink>
             </InfoBox>
           </ChartAndInfoBox>
+          <ReactToolTip id="day" type="info">
+            일별 트렌드를 반영해 이후 5일 간의 비용 예측을 제공합니다.
+          </ReactToolTip>
+          <ReactToolTip id="week" type="info">
+            주별 트렌드를 반영해 이후 2주 간의 비용 예측을 제공합니다.
+          </ReactToolTip>
+          <ReactToolTip id="month" type="info">
+            월별 트렌드를 반영해 다음 달의 비용 예측을 제공합니다.
+          </ReactToolTip>
         </Container>
       )}
     </>

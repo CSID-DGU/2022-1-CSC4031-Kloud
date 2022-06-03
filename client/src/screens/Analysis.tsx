@@ -4,9 +4,12 @@ import BarChart from "../components/AnalChartBar";
 import DonutChart from "../components/AnalChartDonut";
 import LineChart from "../components/AnalChartLine";
 import PolarChart from "../components/AnalChartPolar";
+import Loader from "../components/Loader";
 import ModalFrame from "../components/Modal";
 import AnalysisModal from "../components/AnalysisModal";
 import Info from "../components/Info";
+import { useQuery } from "react-query";
+import { getProphetTrend, getCostRatio } from "../api";
 
 const Container = styled.div`
   display: flex;
@@ -35,8 +38,17 @@ const Analysis = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedChart, setSelectedChart] = useState<JSX.Element>(<></>);
   const [selected, setSelected] = useState<string>("");
-
-  return (
+  const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
+    "prophet",
+    getProphetTrend
+  );
+  const { isLoading: isRatioLoading, data: costRatio } = useQuery<any>(
+    "ratio",
+    getCostRatio
+  );
+  return isProphetLoading || isRatioLoading ? (
+    <Loader />
+  ) : (
     <Container>
       <Info
         contents={[
@@ -48,11 +60,13 @@ const Analysis = () => {
           margin={130}
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<PolarChart modal={true} size={480}></PolarChart>);
+            setSelectedChart(
+              <PolarChart modal={true} size={500} data={costRatio} />
+            );
             setSelected("polar");
           }}
         >
-          <PolarChart modal={false} size={400}></PolarChart>
+          <PolarChart modal={false} size={440} data={costRatio} />
         </ChartBox>
         <ChartBox
           onClick={() => {
@@ -69,11 +83,21 @@ const Analysis = () => {
           margin={130}
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<LineChart modal={true} size={450}></LineChart>);
+            setSelectedChart(
+              <LineChart
+                modal={true}
+                size={450}
+                data={prophetTrend.slice(1, -5)}
+              />
+            );
             setSelected("line");
           }}
         >
-          <LineChart modal={false} size={480}></LineChart>
+          <LineChart
+            modal={false}
+            size={480}
+            data={prophetTrend.slice(1, -5)}
+          />
         </ChartBox>
         <ChartBox
           onClick={() => {
@@ -88,7 +112,11 @@ const Analysis = () => {
       {openModal ? (
         <ModalFrame
           content={
-            <AnalysisModal selectedChart={selectedChart} selected={selected} />
+            <AnalysisModal
+              totalCost={selected === "polar" ? costRatio.at(-1) : null}
+              selectedChart={selectedChart}
+              selected={selected}
+            />
           }
           handleModal={() => setOpenModal(false)}
         />
