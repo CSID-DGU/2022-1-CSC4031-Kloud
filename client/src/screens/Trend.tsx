@@ -5,7 +5,7 @@ import { getProphetTrend } from "../api";
 import Loader from "../components/Loader";
 import PredictChart from "../components/PredictChart";
 import InfoComponents from "../components/Info";
-import { DefaultDeserializer } from "v8";
+import ReactToolTip from "react-tooltip";
 
 const Container = styled.div`
   justify-content: center;
@@ -106,6 +106,8 @@ const Trend = () => {
                   onClick={() => {
                     onUnitClick("일");
                   }}
+                  data-tip
+                  data-for="day"
                 >
                   일별
                 </Unit>
@@ -114,6 +116,8 @@ const Trend = () => {
                   onClick={() => {
                     onUnitClick("주");
                   }}
+                  data-tip
+                  data-for="week"
                 >
                   주별
                 </Unit>
@@ -122,6 +126,8 @@ const Trend = () => {
                   onClick={() => {
                     onUnitClick("월");
                   }}
+                  data-tip
+                  data-for="month"
                 >
                   월별
                 </Unit>
@@ -168,6 +174,15 @@ const Trend = () => {
               </InfoLink>
             </InfoBox>
           </ChartAndInfoBox>
+          <ReactToolTip id="day" type="info">
+            일별 트렌드를 반영해 이후 5일 간의 비용 예측을 제공합니다.
+          </ReactToolTip>
+          <ReactToolTip id="week" type="info">
+            주별 트렌드를 반영해 이후 2주 간의 비용 예측을 제공합니다.
+          </ReactToolTip>
+          <ReactToolTip id="month" type="info">
+            월별 트렌드를 반영해 다음 달의 비용 예측을 제공합니다.
+          </ReactToolTip>
         </Container>
       )}
     </>
