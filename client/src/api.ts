@@ -179,6 +179,57 @@ export async function getProphetTrend() {
   }
   return result;
 }
+export async function getCostRatio() {
+  const response = await axios({
+    method: "GET",
+    url: `${BASE_URL}/cost/history/by-service?days=30`,
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+
+  const result = [];
+  let total = 0;
+  let key;
+  for (const service in response.data) {
+    const cost = response.data[`${service}`].toFixed(2);
+    if (cost < 1) continue;
+    total += cost;
+    switch (service) {
+      case "AWS Cost Explorer":
+        key = "Cost Explorer";
+        break;
+      case "Amazon ElastiCache":
+        key = "ElastiCache";
+        break;
+      case "Amazon Elastic Compute Cloud - Compute":
+      case "EC2 - Other":
+        key = "EC2";
+        break;
+      case "Amazon Elastic Container Service":
+        key = "ECS";
+        break;
+      case "Amazon Elastic Load Balancing":
+        key = "Load Balancing";
+        break;
+      case "Amazon Lightsail":
+        key = "Lightsail";
+        break;
+      case "Amazon Relational Database Service":
+        key = "RDS";
+        break;
+      case "Amazon Route 53":
+        key = "Route 53";
+        break;
+      default:
+        key = service;
+    }
+    result.push([key, response.data[`${service}`]]);
+  }
+  result.push(total);
+  return result;
+}
 
 export function logOut() {
   const data = axios({
