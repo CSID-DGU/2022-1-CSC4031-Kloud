@@ -95,7 +95,6 @@ const Trend = () => {
             <div>
               <PredictChart
                 size="300%"
-                similarity={{}}
                 prophet={prophetTrend.slice(1)}
               ></PredictChart>
             </div>

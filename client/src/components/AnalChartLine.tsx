@@ -3,8 +3,10 @@ import ApexChart from "react-apexcharts";
 interface ILineChart {
   size: number;
   modal: boolean;
+  data: any;
 }
-function LineChart({ size, modal }: ILineChart) {
+function LineChart({ size, modal, data }: ILineChart) {
+  console.log(data);
   return (
     <>
       <ApexChart
