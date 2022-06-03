@@ -5,6 +5,7 @@ import { getProphetTrend } from "../api";
 import Loader from "../components/Loader";
 import PredictChart from "../components/PredictChart";
 import InfoComponents from "../components/Info";
+import { DefaultDeserializer } from "v8";
 
 const Container = styled.div`
   justify-content: center;
@@ -128,7 +129,15 @@ const Trend = () => {
               <InfoTitle>예측 정확도</InfoTitle>
               <InfoTitle marginBottom={"50px"}>{prophetTrend[0][1]}%</InfoTitle>
               <Info color={"yellow"} font={"20px"}>
-                최근 한달간 비용 20.3$
+                최근 한달간 비용{" "}
+                {prophetTrend
+                  .slice(-36, -5)
+                  .map((d: any) => d[1].real_data)
+                  .reduce((sum: number, val: number) => {
+                    return sum + val;
+                  }, 0)
+                  .toFixed(1)}
+                $
               </Info>
               <Info color={"yellow"} font={"20px"}>
                 이후 5{unitDuration} 예측비용 8.1$
