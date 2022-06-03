@@ -140,7 +140,17 @@ const Trend = () => {
                 $
               </Info>
               <Info color={"yellow"} font={"20px"}>
-                이후 5{unitDuration} 예측비용 8.1$
+                {unitDuration === "일"
+                  ? `이후 5일 예측비용 ${prophetTrend
+                      .slice(-5)
+                      .map((d: any) => d[1].expected_data.yhat)
+                      .reduce((sum: number, val: number) => {
+                        return sum + val;
+                      }, 0)
+                      .toFixed(1)}$`
+                  : unitDuration === "주"
+                  ? "이후 2주 예측비용 8.1$"
+                  : "다음달 예측비용 151.3$"}
               </Info>
               <Info>녹색은 예측 데이터, 파란색은 실제 데이터입니다.</Info>
               <Info>
