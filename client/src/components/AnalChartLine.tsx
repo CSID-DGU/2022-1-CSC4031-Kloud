@@ -6,7 +6,6 @@ interface ILineChart {
   data: any;
 }
 function LineChart({ size, modal, data }: ILineChart) {
-  console.log(data);
   return (
     <>
       <ApexChart

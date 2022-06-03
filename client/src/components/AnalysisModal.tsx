@@ -4,6 +4,7 @@ import styled from "styled-components";
 interface IChartModal {
   selectedChart: JSX.Element;
   selected: string;
+  totalCost?: number;
 }
 
 const Container = styled.div`
@@ -73,14 +74,24 @@ const BarInfo = () => {
   );
 };
 
-const PolarInfo = () => {
+interface IPolarInfo {
+  totalCost: any;
+}
+const PolarInfo = ({ totalCost }: IPolarInfo) => {
   return (
     <>
       <InfoTitle>인프라별 지출 비용</InfoTitle>
       <Info>
         이 차트는 최근 한 달 지출에 대한 서비스별 지출 비율을 나타냅니다.
       </Info>
-      <Info>마우스를 올려 해당 인프라를 직관적으로 확인합니다.</Info>
+      <Info>마우스를 올려 실제 지출 비용을 확인합니다.</Info>
+      <Info>
+        이번 달 총 비용은{" "}
+        <span style={{ color: "yellow", fontWeight: "normal" }}>
+          ${totalCost}
+        </span>{" "}
+        입니다.
+      </Info>
     </>
   );
 };
@@ -131,13 +142,13 @@ const DonutInfo = () => {
   );
 };
 
-const AnalysisModal = ({ selectedChart, selected }: IChartModal) => {
+const AnalysisModal = ({ selectedChart, selected, totalCost }: IChartModal) => {
   return (
     <Container>
       <ChartContainer>{selectedChart}</ChartContainer>
       <InfoContainer>
         {selected === "polar" ? (
-          <PolarInfo />
+          <PolarInfo totalCost={totalCost} />
         ) : selected === "line" ? (
           <LineInfo />
         ) : selected === "donut" ? (

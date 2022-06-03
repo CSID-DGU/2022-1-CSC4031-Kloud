@@ -193,7 +193,7 @@ export async function getCostRatio() {
   let total = 0;
   let key;
   for (const service in response.data) {
-    const cost = response.data[`${service}`].toFixed(2);
+    const cost = parseFloat(response.data[`${service}`].toFixed(2));
     if (cost < 1) continue;
     total += cost;
     switch (service) {
@@ -239,4 +239,5 @@ export function logOut() {
       access_token: localStorage.getItem("access_token"),
     },
   });
+  return data;
 }

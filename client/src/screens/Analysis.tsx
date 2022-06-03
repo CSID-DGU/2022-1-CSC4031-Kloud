@@ -9,7 +9,7 @@ import ModalFrame from "../components/Modal";
 import AnalysisModal from "../components/AnalysisModal";
 import Info from "../components/Info";
 import { useQuery } from "react-query";
-import { getProphetTrend } from "../api";
+import { getProphetTrend, getCostRatio } from "../api";
 
 const Container = styled.div`
   display: flex;
@@ -42,7 +42,11 @@ const Analysis = () => {
     "prophet",
     getProphetTrend
   );
-  return isProphetLoading ? (
+  const { isLoading: isRatioLoading, data: costRatio } = useQuery<any>(
+    "ratio",
+    getCostRatio
+  );
+  return isProphetLoading || isRatioLoading ? (
     <Loader />
   ) : (
     <Container>
@@ -56,11 +60,13 @@ const Analysis = () => {
           margin={130}
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<PolarChart modal={true} size={480}></PolarChart>);
+            setSelectedChart(
+              <PolarChart modal={true} size={500} data={costRatio} />
+            );
             setSelected("polar");
           }}
         >
-          <PolarChart modal={false} size={400}></PolarChart>
+          <PolarChart modal={false} size={440} data={costRatio} />
         </ChartBox>
         <ChartBox
           onClick={() => {
@@ -106,7 +112,11 @@ const Analysis = () => {
       {openModal ? (
         <ModalFrame
           content={
-            <AnalysisModal selectedChart={selectedChart} selected={selected} />
+            <AnalysisModal
+              totalCost={selected === "polar" ? costRatio.at(-1) : null}
+              selectedChart={selectedChart}
+              selected={selected}
+            />
           }
           handleModal={() => setOpenModal(false)}
         />
