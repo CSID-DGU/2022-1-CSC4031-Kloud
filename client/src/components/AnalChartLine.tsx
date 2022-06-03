@@ -14,9 +14,7 @@ function LineChart({ size, modal, data }: ILineChart) {
         series={[
           {
             name: "Cost",
-            data: [
-              4, 3, 10, 9, 9, 19, 12, 9, 12, 7, 10, 8, 18, 19, 20, 22, 27, 25,
-            ],
+            data: data.map((d: any) => d[1].real_data),
           },
         ]}
         options={{
@@ -41,32 +39,15 @@ function LineChart({ size, modal, data }: ILineChart) {
             type: "line",
           },
           stroke: {
-            width: 5,
+            width: 2,
             curve: "smooth",
           },
           xaxis: {
             type: "datetime",
-            categories: [
-              "1/11/2000",
-              "2/11/2000",
-              "3/11/2000",
-              "4/11/2000",
-              "5/11/2000",
-              "6/11/2000",
-              "7/11/2000",
-              "8/11/2000",
-              "9/11/2000",
-              "10/11/2000",
-              "11/11/2000",
-              "12/11/2000",
-              "1/11/2001",
-              "2/11/2001",
-              "3/11/2001",
-              "4/11/2001",
-              "5/11/2001",
-              "6/11/2001",
-            ],
-            tickAmount: 10,
+            categories: data.map((d: any) => d[0]),
+          },
+          yaxis: {
+            decimalsInFloat: 2,
           },
           fill: {
             type: "gradient",
@@ -80,9 +61,12 @@ function LineChart({ size, modal, data }: ILineChart) {
               stops: [0, 100, 100, 100],
             },
           },
-          yaxis: {
-            min: -10,
-            max: 40,
+          tooltip: {
+            y: {
+              formatter: (value) => `$${value.toFixed(2)}`,
+            },
+            shared: true,
+            intersect: false,
           },
         }}
         width={`${size}px`}

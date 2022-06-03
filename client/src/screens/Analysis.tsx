@@ -78,7 +78,11 @@ const Analysis = () => {
           onClick={() => {
             setOpenModal((prev) => !prev);
             setSelectedChart(
-              <LineChart modal={true} size={450} data={prophetTrend} />
+              <LineChart
+                modal={true}
+                size={450}
+                data={prophetTrend.slice(1, -5)}
+              />
             );
             setSelected("line");
           }}
