@@ -10,7 +10,6 @@ import botocore.exceptions
 
 from .boto3_wrappers.kloud_client import KloudClient
 from .response_exceptions import UserNotInDBException, CeleryTimeOutError
-from . import common_functions
 from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
 from .config.cellery_app import da_app
 from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
@@ -127,7 +126,8 @@ async def logout(user_id=Depends(get_user_id), token=Depends(security)):
 
 @app.get("/available-regions")  # 가능한 aws 지역 목록, 가장 기본적이고 보편적인 서비스인 ec2를 기본값으로 요청.
 async def get_available_regions():
-    return await common_functions.get_available_regions()
+    s = boto3.Session(region_name="ap-northeast-2")
+    return await asyncio.to_thread(s.get_available_regions, service_name="ec2")
 
 
 @app.get("/infra/info")
