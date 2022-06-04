@@ -1,6 +1,8 @@
 import json
 from json import JSONDecodeError
+
 from aioredis import Redis
+
 from .config.redis_conf import HOST, PORT, CREDDB, CRED_EXP, COST_EXP, REVOKED_TOKENS, CACHEDB
 from .response_exceptions import UserNotInDBException
 

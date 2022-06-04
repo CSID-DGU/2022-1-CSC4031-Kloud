@@ -9,10 +9,11 @@ import boto3
 import botocore.exceptions
 
 from .boto3_wrappers.kloud_client import KloudClient
-from .response_exceptions import UserNotInDBException, CeleryTimeOutError
-from .auth import create_access_token, get_user_id, request_temp_cred_async, temp_session_create, security, revoke_token
+from .response_exceptions import CeleryTimeOutError
+from .auth import create_access_token, async_request_temp_cred, security, revoke_token
+from .dependencies import get_user_id, get_user_client
 from .config.cellery_app import da_app
-from .redis_req import set_cred_to_redis, get_cred_from_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
+from .redis_req import set_cred_to_redis, delete_cred_from_redis, get_cost_cache, set_cost_cache, \
     delete_cache_from_redis
 
 app = FastAPI(
@@ -43,19 +44,6 @@ app.add_middleware(
 
 
 # #### CORS #####
-
-
-async def get_user_client(user_id: str = Depends(get_user_id)) -> KloudClient:
-    """
-    redis에서 임시 자격증명을 가져와 객체를 생성함.
-    """
-    cred = await get_cred_from_redis(user_id)
-    if cred is None:
-        raise UserNotInDBException  # 없는 유저
-    else:
-        session_instance = temp_session_create(cred)
-        kloud_client = KloudClient(user_id, session_instance)
-        return kloud_client
 
 
 class KloudLoginForm(BaseModel):
@@ -103,7 +91,7 @@ async def login(login_form: KloudLoginForm):
         session_instance: boto3.Session = boto3.Session(aws_access_key_id=login_form.access_key_public,
                                                         aws_secret_access_key=login_form.access_key_secret,
                                                         region_name=login_form.region)
-        temp_cred = await request_temp_cred_async(session_instance, login_form.region)
+        temp_cred = await async_request_temp_cred(session_instance, login_form.region)
 
         await set_cred_to_redis(user_id=login_form.access_key_public, cred=temp_cred)  # await 하지 않을시 잠재적 에러 가능성
         token = create_access_token(login_form.access_key_public)
