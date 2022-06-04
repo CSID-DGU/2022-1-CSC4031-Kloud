@@ -2,6 +2,7 @@ import asyncio
 import functools
 from datetime import datetime, timedelta
 from collections import defaultdict
+import heapq
 
 import boto3
 
@@ -66,7 +67,7 @@ class KloudCostExplorer(KloudBoto3Wrapper):
 
         return dict(to_return)
 
-    def _get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str) -> dict:
+    def _get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str) -> list:
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
                        'End': str(datetime.date(datetime.now()))}
         ec2_dict: dict = self.fetch_and_process(identifier='InstanceId',
@@ -95,7 +96,7 @@ class KloudCostExplorer(KloudBoto3Wrapper):
         )
         return res['ResultsByTime']
 
-    async def get_cost_history_by_instances(self, show_usage_type_and_quantity: bool, granularity: str) -> dict:
+    async def get_cost_history_by_instances(self, show_usage_type_and_quantity: bool, granularity: str) -> list:
         """
         :param show_usage_type_and_quantity: bool
         :param granularity: MONTHLY|DAILY|HOURLY
@@ -106,6 +107,26 @@ class KloudCostExplorer(KloudBoto3Wrapper):
                                 show_usage_type_and_quantity=show_usage_type_and_quantity,
                                 granularity=granularity)
         return await asyncio.to_thread(fun)
+
+    async def get_total_cost_by_instance(self) -> dict:
+        resource_data: list = await self.get_cost_history_by_instances(False, "MONTHLY")
+        to_return = defaultdict(int)
+        for unit in resource_data:
+            needed_data = unit['Groups']
+            for group in needed_data:
+                instance_id = group["Keys"][0]
+                cost = group["Metrics"]["UnblendedCost"]["Amount"]
+                to_return[instance_id] += float(cost)
+        to_return = dict(to_return)
+        return to_return
+
+    async def get_total_cost_by_instance_with_top_3_usage(self) -> dict:
+        total_cost_by_instance: dict = await self.get_total_cost_by_instance()
+        top_three = heapq.nlargest(3, total_cost_by_instance, total_cost_by_instance.get)
+        to_return = dict()
+        to_return['costs'] = total_cost_by_instance
+        to_return['top3'] = top_three
+        return to_return
 
     async def get_default_cost_history(self) -> dict:
         return await self.get_cost_history()
