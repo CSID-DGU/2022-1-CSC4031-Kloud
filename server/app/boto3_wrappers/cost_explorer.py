@@ -2,6 +2,7 @@ import asyncio
 import functools
 from datetime import datetime, timedelta
 from collections import defaultdict
+
 import boto3
 
 from .kloud_boto3_wrapper import KloudBoto3Wrapper
@@ -11,6 +12,17 @@ DEFAULT_GROUP_BY = [{'Type': 'DIMENSION', 'Key': 'SERVICE'},
                     {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}]
 GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENTITY", "LINKED_ACCOUNT", "OPERATION",
                       "PLATFORM", "PURCHASE_TYPE", "SERVICE", "TENANCY", "RECORD_TYPE", "USAGE_TYPE"]
+
+AVAILABLE_RESERVATION = ['Amazon Elastic Compute Cloud - Compute',
+                         'Amazon Relational Database Service',
+                         'Amazon Redshift',
+                         'Amazon ElastiCache',
+                         'Amazon Elasticsearch Service',
+                         'Amazon OpenSearch Service']
+AVAILABLE_LOOK_BACK_PERIOD = ['SEVEN_DAYS', 'THIRTY_DAYS', 'SIXTY_DAYS']
+PAYMENT_OPTIONS = ['NO_UPFRONT', 'PARTIAL_UPFRONT', 'ALL_UPFRONT', 'LIGHT_UTILIZATION', 'MEDIUM_UTILIZATION',
+                   'HEAVY_UTILIZATION']
+TERM_IN_YEARS = ['ONE_YEAR', 'THREE_YEARS']
 
 
 class KloudCostExplorer(KloudBoto3Wrapper):
@@ -98,4 +110,18 @@ class KloudCostExplorer(KloudBoto3Wrapper):
     async def get_default_cost_history(self) -> dict:
         return await self.get_cost_history()
 
+    def get_reservation_recommendation(self, service: str, look_back_period: str, years: str,
+                                       payment_option: str) -> dict:
+        recommendation = self._ce_client.get_reservation_purchase_recommendation(Service=service,
+                                                                                 LookbackPeriodInDays=look_back_period,
+                                                                                 TermInYears=years,
+                                                                                 PaymentOption=payment_option)
+        return {"Recommendations": recommendation['Recommendations']}
 
+    async def async_get_reservation_recommendation(self, service: str, look_back_period: str, years: str,
+                                                   payment_option: str) -> dict:
+        return await asyncio.to_thread(self.get_reservation_recommendation,
+                                       service=service,
+                                       look_back_period=look_back_period,
+                                       years=years,
+                                       payment_option=payment_option)
