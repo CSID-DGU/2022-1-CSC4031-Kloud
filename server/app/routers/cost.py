@@ -102,7 +102,7 @@ async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(securi
                           yearly_seasonality: Optional[bool] = True,
                           weekly_seasonality: Optional[bool] = True,
                           daily_seasonality: Optional[bool] = True,
-                          n_changepoints: Optional[int] = 10,
+                          n_changepoints: Optional[int] = 7,
                           period: Optional[int] = 5):
     """
     yearly_seasonality : 연 계절성
