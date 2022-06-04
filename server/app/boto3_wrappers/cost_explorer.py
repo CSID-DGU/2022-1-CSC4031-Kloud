@@ -66,7 +66,7 @@ class KloudCostExplorer(KloudBoto3Wrapper):
 
         return dict(to_return)
 
-    def get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str):
+    def _get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str) -> dict:
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
                        'End': str(datetime.date(datetime.now()))}
         ec2_dict: dict = self.fetch_and_process(identifier='InstanceId',
@@ -102,7 +102,7 @@ class KloudCostExplorer(KloudBoto3Wrapper):
         :return: dict
         """
 
-        fun = functools.partial(self.get_ec2_instances_cost_history,
+        fun = functools.partial(self._get_ec2_instances_cost_history,
                                 show_usage_type_and_quantity=show_usage_type_and_quantity,
                                 granularity=granularity)
         return await asyncio.to_thread(fun)
@@ -110,8 +110,8 @@ class KloudCostExplorer(KloudBoto3Wrapper):
     async def get_default_cost_history(self) -> dict:
         return await self.get_cost_history()
 
-    def get_reservation_recommendation(self, service: str, look_back_period: str, years: str,
-                                       payment_option: str) -> dict:
+    def _get_reservation_recommendation(self, service: str, look_back_period: str, years: str,
+                                        payment_option: str) -> dict:
         recommendation = self._ce_client.get_reservation_purchase_recommendation(Service=service,
                                                                                  LookbackPeriodInDays=look_back_period,
                                                                                  TermInYears=years,
@@ -120,7 +120,7 @@ class KloudCostExplorer(KloudBoto3Wrapper):
 
     async def async_get_reservation_recommendation(self, service: str, look_back_period: str, years: str,
                                                    payment_option: str) -> dict:
-        return await asyncio.to_thread(self.get_reservation_recommendation,
+        return await asyncio.to_thread(self._get_reservation_recommendation,
                                        service=service,
                                        look_back_period=look_back_period,
                                        years=years,
