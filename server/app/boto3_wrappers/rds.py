@@ -8,7 +8,7 @@ class KloudRDS(KloudBoto3Wrapper):
         super().__init__(session_instance)
         self._rds_client = session_instance.client(service_name="rds")
 
-    async def get_rds_resources(self):
-        to_return = await self.fetch_and_process_async(identifier='DBInstanceIdentifier',
-                                                       describing_method=self._rds_client.describe_db_instances)
+    async def get_rds_resources(self) -> dict:
+        to_return: dict = await self.fetch_and_process_async(identifier='DBInstanceIdentifier',
+                                                             describing_method=self._rds_client.describe_db_instances)
         return to_return

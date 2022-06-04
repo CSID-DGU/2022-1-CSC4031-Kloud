@@ -7,6 +7,7 @@ from .ec2 import KloudEC2
 from .ecs import KloudECS
 from .elb import KloudELB
 
+
 POSSIBLE_ROOT_NODES = {'vpc', 'ecs_cluster'}
 PARENT = {
     'subnet': 'VpcId',
@@ -17,6 +18,9 @@ PARENT = {
 
 
 class InfraTreeBuilder:
+    """
+    인프라 시각화를 위한 nested dict 생성용 객체
+    """
     def __init__(self, infra_data: dict):
         self.infra_data = infra_data
 
@@ -28,14 +32,14 @@ class InfraTreeBuilder:
         """
         resource_type = child['resource_type']
         if resource_type in PARENT.keys():
-            return child.get(PARENT[resource_type])
+            return child.get(PARENT[resource_type])  # child 딕셔너리에서 부모 리소스 id 가져옴
         else:
             pass
 
     @staticmethod
     def _get_vpc_parent(vpc_id: str, resources: dict) -> str:
         """
-        describe vpcs에는 igw정보가 없기 때문에 resource 전체를 탐색해서 할당된 igw가 있는지 확인해야함.
+        igw를 vpc의 부모 노드로 놓으려는 경우, describe vpcs에는 igw정보가 없기 때문에 resource 전체를 탐색해서 할당된 igw가 있는지 확인해야함.
         """
         for key, val in resources.items():
             if val['resource_type'] == 'igw':
@@ -74,8 +78,8 @@ class InfraTreeBuilder:
 class KloudClient(KloudEC2, KloudRDS, KloudECS, KloudELB, KloudCostExplorer):
     def __init__(self, access_key_id: str, session_instance: boto3.Session):
         super().__init__(session_instance)
-        self.id = access_key_id
-        self.describing_tasks = [  # async def 이기 때문에 await 하지 않을 시 awaitable 객체 반환
+        self.id: str = access_key_id
+        self.describing_coroutines: list = [  # 리스트 요소들은 coroutine
             self.get_ec2_resources,
             self.get_rds_resources,
             self.get_ecs_resources,
@@ -85,14 +89,15 @@ class KloudClient(KloudEC2, KloudRDS, KloudECS, KloudELB, KloudCostExplorer):
     async def get_current_infra_dict(self) -> dict:
         to_return = dict()
         tasks = list()
-        for task in self.describing_tasks:
-            tasks.append(task())
-        done, pending = await asyncio.wait(tasks)
+        for task in self.describing_coroutines:
+            tasks.append(task())  # coroutine await 하지 않고 실행 후 리스트에 넣음.
+        done, pending = await asyncio.wait(tasks)  # 코루틴 한꺼번에 await. pending은 asyncio 리턴값 형식 때문에 필요. 사용 x.
         for task in done:
-            to_return.update(task.result())
+            to_return.update(task.result())  # 받아온 인프라 정보들 모두 한 딕셔너리에 합침.
         return to_return
 
     async def get_infra_tree(self) -> dict:
+        # 인프라 정보 받아온 후 트리 생성
         resources = await self.get_current_infra_dict()
         tb = InfraTreeBuilder(resources)
         return tb.build_tree()
