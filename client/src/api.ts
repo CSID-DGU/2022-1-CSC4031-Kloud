@@ -227,7 +227,7 @@ export async function getCostRatio() {
     }
     result.push([key, response.data[`${service}`]]);
   }
-  result.push(total);
+  result.push(total.toFixed(2));
   return result;
 }
 
@@ -239,5 +239,4 @@ export function logOut() {
       access_token: localStorage.getItem("access_token"),
     },
   });
-  return data;
 }
