@@ -6,7 +6,7 @@ from .rds import KloudRDS
 from .ec2 import KloudEC2
 from .ecs import KloudECS
 from .elb import KloudELB
-
+from .cloudwatch import KloudCloudWatch
 
 POSSIBLE_ROOT_NODES = {'vpc', 'ecs_cluster'}
 PARENT = {
@@ -21,6 +21,7 @@ class InfraTreeBuilder:
     """
     인프라 시각화를 위한 nested dict 생성용 객체
     """
+
     def __init__(self, infra_data: dict):
         self.infra_data = infra_data
 
@@ -75,7 +76,7 @@ class InfraTreeBuilder:
         return to_return
 
 
-class KloudClient(KloudEC2, KloudRDS, KloudECS, KloudELB, KloudCostExplorer):
+class KloudClient(KloudEC2, KloudRDS, KloudECS, KloudELB, KloudCloudWatch, KloudCostExplorer):
     def __init__(self, access_key_id: str, session_instance: boto3.Session):
         super().__init__(session_instance)
         self.id: str = access_key_id
@@ -101,3 +102,11 @@ class KloudClient(KloudEC2, KloudRDS, KloudECS, KloudELB, KloudCostExplorer):
         resources = await self.get_current_infra_dict()
         tb = InfraTreeBuilder(resources)
         return tb.build_tree()
+
+    async def get_top_3_usage_average(self) -> dict:
+        to_return = dict()
+        top3_with_cost = await self.get_total_cost_by_instance_with_top_3_usage()
+        for resource_id in top3_with_cost['top3']:
+            average_utilization = await self.async_get_resource_utilization(resource_id)
+            to_return[resource_id] = average_utilization
+        return to_return

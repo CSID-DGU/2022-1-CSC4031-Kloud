@@ -1,7 +1,7 @@
 import asyncio
 
 from typing import Optional
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from ..auth import security
 from ..boto3_wrappers.kloud_client import KloudClient
@@ -65,6 +65,33 @@ async def cost_history_by_resource(user_id=Depends(get_user_id),
 @router.get("/history/by-service")
 async def cost_history_by_service(user_client: KloudClient = Depends(get_user_client), days: Optional[int] = 90):
     return await user_client.get_cost_history_by_service(days=days)
+
+
+AVAILABLE_RESERVATION = ['Amazon Elastic Compute Cloud - Compute',
+                         'Amazon Relational Database Service',
+                         'Amazon Redshift',
+                         'Amazon ElastiCache',
+                         'Amazon Elasticsearch Service',
+                         'Amazon OpenSearch Service']
+AVAILABLE_LOOK_BACK_PERIOD = ['SEVEN_DAYS', 'THIRTY_DAYS', 'SIXTY_DAYS']
+PAYMENT_OPTIONS = ['NO_UPFRONT', 'PARTIAL_UPFRONT', 'ALL_UPFRONT', 'LIGHT_UTILIZATION', 'MEDIUM_UTILIZATION',
+                   'HEAVY_UTILIZATION']
+TERM_IN_YEARS = ['ONE_YEAR', 'THREE_YEARS']
+
+
+@router.get("/recommendation/reservation")
+async def reservation_recommendation(user_client: KloudClient = Depends(get_user_client),
+                                     service: str = Query(default=AVAILABLE_RESERVATION[0],
+                                                          description=str(AVAILABLE_RESERVATION)),
+                                     look_back_period: str = Query(default=AVAILABLE_LOOK_BACK_PERIOD[0],
+                                                                   description=str(AVAILABLE_LOOK_BACK_PERIOD)),
+                                     years: str = Query(default=TERM_IN_YEARS[0],
+                                                        description=str(TERM_IN_YEARS)),
+                                     payment_option: str = Query(default=PAYMENT_OPTIONS[0],
+                                                                 description=str(PAYMENT_OPTIONS))
+                                     ) -> dict:
+
+    return await user_client.async_get_reservation_recommendation(service, look_back_period, years, payment_option)
 
 
 LOOP_BREAKING_STATE = {'SUCCESS', 'REVOKED', 'FAILURE'}

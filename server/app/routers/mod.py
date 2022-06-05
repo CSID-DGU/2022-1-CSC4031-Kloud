@@ -15,7 +15,7 @@ class InstanceStop(BaseModel):
     force: bool
 
 
-@router.post("/mod/instance/stop")
+@router.post("/instance/stop")
 async def stop_instance(req_body: InstanceStop, user_client: KloudClient = Depends(get_user_client)):
     coro = asyncio.to_thread(user_client.stop_instance,
                              instance_id=req_body.instance_id,
@@ -29,7 +29,7 @@ class InstanceStart(BaseModel):
     instance_id: str
 
 
-@router.post("/mod/instance/start")
+@router.post("/instance/start")
 async def start_instance(req_body: InstanceStart, user_client: KloudClient = Depends(get_user_client)):
     coro = asyncio.to_thread(user_client.start_instance, instance_id=req_body.instance_id)
     asyncio.create_task(coro)
