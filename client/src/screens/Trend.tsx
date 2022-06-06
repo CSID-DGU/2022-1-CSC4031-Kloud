@@ -79,6 +79,7 @@ const Trend = () => {
   const onUnitClick = (selected: string) => {
     setUnitDuration(selected);
   };
+  console.log(prophetTrend);
   return (
     <>
       {isProphetLoading ? (
@@ -93,10 +94,13 @@ const Trend = () => {
           />
           <ChartAndInfoBox>
             <div>
-              <PredictChart
-                size="300%"
-                prophet={prophetTrend.slice(1)}
-              ></PredictChart>
+              {unitDuration === "일" ? (
+                <PredictChart size="300%" prophet={prophetTrend.day} />
+              ) : unitDuration === "주" ? (
+                <PredictChart size="300%" prophet={prophetTrend.week} />
+              ) : (
+                <PredictChart size="300%" prophet={prophetTrend.month} />
+              )}
             </div>
             <InfoBox>
               <UnitBox>
@@ -132,10 +136,12 @@ const Trend = () => {
                 </Unit>
               </UnitBox>
               <InfoTitle>예측 정확도</InfoTitle>
-              <InfoTitle marginBottom={"50px"}>{prophetTrend[0][1]}%</InfoTitle>
+              <InfoTitle marginBottom={"50px"}>
+                {prophetTrend.performance}%
+              </InfoTitle>
               <Info color={"yellow"} font={"20px"}>
                 최근 한달간 비용{" "}
-                {prophetTrend
+                {prophetTrend.day
                   .slice(-36, -5)
                   .map((d: any) => d[1].real_data)
                   .reduce((sum: number, val: number) => {
@@ -146,10 +152,11 @@ const Trend = () => {
               </Info>
               <Info color={"yellow"} font={"20px"}>
                 {unitDuration === "일"
-                  ? `이후 5일 예측비용 ${prophetTrend
+                  ? `이후 5일 예측비용 ${prophetTrend.day
                       .slice(-5)
                       .map((d: any) => d[1].expected_data.yhat)
                       .reduce((sum: number, val: number) => {
+                        if (val < 0) val = 0;
                         return sum + val;
                       }, 0)
                       .toFixed(1)}$`
