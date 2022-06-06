@@ -115,8 +115,8 @@ const DonutInfo = () => {
     <>
       <InfoTitle>인프라별 사용률</InfoTitle>
       <Info>
-        이 차트는 인프라별 사용률을 나타냅니다. EC2, ECS, RDS, S3 에 대한
-        사용률을 확인합니다.
+        이 차트는 인프라별 사용률을 나타냅니다. 비용 TOP3 서비스에 대한 사용률을
+        확인합니다.
       </Info>
       <Info
         textColor="black"
