@@ -2,6 +2,8 @@ import asyncio
 import functools
 from datetime import datetime, timedelta
 from collections import defaultdict
+import heapq
+
 import boto3
 
 from .kloud_boto3_wrapper import KloudBoto3Wrapper
@@ -11,6 +13,17 @@ DEFAULT_GROUP_BY = [{'Type': 'DIMENSION', 'Key': 'SERVICE'},
                     {'Type': 'DIMENSION', 'Key': 'USAGE_TYPE'}]
 GROUP_BY_DIMENSION = ["AZ", "INSTANCE_TYPE", "LEGAL_ENTITY_NAME", "INVOICING_ENTITY", "LINKED_ACCOUNT", "OPERATION",
                       "PLATFORM", "PURCHASE_TYPE", "SERVICE", "TENANCY", "RECORD_TYPE", "USAGE_TYPE"]
+
+AVAILABLE_RESERVATION = ['Amazon Elastic Compute Cloud - Compute',
+                         'Amazon Relational Database Service',
+                         'Amazon Redshift',
+                         'Amazon ElastiCache',
+                         'Amazon Elasticsearch Service',
+                         'Amazon OpenSearch Service']
+AVAILABLE_LOOK_BACK_PERIOD = ['SEVEN_DAYS', 'THIRTY_DAYS', 'SIXTY_DAYS']
+PAYMENT_OPTIONS = ['NO_UPFRONT', 'PARTIAL_UPFRONT', 'ALL_UPFRONT', 'LIGHT_UTILIZATION', 'MEDIUM_UTILIZATION',
+                   'HEAVY_UTILIZATION']
+TERM_IN_YEARS = ['ONE_YEAR', 'THREE_YEARS']
 
 
 class KloudCostExplorer(KloudBoto3Wrapper):
@@ -54,7 +67,7 @@ class KloudCostExplorer(KloudBoto3Wrapper):
 
         return dict(to_return)
 
-    def get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str):
+    def _get_ec2_instances_cost_history(self, show_usage_type_and_quantity: bool, granularity: str) -> list:
         time_period = {'Start': str(datetime.date(datetime.now() - timedelta(days=14))),  # 인스턴스당 비용은 최대 14일까지만
                        'End': str(datetime.date(datetime.now()))}
         ec2_dict: dict = self.fetch_and_process(identifier='InstanceId',
@@ -83,19 +96,53 @@ class KloudCostExplorer(KloudBoto3Wrapper):
         )
         return res['ResultsByTime']
 
-    async def get_cost_history_by_instances(self, show_usage_type_and_quantity: bool, granularity: str) -> dict:
+    async def get_cost_history_by_instances(self, show_usage_type_and_quantity: bool, granularity: str) -> list:
         """
         :param show_usage_type_and_quantity: bool
         :param granularity: MONTHLY|DAILY|HOURLY
         :return: dict
         """
 
-        fun = functools.partial(self.get_ec2_instances_cost_history,
+        fun = functools.partial(self._get_ec2_instances_cost_history,
                                 show_usage_type_and_quantity=show_usage_type_and_quantity,
                                 granularity=granularity)
         return await asyncio.to_thread(fun)
 
+    async def get_total_cost_by_instance(self) -> dict:
+        resource_data: list = await self.get_cost_history_by_instances(False, "MONTHLY")
+        to_return = defaultdict(int)
+        for unit in resource_data:
+            needed_data = unit['Groups']
+            for group in needed_data:
+                instance_id = group["Keys"][0]
+                cost = group["Metrics"]["UnblendedCost"]["Amount"]
+                to_return[instance_id] += float(cost)
+        to_return = dict(to_return)
+        return to_return
+
+    async def get_total_cost_by_instance_with_top_3_usage(self) -> dict:
+        total_cost_by_instance: dict = await self.get_total_cost_by_instance()
+        top_three = heapq.nlargest(3, total_cost_by_instance, total_cost_by_instance.get)
+        to_return = dict()
+        to_return['costs'] = total_cost_by_instance
+        to_return['top3'] = top_three
+        return to_return
+
     async def get_default_cost_history(self) -> dict:
         return await self.get_cost_history()
 
+    def _get_reservation_recommendation(self, service: str, look_back_period: str, years: str,
+                                        payment_option: str) -> dict:
+        recommendation = self._ce_client.get_reservation_purchase_recommendation(Service=service,
+                                                                                 LookbackPeriodInDays=look_back_period,
+                                                                                 TermInYears=years,
+                                                                                 PaymentOption=payment_option)
+        return {"Recommendations": recommendation['Recommendations']}
 
+    async def async_get_reservation_recommendation(self, service: str, look_back_period: str, years: str,
+                                                   payment_option: str) -> dict:
+        return await asyncio.to_thread(self._get_reservation_recommendation,
+                                       service=service,
+                                       look_back_period=look_back_period,
+                                       years=years,
+                                       payment_option=payment_option)
