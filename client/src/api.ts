@@ -163,8 +163,15 @@ export function getSimilarityTrend() {
   });
   return data;
 }
+interface IResult {
+  performance: number;
+  day: any;
+  week: any;
+  month: any;
+}
+
 export async function getProphetTrend() {
-  const response = await axios({
+  const { data } = await axios({
     method: "GET",
     url: `${BASE_URL}/cost/trend/prophet`,
     headers: {
@@ -173,9 +180,30 @@ export async function getProphetTrend() {
     },
   });
 
-  const result = [];
-  for (const date in response.data) {
-    result.push([date, response.data[`${date}`]]);
+  const result: IResult = {
+    performance: 0,
+    day: [],
+    week: [],
+    month: [],
+  };
+  for (const unit in data) {
+    if (unit === "Performance") {
+      result.performance = data["Performance"];
+      continue;
+    }
+    for (const date in data[`${unit}`]) {
+      switch (unit) {
+        case "day":
+          result.day.push([date, data[`${unit}`][`${date}`]]);
+          break;
+        case "week":
+          result.week.push([date, data[`${unit}`][`${date}`]]);
+          break;
+        case "month":
+          result.month.push([date, data[`${unit}`][`${date}`]]);
+          break;
+      }
+    }
   }
   return result;
 }
@@ -227,7 +255,7 @@ export async function getCostRatio() {
     }
     result.push([key, response.data[`${service}`]]);
   }
-  result.push(total);
+  result.push(total.toFixed(2));
   return result;
 }
 
@@ -239,5 +267,4 @@ export function logOut() {
       access_token: localStorage.getItem("access_token"),
     },
   });
-  return data;
 }
