@@ -125,17 +125,58 @@ export async function getNestedInfra() {
   return data;
 }
 
-export function getCostHistory() {
-  const data = axios({
+export async function getCostHistory() {
+  const {
+    data: { ResultsByTime: data },
+  } = await axios({
     method: "GET",
-    url: `${BASE_URL}/cost/history/param`,
-    data: {},
+    url: `${BASE_URL}/cost/history/param?granularity=DAILY&days=14`,
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   });
-  return data;
+  const result: any = {};
+  for (const index in data) {
+    const dayData = data[index];
+    const date = dayData.TimePeriod.Start;
+    let ECS = 0;
+    let EC2 = 0;
+    let ElastiCache = 0;
+    let RDS = 0;
+    let key;
+    for (const idx in dayData.Groups) {
+      const dayCostData = dayData.Groups[idx];
+      const service = dayCostData.Keys[0];
+      const cost = dayCostData.Metrics.UnblendedCost.Amount;
+      switch (service) {
+        case "EC2 - Other":
+        case "Amazon Elastic Compute Cloud - Compute":
+          EC2 += parseFloat(cost);
+          break;
+        case "Amazon Elastic Container Service":
+        case "Amazon Elastic Registry Public":
+        case "Amazon EC2 Container Registry (ECR)":
+          ECS += parseFloat(cost);
+          break;
+        case "Amazon Simple Storage Service":
+        case "Amazon Relational Database Service":
+          RDS += parseFloat(cost);
+          break;
+        case "Amazon ElastiCache":
+          ElastiCache += parseFloat(cost);
+          break;
+      }
+      result[date] = {
+        ECS: ECS.toFixed(2),
+        EC2: EC2.toFixed(2),
+        RDS: RDS.toFixed(2),
+        ElastiCache: ElastiCache.toFixed(2),
+      };
+    }
+  }
+
+  return result;
 }
 
 export async function getCostHistoryByResource() {
@@ -148,6 +189,7 @@ export async function getCostHistoryByResource() {
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     },
   });
+
   return data;
 }
 
@@ -232,8 +274,11 @@ export async function getCostRatio() {
         key = "ElastiCache";
         break;
       case "Amazon Elastic Compute Cloud - Compute":
-      case "EC2 - Other":
         key = "EC2";
+        break;
+      case "EC2":
+      case "EC2 - Other":
+        key = "EC2 - Compute";
         break;
       case "Amazon Elastic Container Service":
         key = "ECS";
@@ -257,6 +302,17 @@ export async function getCostRatio() {
   }
   result.push(total.toFixed(2));
   return result;
+}
+export async function getTop3UsedAmount() {
+  const { data } = await axios({
+    method: "GET",
+    url: `${BASE_URL}/infra/top3`,
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+  return data;
 }
 
 export function logOut() {
