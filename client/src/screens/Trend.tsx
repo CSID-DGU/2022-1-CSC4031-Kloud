@@ -172,8 +172,22 @@ const Trend = () => {
                       }, 0)
                       .toFixed(1)}$`
                   : unitDuration === "주"
-                  ? "이후 2주 예측비용 8.1$"
-                  : "다음달 예측비용 151.3$"}
+                  ? `이후 2주 예측비용 ${prophetTrend.week
+                      .slice(-14)
+                      .map((d: any) => d[1].expected_data.yhat)
+                      .reduce((sum: number, val: number) => {
+                        if (val < 0) val = 0;
+                        return sum + val;
+                      }, 0)
+                      .toFixed(1)}$`
+                  : `다음달 예측비용 ${prophetTrend.month
+                      .slice(-30)
+                      .map((d: any) => d[1].expected_data.yhat)
+                      .reduce((sum: number, val: number) => {
+                        if (val < 0) val = 0;
+                        return sum + val;
+                      }, 0)
+                      .toFixed(1)}$`}
               </Info>
               <Info>녹색은 예측 데이터, 파란색은 실제 데이터입니다.</Info>
               <Info>
