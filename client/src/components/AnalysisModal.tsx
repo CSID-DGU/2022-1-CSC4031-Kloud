@@ -128,10 +128,7 @@ const DonutInfo = () => {
       {isHover ? (
         <InfoHoverContainer>
           <InfoHoverText>
-            EC2 &rarr; CPU 평균 사용량을 측정합니다.
-          </InfoHoverText>
-          <InfoHoverText>
-            ECS &rarr; 메모리 평균 사용량을 측정합니다.
+            EC2 &rarr; CPU와 메모리 평균 사용량을 측정합니다.
           </InfoHoverText>
           <InfoHoverText>
             RDS, S3 &rarr; 남은 저장 공간을 측정합니다.

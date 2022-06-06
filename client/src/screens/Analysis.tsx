@@ -38,10 +38,10 @@ const Analysis = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedChart, setSelectedChart] = useState<JSX.Element>(<></>);
   const [selected, setSelected] = useState<string>("");
-  const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
-    "prophet",
-    getProphetTrend
-  );
+  // const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
+  //   "prophet",
+  //   getProphetTrend
+  // ); // 주석풀때 isProphetLoading 추가
   const { isLoading: isRatioLoading, data: costRatio } = useQuery<any>(
     "ratio",
     getCostRatio
@@ -50,7 +50,7 @@ const Analysis = () => {
     "costHistory",
     getCostHistory
   );
-  return isProphetLoading || isRatioLoading || isCostHistoryLoading ? (
+  return isRatioLoading || isCostHistoryLoading ? (
     <Loader />
   ) : (
     <Container>
@@ -75,15 +75,17 @@ const Analysis = () => {
         <ChartBox
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<BarChart modal={true} size={450}></BarChart>);
+            setSelectedChart(
+              <BarChart modal={true} data={costHistory} size={480} />
+            );
             setSelected("bar");
           }}
         >
-          <BarChart modal={false} size={480}></BarChart>
+          <BarChart modal={false} data={costHistory} size={510} />
         </ChartBox>
       </ChartBoxContainer>
       <ChartBoxContainer>
-        <ChartBox
+        {/* <ChartBox
           margin={130}
           onClick={() => {
             setOpenModal((prev) => !prev);
@@ -104,7 +106,7 @@ const Analysis = () => {
             data={prophetTrend.day.slice(1, -5)}
             performance={prophetTrend.performance}
           />
-        </ChartBox>
+        </ChartBox> */}
         <ChartBox
           onClick={() => {
             setOpenModal((prev) => !prev);
