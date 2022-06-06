@@ -79,7 +79,6 @@ const Trend = () => {
   const onUnitClick = (selected: string) => {
     setUnitDuration(selected);
   };
-  console.log(prophetTrend);
   return (
     <>
       {isProphetLoading ? (
@@ -95,11 +94,23 @@ const Trend = () => {
           <ChartAndInfoBox>
             <div>
               {unitDuration === "일" ? (
-                <PredictChart size="300%" prophet={prophetTrend.day} />
+                <PredictChart
+                  size="300%"
+                  selected={unitDuration}
+                  prophet={prophetTrend.day}
+                />
               ) : unitDuration === "주" ? (
-                <PredictChart size="300%" prophet={prophetTrend.week} />
+                <PredictChart
+                  size="300%"
+                  selected={unitDuration}
+                  prophet={prophetTrend.week}
+                />
               ) : (
-                <PredictChart size="300%" prophet={prophetTrend.month} />
+                <PredictChart
+                  size="300%"
+                  selected={unitDuration}
+                  prophet={prophetTrend.month}
+                />
               )}
             </div>
             <InfoBox>
