@@ -9,7 +9,7 @@ import ModalFrame from "../components/Modal";
 import AnalysisModal from "../components/AnalysisModal";
 import Info from "../components/Info";
 import { useQuery } from "react-query";
-import { getProphetTrend, getCostRatio } from "../api";
+import { getProphetTrend, getCostRatio, getCostHistory } from "../api";
 
 const Container = styled.div`
   display: flex;
@@ -46,7 +46,11 @@ const Analysis = () => {
     "ratio",
     getCostRatio
   );
-  return isProphetLoading || isRatioLoading ? (
+  const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
+    "costHistory",
+    getCostHistory
+  );
+  return isProphetLoading || isRatioLoading || isCostHistoryLoading ? (
     <Loader />
   ) : (
     <Container>
