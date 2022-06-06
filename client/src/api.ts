@@ -303,6 +303,17 @@ export async function getCostRatio() {
   result.push(total.toFixed(2));
   return result;
 }
+export async function getTop3UsedAmount() {
+  const { data } = await axios({
+    method: "GET",
+    url: `${BASE_URL}/infra/top3`,
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+  return data;
+}
 
 export function logOut() {
   const data = axios({

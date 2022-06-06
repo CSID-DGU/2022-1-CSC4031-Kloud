@@ -9,7 +9,12 @@ import ModalFrame from "../components/Modal";
 import AnalysisModal from "../components/AnalysisModal";
 import Info from "../components/Info";
 import { useQuery } from "react-query";
-import { getProphetTrend, getCostRatio, getCostHistory } from "../api";
+import {
+  getTop3UsedAmount,
+  getProphetTrend,
+  getCostRatio,
+  getCostHistory,
+} from "../api";
 
 const Container = styled.div`
   display: flex;
@@ -38,10 +43,10 @@ const Analysis = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedChart, setSelectedChart] = useState<JSX.Element>(<></>);
   const [selected, setSelected] = useState<string>("");
-  // const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
-  //   "prophet",
-  //   getProphetTrend
-  // ); // 주석풀때 isProphetLoading 추가
+  const { isLoading: isProphetLoading, data: prophetTrend } = useQuery<any>(
+    "prophet",
+    getProphetTrend
+  );
   const { isLoading: isRatioLoading, data: costRatio } = useQuery<any>(
     "ratio",
     getCostRatio
@@ -50,7 +55,15 @@ const Analysis = () => {
     "costHistory",
     getCostHistory
   );
-  return isRatioLoading || isCostHistoryLoading ? (
+  const { isLoading: isTop3AmountLoading, data: top3Amount } = useQuery<any>(
+    "top3",
+    getTop3UsedAmount
+  );
+
+  return isRatioLoading ||
+    isProphetLoading ||
+    isCostHistoryLoading ||
+    isTop3AmountLoading ? (
     <Loader />
   ) : (
     <Container>
@@ -85,7 +98,7 @@ const Analysis = () => {
         </ChartBox>
       </ChartBoxContainer>
       <ChartBoxContainer>
-        {/* <ChartBox
+        <ChartBox
           margin={130}
           onClick={() => {
             setOpenModal((prev) => !prev);
@@ -106,15 +119,17 @@ const Analysis = () => {
             data={prophetTrend.day.slice(1, -5)}
             performance={prophetTrend.performance}
           />
-        </ChartBox> */}
+        </ChartBox>
         <ChartBox
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<DonutChart modal={true} size={400}></DonutChart>);
+            setSelectedChart(
+              <DonutChart data={top3Amount} modal={true} size={400} />
+            );
             setSelected("donut");
           }}
         >
-          <DonutChart modal={false} size={430}></DonutChart>
+          <DonutChart data={top3Amount} modal={false} size={430} />
         </ChartBox>
       </ChartBoxContainer>
       {openModal ? (
