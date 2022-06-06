@@ -87,7 +87,8 @@ const Analysis = () => {
               <LineChart
                 modal={true}
                 size={450}
-                data={prophetTrend.slice(1, -5)}
+                data={prophetTrend.day.slice(1, -5)}
+                performance={prophetTrend.performance}
               />
             );
             setSelected("line");
@@ -96,7 +97,8 @@ const Analysis = () => {
           <LineChart
             modal={false}
             size={480}
-            data={prophetTrend.slice(1, -5)}
+            data={prophetTrend.day.slice(1, -5)}
+            performance={prophetTrend.performance}
           />
         </ChartBox>
         <ChartBox
