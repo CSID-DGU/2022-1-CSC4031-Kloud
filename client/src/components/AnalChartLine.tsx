@@ -4,8 +4,9 @@ interface ILineChart {
   size: number;
   modal: boolean;
   data: any;
+  performance: number;
 }
-function LineChart({ size, modal, data }: ILineChart) {
+function LineChart({ size, modal, data, performance }: ILineChart) {
   return (
     <>
       <ApexChart

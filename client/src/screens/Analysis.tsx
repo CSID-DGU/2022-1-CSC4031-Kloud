@@ -9,7 +9,12 @@ import ModalFrame from "../components/Modal";
 import AnalysisModal from "../components/AnalysisModal";
 import Info from "../components/Info";
 import { useQuery } from "react-query";
-import { getProphetTrend, getCostRatio } from "../api";
+import {
+  getTop3UsedAmount,
+  getProphetTrend,
+  getCostRatio,
+  getCostHistory,
+} from "../api";
 
 const Container = styled.div`
   display: flex;
@@ -46,7 +51,19 @@ const Analysis = () => {
     "ratio",
     getCostRatio
   );
-  return isProphetLoading || isRatioLoading ? (
+  const { isLoading: isCostHistoryLoading, data: costHistory } = useQuery<any>(
+    "costHistory",
+    getCostHistory
+  );
+  const { isLoading: isTop3AmountLoading, data: top3Amount } = useQuery<any>(
+    "top3",
+    getTop3UsedAmount
+  );
+
+  return isRatioLoading ||
+    isProphetLoading ||
+    isCostHistoryLoading ||
+    isTop3AmountLoading ? (
     <Loader />
   ) : (
     <Container>
@@ -71,11 +88,13 @@ const Analysis = () => {
         <ChartBox
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<BarChart modal={true} size={450}></BarChart>);
+            setSelectedChart(
+              <BarChart modal={true} data={costHistory} size={480} />
+            );
             setSelected("bar");
           }}
         >
-          <BarChart modal={false} size={480}></BarChart>
+          <BarChart modal={false} data={costHistory} size={510} />
         </ChartBox>
       </ChartBoxContainer>
       <ChartBoxContainer>
@@ -87,7 +106,8 @@ const Analysis = () => {
               <LineChart
                 modal={true}
                 size={450}
-                data={prophetTrend.slice(1, -5)}
+                data={prophetTrend.day.slice(1, -5)}
+                performance={prophetTrend.performance}
               />
             );
             setSelected("line");
@@ -96,17 +116,20 @@ const Analysis = () => {
           <LineChart
             modal={false}
             size={480}
-            data={prophetTrend.slice(1, -5)}
+            data={prophetTrend.day.slice(1, -5)}
+            performance={prophetTrend.performance}
           />
         </ChartBox>
         <ChartBox
           onClick={() => {
             setOpenModal((prev) => !prev);
-            setSelectedChart(<DonutChart modal={true} size={400}></DonutChart>);
+            setSelectedChart(
+              <DonutChart data={top3Amount} modal={true} size={400} />
+            );
             setSelected("donut");
           }}
         >
-          <DonutChart modal={false} size={430}></DonutChart>
+          <DonutChart data={top3Amount} modal={false} size={430} />
         </ChartBox>
       </ChartBoxContainer>
       {openModal ? (

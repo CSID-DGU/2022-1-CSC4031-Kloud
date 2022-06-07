@@ -41,29 +41,39 @@ def pattern_finder(token: str, start_date="2022-02-02", end_date="2022-05-10" , 
 @celery_task.task(name="/cost/trend/prophet")
 def pattern_finder2(token: str, yearly_seasonality, weekly_seasonality , daily_seasonality, n_changepoints, period):
     data = get_cost_info(token)
-    p = ProPhetPatternFinder(data=data,
-                            yearly_seasonality = yearly_seasonality,
-                            weekly_seasonality = weekly_seasonality,
-                            daily_seasonality = daily_seasonality,
-                            n_changepoints = n_changepoints,
-                            period = period)
+    answers = {}
+    periods = [5,14,30]
+    for idx,period_num in enumerate(periods):
+        p = ProPhetPatternFinder(data=data,
+                                yearly_seasonality = yearly_seasonality,
+                                weekly_seasonality = weekly_seasonality,
+                                daily_seasonality = daily_seasonality,
+                                n_changepoints = n_changepoints,
+                                period = period_num)
 
-    p.model_fit()
-    expected_data = p.expected_data()
-    real_data = p.real_data()
+        p.model_fit()
+        expected_data = p.expected_data()
+        real_data = p.real_data()
+        answer = {}
+        # print(performance)
+        for i in range(len(expected_data)):
+            date = str(expected_data.ds.iloc[i]).split()[0]
+            if i < len(real_data):
+                answer[date] = {"real_data": round(real_data.y.iloc[i], 6),
+                                "expected_data": {"yhat": round(expected_data.yhat.iloc[i], 6),
+                                                "yhat_lower": round(expected_data.yhat_lower.iloc[i], 6),
+                                                "yhat_upper": round(expected_data.yhat_upper.iloc[i], 6)}}
+            else:
+                answer[date] = {"expected_data": {"yhat": round(expected_data.yhat.iloc[i], 6),
+                                                "yhat_lower": round(expected_data.yhat_lower.iloc[i], 6),
+                                                "yhat_upper": round(expected_data.yhat_upper.iloc[i], 6)}}
+        if idx == 0:
+            answers["day"] = answer
+        elif idx == 1:
+            answers["week"] = answer
+        elif idx == 2:
+            answers["month"] = answer
     performance = p.performance()
-    answer = {}
-    answer["Performance"] = performance
-    print(performance)
-    for i in range(len(expected_data)):
-        date = str(expected_data.ds.iloc[i]).split()[0]
-        if i < len(real_data):
-            answer[date] = {"real_data": round(real_data.y.iloc[i], 6),
-                            "expected_data": {"yhat": round(expected_data.yhat.iloc[i], 6),
-                                              "yhat_lower": round(expected_data.yhat_lower.iloc[i], 6),
-                                              "yhat_upper": round(expected_data.yhat_upper.iloc[i], 6)}}
-        else:
-            answer[date] = {"expected_data": {"yhat": round(expected_data.yhat.iloc[i], 6),
-                                              "yhat_lower": round(expected_data.yhat_lower.iloc[i], 6),
-                                              "yhat_upper": round(expected_data.yhat_upper.iloc[i], 6)}}
-    return answer
+    answers["Performance"] = performance
+
+    return answers

@@ -66,8 +66,8 @@ const BarInfo = () => {
     <>
       <InfoTitle>인프라별 지출 내역</InfoTitle>
       <Info>
-        이 차트는 최근 2주 간의 비용에 대한 서비스별 세부 비용 내역을
-        나타냅니다.
+        이 차트는 가장 많은 지출을 차지하는 4개 서비스에 대한 2주 간의 세부 비용
+        내역을 나타냅니다.
       </Info>
       <Info>차트 상단의 툴바 혹은 드래그를 통해 차트를 확대 / 축소합니다.</Info>
     </>
@@ -115,8 +115,8 @@ const DonutInfo = () => {
     <>
       <InfoTitle>인프라별 사용률</InfoTitle>
       <Info>
-        이 차트는 인프라별 사용률을 나타냅니다. EC2, ECS, RDS, S3 에 대한
-        사용률을 확인합니다.
+        이 차트는 인프라별 사용률을 나타냅니다. 비용 TOP3 서비스에 대한 사용률을
+        확인합니다.
       </Info>
       <Info
         textColor="black"
@@ -128,10 +128,7 @@ const DonutInfo = () => {
       {isHover ? (
         <InfoHoverContainer>
           <InfoHoverText>
-            EC2 &rarr; CPU 평균 사용량을 측정합니다.
-          </InfoHoverText>
-          <InfoHoverText>
-            ECS &rarr; 메모리 평균 사용량을 측정합니다.
+            EC2 &rarr; CPU와 메모리 평균 사용량을 측정합니다.
           </InfoHoverText>
           <InfoHoverText>
             RDS, S3 &rarr; 남은 저장 공간을 측정합니다.

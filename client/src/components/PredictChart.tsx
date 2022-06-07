@@ -3,8 +3,21 @@ import ApexChart from "react-apexcharts";
 interface IPredictChart {
   size?: string;
   prophet: any;
+  selected: string;
 }
-function PredictChart({ size, prophet }: IPredictChart) {
+function PredictChart({ size, prophet, selected }: IPredictChart) {
+  let predictDuration = 0;
+  switch (selected) {
+    case "일":
+      predictDuration = 5;
+      break;
+    case "주":
+      predictDuration = 14;
+      break;
+    case "월":
+      predictDuration = 30;
+      break;
+  }
   return (
     <>
       <ApexChart
@@ -13,9 +26,18 @@ function PredictChart({ size, prophet }: IPredictChart) {
           {
             name: "Real",
             type: "line",
-            data: prophet.slice(0, -5).map((d: any, idx: number) => {
-              return d[1].real_data;
-            }),
+            data:
+              selected === "일"
+                ? prophet.slice(0, -5).map((d: any, idx: number) => {
+                    return d[1].real_data;
+                  })
+                : selected === "주"
+                ? prophet.slice(0, -14).map((d: any, idx: number) => {
+                    return d[1].real_data;
+                  })
+                : prophet.slice(0, -30).map((d: any, idx: number) => {
+                    return d[1].real_data;
+                  }),
           },
           {
             name: "Expected",
@@ -89,7 +111,7 @@ function PredictChart({ size, prophet }: IPredictChart) {
             intersect: false,
           },
           forecastDataPoints: {
-            count: 5,
+            count: predictDuration,
             dashArray: 5,
           },
         }}
