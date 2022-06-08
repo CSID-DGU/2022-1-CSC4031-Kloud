@@ -146,8 +146,10 @@ const Trend = () => {
                   월별
                 </Unit>
               </UnitBox>
-              <InfoTitle>예측 정확도</InfoTitle>
-              <InfoTitle marginBottom={"50px"}>
+              <InfoTitle data-tip data-for="performance">
+                예측 정확도
+              </InfoTitle>
+              <InfoTitle marginBottom={"50px"} data-tip data-for="performance">
                 {prophetTrend.performance.toFixed(2)}%
               </InfoTitle>
               <Info color={"yellow"} font={"20px"}>
@@ -213,6 +215,9 @@ const Trend = () => {
           </ReactToolTip>
           <ReactToolTip id="month" type="info">
             월별 트렌드를 반영해 다음 달의 비용 예측을 제공합니다.
+          </ReactToolTip>
+          <ReactToolTip id="performance" type="info">
+            예측 정확도는 평균 절대 백분율 오차 MAPE로 계산됩니다.
           </ReactToolTip>
         </Container>
       )}
