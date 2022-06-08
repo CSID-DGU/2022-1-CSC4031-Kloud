@@ -8,7 +8,7 @@
 
 AWS IAM 으로 AWS API에 접근합니다. (IAM 정보는 서버에 저장되지 않으며, AWS STS를 통해 발급 받은 임시 토큰이 Redis에 저장됩니다.)
 
-![ServiceStructure](https://github.com/kshshkim/2022-1-CSC4031-Kloud/blob/main/miscs/service_structure.png)
+![ServiceStructure](/miscs/service_structure.png)
 
 ## Server
 ![](https://img.shields.io/badge/Python-3.9-blue?style=for-the-badge&logo=appveyor?logo=null)
