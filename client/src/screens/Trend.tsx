@@ -148,7 +148,7 @@ const Trend = () => {
               </UnitBox>
               <InfoTitle>예측 정확도</InfoTitle>
               <InfoTitle marginBottom={"50px"}>
-                {prophetTrend.performance}%
+                {prophetTrend.performance.toFixed(2)}%
               </InfoTitle>
               <Info color={"yellow"} font={"20px"}>
                 최근 한달간 비용{" "}
@@ -172,7 +172,7 @@ const Trend = () => {
                       }, 0)
                       .toFixed(1)}$`
                   : unitDuration === "주"
-                  ? `이후 2주 예측비용 ${prophetTrend.week
+                  ? `2주 예측비용 ${prophetTrend.week
                       .slice(-14)
                       .map((d: any) => d[1].expected_data.yhat)
                       .reduce((sum: number, val: number) => {
