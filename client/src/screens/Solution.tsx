@@ -7,6 +7,7 @@ import SolutionCompareChart from "../components/SolutionCompareChart";
 import { getCostRatio, getRightSizingRecommendation } from "../api";
 import Loader from "../components/Loader";
 import { useQuery } from "react-query";
+import Infra from "./Infra";
 
 const Container = styled.div`
   width: 100%;
@@ -87,8 +88,9 @@ const Solution = () => {
     "ratio",
     getCostRatio
   );
-  const [selectedInfra, setSelectedInfra] = useState<string>();
-  const onChartClick = (infra: string) => {
+  const [selectedInfra, setSelectedInfra] = useState<any>();
+  const [selectedInfraType, setSelectedInfraType] = useState<string>();
+  const onChartClick = (infra: any) => {
     setSelectedInfra(infra);
   };
   return (
@@ -150,49 +152,79 @@ const Solution = () => {
           </CompareSection>
           <SolutionBox>
             <HorizontalMenu
-              contents={[
-                <ChartBox onClick={() => onChartClick("RDS1")}>
-                  <SolutionChart
-                    selected={selectedInfra === "RDS1"}
-                    infra={"RDS1"}
-                    percent={20}
-                  />
-                </ChartBox>,
-                <ChartBox onClick={() => onChartClick("EC2-1")}>
-                  <SolutionChart
-                    selected={selectedInfra === "EC2-1"}
-                    infra={"EC2"}
-                    percent={34}
-                  />
-                </ChartBox>,
-                <ChartBox onClick={() => onChartClick("EC2-2")}>
-                  <SolutionChart
-                    selected={selectedInfra === "EC2-2"}
-                    infra={"EC2"}
-                    percent={22}
-                  />
-                </ChartBox>,
-                <ChartBox onClick={() => onChartClick("EC2-3")}>
-                  <SolutionChart
-                    selected={selectedInfra === "EC2-3"}
-                    infra={"EC2"}
-                    percent={15}
-                  />
-                </ChartBox>,
-              ]}
+              contents={recommendation.map((infra: any) => {
+                const infraType =
+                  typeof infra.CurrentInstance === "undefined" ? "RDS" : "EC2";
+                return (
+                  <ChartBox
+                    onClick={() => {
+                      onChartClick(infra);
+                      setSelectedInfraType(infraType);
+                    }}
+                  >
+                    <SolutionChart
+                      selected={selectedInfra === infra}
+                      infra={selectedInfraType}
+                      percent={
+                        typeof infra.CurrentInstance === "undefined"
+                          ? 20
+                          : infra.CurrentInstance.ResourceDetails
+                              .EC2ResourceDetails.HourlyOnDemandRate * 100
+                      }
+                    />
+                  </ChartBox>
+                );
+              })}
             />
             {selectedInfra ? (
               <SolutionContainer>
                 <Info
-                  contents={[`${selectedInfra}`, "i-02f892f88345aad41"]}
+                  contents={[
+                    `${selectedInfraType}`,
+                    selectedInfra.CurrentInstance.ResourceId,
+                  ]}
                   direction={"left"}
                 />
                 <div>
                   <SolutionText color={"white"} size={"25px"}>
-                    t2.micro 인스턴스로 최근 한 달간 비용은
+                    {
+                      selectedInfra.CurrentInstance.ResourceDetails
+                        .EC2ResourceDetails.InstanceType
+                    }{" "}
+                    인스턴스로 최근 한 달간 비용은
                   </SolutionText>
                   <SolutionText color={"yellow"} size={"30px"}>
-                    16.4$
+                    $
+                    {parseFloat(
+                      selectedInfra.CurrentInstance.MonthlyCost
+                    ).toFixed(2)}
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    입니다.
+                  </SolutionText>
+                </div>
+                <div>
+                  <SolutionText color={"white"} size={"25px"}>
+                    시간 당 평균 인프라 가동률은
+                  </SolutionText>
+                  <SolutionText color={"orange"} size={"30px"}>
+                    {(
+                      parseFloat(
+                        selectedInfra.CurrentInstance.ResourceDetails
+                          .EC2ResourceDetails.HourlyOnDemandRate
+                      ) * 100
+                    ).toFixed(2)}
+                    %,
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    최대 메모리 사용량은
+                  </SolutionText>
+                  <SolutionText color={"orange"} size={"30px"}>
+                    {parseFloat(
+                      selectedInfra.CurrentInstance.ResourceUtilization
+                        .EC2ResourceUtilization.MaxCpuUtilizationPercentage
+                    ).toFixed(2)}
+                    %
                   </SolutionText>
                   <SolutionText color={"white"} size={"25px"}>
                     입니다.
@@ -203,13 +235,23 @@ const Solution = () => {
                 </ChartContainer>
                 <div>
                   <SolutionText color={"yellow"} size={"25px"}>
-                    t2.nano
+                    {
+                      selectedInfra.ModifyRecommendationDetail.TargetInstances.at(
+                        0
+                      ).ResourceDetails.EC2ResourceDetails.InstanceType
+                    }
                   </SolutionText>
                   <SolutionText color={"white"} size={"25px"}>
                     로 사이즈 변경시 예상 절감 금액은
                   </SolutionText>
                   <SolutionText color={"yellowgreen"} size={"30px"}>
-                    +4.3$
+                    +
+                    {parseFloat(
+                      selectedInfra.ModifyRecommendationDetail.TargetInstances.at(
+                        0
+                      ).EstimatedMonthlySavings
+                    ).toFixed(2)}
+                    $
                   </SolutionText>
                   <SolutionText color={"white"} size={"25px"}>
                     입니다.
