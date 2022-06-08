@@ -3,13 +3,16 @@ import ApexChart from "react-apexcharts";
 interface IDonutChart {
   size: number;
   modal: boolean;
+  data: any;
 }
-function DonutChart({ size, modal }: IDonutChart) {
+function DonutChart({ size, modal, data }: IDonutChart) {
   return (
     <>
       <ApexChart
         type="radialBar"
-        series={[20, 55, 67, 83]}
+        series={Object.values(data).map((d: any) =>
+          parseInt((d * 100).toFixed(2))
+        )}
         options={{
           title: modal
             ? {}
@@ -50,7 +53,7 @@ function DonutChart({ size, modal }: IDonutChart) {
               },
             },
           },
-          labels: ["RDS", "EC2", "ECS", "S3"],
+          labels: Object.keys(data),
         }}
         width={`${size}px`}
       />

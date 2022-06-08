@@ -146,3 +146,23 @@ class KloudCostExplorer(KloudBoto3Wrapper):
                                        look_back_period=look_back_period,
                                        years=years,
                                        payment_option=payment_option)
+
+    def _get_rightsizing_recommendation(self, within_same_instance_family: bool, benefits_considered: bool) -> dict:
+        if within_same_instance_family:
+            instance_family = "SAME_INSTANCE_FAMILY"
+        else:
+            instance_family = "CROSS_INSTANCE_FAMILY"
+        recommendation: dict = self._ce_client.get_rightsizing_recommendation(
+            Service="AmazonEC2",
+            Configuration={
+                "RecommendationTarget": instance_family,
+                'BenefitsConsidered': benefits_considered
+            }
+        )
+
+        return {"RightsizingRecommendations": recommendation["RightsizingRecommendations"]}
+
+    async def async_get_rightsizing_recommendation(self, within_same_instance_family: bool, benefits_considered: bool) -> dict:
+        return await asyncio.to_thread(self._get_rightsizing_recommendation,
+                                       within_same_instance_family=within_same_instance_family,
+                                       benefits_considered=benefits_considered)

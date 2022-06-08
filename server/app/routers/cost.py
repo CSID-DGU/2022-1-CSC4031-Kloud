@@ -94,6 +94,15 @@ async def reservation_recommendation(user_client: KloudClient = Depends(get_user
     return await user_client.async_get_reservation_recommendation(service, look_back_period, years, payment_option)
 
 
+@router.get("/recommendation/rightsizing")
+async def rightsizing_recommendation(user_client: KloudClient = Depends(get_user_client),
+                                     within_same_instance_family: bool = True,
+                                     benefits_considered: bool = True):
+    return await user_client.async_get_rightsizing_recommendation(
+        within_same_instance_family=within_same_instance_family,
+        benefits_considered=benefits_considered)
+
+
 LOOP_BREAKING_STATE = {'SUCCESS', 'REVOKED', 'FAILURE'}
 
 
@@ -129,7 +138,7 @@ async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(securi
                           yearly_seasonality: Optional[bool] = True,
                           weekly_seasonality: Optional[bool] = True,
                           daily_seasonality: Optional[bool] = True,
-                          n_changepoints: Optional[int] = 10,
+                          n_changepoints: Optional[int] = 7,
                           period: Optional[int] = 5):
     """
     yearly_seasonality : 연 계절성

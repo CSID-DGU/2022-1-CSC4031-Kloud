@@ -56,10 +56,12 @@ class ProPhetPatternFinder:
         df_p = performance_metrics(df_cv)
         performance = 100 - round(df_p["mape"].mean(),3)
         return performance
-    # 예측에 영향을 준 요소를 출력
-    # 어떤 근거를 가지고 예측을 했는지 
-    # 트랜드를 분석해보니 ~~경향을 가지더라
-    # yearly하게 연간 가격 변동 그래프를 보면 이런 패턴이 있더라~~
+    """
+    예측에 영향을 준 요소를 출력
+    어떤 근거를 가지고 예측을 했는지 
+    트랜드를 분석해보니 ~~경향을 가지더라
+    yearly하게 연간 가격 변동 그래프를 보면 이런 패턴이 나오더라.
+    """
     def component_plot(self):
         fig3 = fig3 = self.model.plot_components(self.forecast)
     

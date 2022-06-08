@@ -3,8 +3,9 @@ import ApexChart from "react-apexcharts";
 interface IBarChart {
   size: number;
   modal: boolean;
+  data: any;
 }
-function BarChart({ size, modal }: IBarChart) {
+function BarChart({ size, modal, data }: IBarChart) {
   return (
     <>
       <ApexChart
@@ -12,19 +13,19 @@ function BarChart({ size, modal }: IBarChart) {
         series={[
           {
             name: "EC2",
-            data: [4.4, 5.5, 5.7, 5.6, 6.1, 5.8, 6.3, 6.0, 6.6],
+            data: Object.values(data).map((d: any) => d.EC2),
           },
           {
             name: "ECS",
-            data: [7.6, 8.5, 10.1, 9.8, 8.7, 10.5, 9.1, 11.4, 9.4],
+            data: Object.values(data).map((d: any) => d.ECS),
           },
           {
             name: "RDS",
-            data: [3.5, 4.1, 3.6, 2.6, 4.5, 4.8, 5.2, 5.3, 4.1],
+            data: Object.values(data).map((d: any) => d.RDS),
           },
           {
-            name: "S3",
-            data: [0, 0, 1, 0, 1.3, 1.3, 0.5, 1, 1],
+            name: "ElastiCache",
+            data: Object.values(data).map((d: any) => d.ElastiCache),
           },
         ]}
         options={{
@@ -57,11 +58,23 @@ function BarChart({ size, modal }: IBarChart) {
           plotOptions: {
             bar: {
               horizontal: false,
-              columnWidth: "55%",
+              columnWidth: "60%",
             },
           },
           dataLabels: {
             enabled: false,
+          },
+          xaxis: {
+            labels: { show: true },
+            categories: Object.keys(data),
+            type: "datetime",
+          },
+          tooltip: {
+            y: {
+              formatter: (value) => `$${value.toFixed(2)}`,
+            },
+            shared: true,
+            intersect: false,
           },
         }}
         width={`${size}px`}
