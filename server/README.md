@@ -29,10 +29,10 @@ Docker Compose 사용시 무시하여도 괜찮습니다.
 - 서버의 주소입니다. *IS_PRODUCTION* 값이 *true*일 경우 필요합니다.
 - *ex) https://api.something.com*
 ## boto3_wrappers
-[README](boto3_wrappers/README.md)
+[README](/server/app/boto3_wrappers/README.md)
 
 ## routers
-[README](routers/README.md)
+[README](/server/app/README.md)
 
 ## auth.py
 - 클라이언트-Kloud 서버 인증과 Kloud 서버 - AWS 인증에 필요한 모듈입니다.
