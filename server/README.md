@@ -32,7 +32,7 @@ Docker Compose 사용시 무시하여도 괜찮습니다.
 [README](/server/app/boto3_wrappers/README.md)
 
 ## routers
-[README](/server/app/README.md)
+[README](/server/app/routers/README.md)
 
 ## auth.py
 - 클라이언트-Kloud 서버 인증과 Kloud 서버 - AWS 인증에 필요한 모듈입니다.
