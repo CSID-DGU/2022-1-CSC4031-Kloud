@@ -3,6 +3,9 @@ Kloud의 백엔드 서버입니다.
 
 상세 API 문서는 *{server-url}/docs* 혹은 *{server-url}/redoc* 을 참조하시기 바랍니다.
 
+## app
+[README](/server/app/README.md)
+
 ## Deployment
 컨테이너 기반 배포를 상정하였습니다. 
 
@@ -28,19 +31,3 @@ Docker Compose 사용시 무시하여도 괜찮습니다.
 #### API_URL
 - 서버의 주소입니다. *IS_PRODUCTION* 값이 *true*일 경우 필요합니다.
 - *ex) https://api.something.com*
-## boto3_wrappers
-[README](/server/app/boto3_wrappers/README.md)
-
-## routers
-[README](/server/app/routers/README.md)
-
-## auth.py
-- 클라이언트-Kloud 서버 인증과 Kloud 서버 - AWS 인증에 필요한 모듈입니다.
-- FastAPI의 의존성 주입(Depends)을 통해 사용됩니다.
-
-## dependencies.py
-- JWT access token을 입력받아 _user_id: str_, 혹은 _user_client: KloudClient_ 객체를 반환합니다.
-- FastAPI의 의존성 주입(Depends)을 통해 사용됩니다.
-
-## redis_req.py
-- aioredis 라이브러리를 통해 redis와 통신합니다.
