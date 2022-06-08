@@ -4,6 +4,7 @@ import Info from "../components/Info";
 import HorizontalMenu from "../components/HorizontalMenu/index";
 import { useState } from "react";
 import SolutionCompareChart from "../components/SolutionCompareChart";
+import { getRightSizingRecommendation } from "../api";
 
 const Container = styled.div`
   width: 100%;
