@@ -1,8 +1,10 @@
 # Kloud
 ### Cloud Visualization And Cost Optimization Service
-- [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://www.olis.or.kr/license/Detailselect.do?lId=1006)
-- [Kloud Demo](https://kloud.prvt.dev)
-- [Kloud API Demo](https://api.kloud.prvt.dev)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://www.olis.or.kr/license/Detailselect.do?lId=1006)
+
+[Kloud Demo](https://kloud.prvt.dev), [Kloud API Demo](https://api.kloud.prvt.dev)
+
+![ServiceStructure](https://github.com/kshshkim/2022-1-CSC4031-Kloud/blob/main/miscs/service_structure.png)
 
 클라우드 인프라 시각화 및, 비용 분석 및 예측, 관리 서비스를 제공합니다. 
 
