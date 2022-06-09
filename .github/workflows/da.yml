@@ -1,13 +1,13 @@
-name: Front-End
+name: Data Analysis
 on:
   push:
     branches:
       - master
 
 env:
-  DOCKER_IMAGE: kshshkim/kloudfe
+  DOCKER_IMAGE: kshshkim/kloudda
   VERSION: ${{ github.sha }}
-  NAME: kloudfe
+  NAME: kloudda
   USERNAME: kshshkim
 
 jobs:
@@ -39,18 +39,18 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: client
+          context: data_analysis
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{env.DOCKER_IMAGE}}:latest
+          tags: ${{ env.DOCKER_IMAGE}}:latest
 
   deploy:
     needs: build
-    name: fe-deploy
-    runs-on: [ self-hosted ]
+    name: da-deploy
+    runs-on: [self-hosted]
     steps:
       - name: docker run
         run: |
           docker kill ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-          docker run -d -p 8080:8080 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
 
