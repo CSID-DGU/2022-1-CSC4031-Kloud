@@ -8,12 +8,14 @@
 
 AWS IAM 으로 AWS API에 접근합니다. (IAM 정보는 서버에 저장되지 않으며, AWS STS를 통해 발급 받은 임시 토큰이 Redis에 저장됩니다.)
 
-![ServiceStructure](https://github.com/kshshkim/2022-1-CSC4031-Kloud/blob/main/miscs/service_structure.png)
+![ServiceStructure](/miscs/service_structure.png)
 
 ## Server
 ![](https://img.shields.io/badge/Python-3.9-blue?style=for-the-badge&logo=appveyor?logo=null)
 [![](https://img.shields.io/badge/FastAPI-0.75.1-teal?style=for-the-badge&logo=appveyor?logo=null)](https://fastapi.tiangolo.com/)
 [![](https://img.shields.io/badge/Boto3-1.21.41-yellow?style=for-the-badge&logo=appveyor?logo=null)](https://aws.amazon.com/sdk-for-python/)
+
+[README](/server/README.md)
 
 - FastAPI를 기반으로 하는 웹 애플리케이션 서버로, 컨테이너 기반 배포와 Scale-Out을 고려하였습니다.
 - AWS SDK Boto3를 통해 AWS API 요청 등 I/O-Bound 작업을 비동기로 처리합니다.

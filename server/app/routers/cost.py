@@ -135,7 +135,7 @@ async def pattern_finder(user_client=Depends(get_user_id), token=Depends(securit
 
 @router.get("/trend/prophet")
 async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(security),
-                          yearly_seasonality: Optional[bool] = True,
+                          yearly_seasonality: Optional[bool] = False,
                           weekly_seasonality: Optional[bool] = True,
                           daily_seasonality: Optional[bool] = True,
                           n_changepoints: Optional[int] = 7,

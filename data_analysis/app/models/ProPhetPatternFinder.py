@@ -52,9 +52,9 @@ class ProPhetPatternFinder:
         return self.forecast
     
     def performance(self):
-        df_cv = cross_validation(self.model,initial="1 days" ,period = "20 days", horizon = '7 days')
+        df_cv = cross_validation(self.model,initial="3 days" ,period = "40 days", horizon = '30 days')
         df_p = performance_metrics(df_cv)
-        performance = 100 - round(df_p["mape"].mean(),3)
+        performance = 100 - round(df_p["mape"].max(),3)
         return performance
     """
     예측에 영향을 준 요소를 출력
