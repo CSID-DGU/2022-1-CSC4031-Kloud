@@ -5,7 +5,7 @@ on:
       - master
 
 env:
-  DOCKER_IMAGE: kshshkim/kloudfe # 403 에러 수정 ghcr.io/${{ github.actor }}/ossp_flaskapp
+  DOCKER_IMAGE: kshshkim/kloudfe 
   VERSION: ${{ github.sha }}
   NAME: kloudfe
 
