@@ -314,6 +314,19 @@ export async function getTop3UsedAmount() {
   });
   return data;
 }
+export async function getRightSizingRecommendation() {
+  const {
+    data: { RightsizingRecommendations: data },
+  } = await axios({
+    method: "GET",
+    url: `${BASE_URL}/cost/recommendation/rightsizing?within_same_instance_family=true&benefits_considered=true`,
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+  return data;
+}
 
 export function logOut() {
   const data = axios({
