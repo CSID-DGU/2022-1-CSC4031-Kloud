@@ -70,11 +70,17 @@ const SolutionContainer = styled.div`
   padding: 0 90px;
   margin-bottom: 100px;
 `;
-const SolutionText = styled.span<{ size: string; color: string }>`
+const SolutionText = styled.span<{
+  size: string;
+  color: string;
+  margin?: string;
+}>`
   font-weight: lighter;
   font-size: ${(props) => props.size};
   color: ${(props) => props.color};
   margin-right: 8px;
+  margin-bottom: ${(props) => (props.margin ? props.margin : 0)};
+  display: ${(props) => (props.margin ? "block" : "inline")};
 `;
 
 const ChartContainer = styled.div`
@@ -317,6 +323,72 @@ const Solution = () => {
                       selectedInfra.ModifyRecommendationDetail.TargetInstances.at(
                         0
                       ).EstimatedMonthlySavings
+                    ).toFixed(2)}
+                    $
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    입니다.
+                  </SolutionText>
+                </div>
+              </SolutionContainer>
+            ) : recommendationType === "reservation" ? (
+              <SolutionContainer>
+                <div>
+                  <SolutionText color={"yellow"} size={"40px"}>
+                    예약 인스턴스 제안
+                  </SolutionText>
+                </div>
+                <div>
+                  <SolutionText color={"white"} size={"25px"}>
+                    이용중인 온디맨드 서비스를 예약 인스턴스로 변경 시 절감
+                    가능한 금액 및 플랜을 제안합니다.
+                  </SolutionText>
+                </div>
+                <Info
+                  contents={[
+                    `${selectedInfraType}`,
+                    selectedInfraType === "EC2"
+                      ? selectedInfra.InstanceDetails.EC2InstanceDetails
+                          .InstanceType
+                      : selectedInfra.InstanceDetails.RDSInstanceDetails
+                          .InstanceType,
+                  ]}
+                  direction={"left"}
+                />
+
+                <div>
+                  <SolutionText color={"white"} size={"25px"}>
+                    {selectedInfraType === "EC2"
+                      ? selectedInfra.InstanceDetails.EC2InstanceDetails
+                          .InstanceType
+                      : selectedInfra.InstanceDetails.RDSInstanceDetails
+                          .InstanceType}{" "}
+                    인스턴스로 최근 한 달간 비용은
+                  </SolutionText>
+                  <SolutionText color={"yellow"} size={"30px"}>
+                    $
+                    {parseFloat(
+                      selectedInfra.EstimatedMonthlyOnDemandCost
+                    ).toFixed(2)}
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    입니다.
+                  </SolutionText>
+                </div>
+                <ChartContainer>
+                  <SolutionCompareChart />
+                </ChartContainer>
+                <div>
+                  <SolutionText color={"yellow"} size={"25px"}>
+                    1년 예약 인스턴스
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    구매시 월별 예상 절감 금액은
+                  </SolutionText>
+                  <SolutionText color={"yellowgreen"} size={"30px"}>
+                    +
+                    {parseFloat(
+                      selectedInfra.EstimatedMonthlySavingsAmount
                     ).toFixed(2)}
                     $
                   </SolutionText>
