@@ -147,10 +147,10 @@ const Trend = () => {
                 </Unit>
               </UnitBox>
               <InfoTitle data-tip data-for="performance">
-                예측 정확도
+                예측 SCORE
               </InfoTitle>
               <InfoTitle marginBottom={"50px"} data-tip data-for="performance">
-                {prophetTrend.performance.toFixed(2)}%
+                {prophetTrend.performance.toFixed(2)}
               </InfoTitle>
               <Info color={"yellow"} font={"20px"}>
                 최근 한달간 비용{" "}
@@ -217,7 +217,10 @@ const Trend = () => {
             월별 트렌드를 반영해 다음 달의 비용 예측을 제공합니다.
           </ReactToolTip>
           <ReactToolTip id="performance" type="info">
-            예측 정확도는 평균 절대 백분율 오차 MAPE로 계산됩니다.
+            예측 SCORE는 최대 절댓값 평균 오분류 Maximum Mean Absolute
+            Percentage Error 를 이용해 도출된 예측 정확도에 대한 평가
+            지표입니다. 0~100 사이의 값을 가지며 0에 가까울수록 정확한
+            예측값입니다.
           </ReactToolTip>
         </Container>
       )}
