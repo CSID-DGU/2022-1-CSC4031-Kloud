@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - master
+
+env:
+  DOCKER_IMAGE: kshshkim/kloudfe # 403 에러 수정 ghcr.io/${{ github.actor }}/ossp_flaskapp
+  VERSION: ${{ github.sha }}
+  NAME: kloudfe
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,10 +16,43 @@ jobs:
       - name: Checkout source code.
         uses: actions/checkout@v2
 
+      - name: Set up docker buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ env.VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: docker build
         working-directory: ./client
-        run: docker build . -t kloudfe:latest
+        run: docker build . -t kshshkim/kloudfe:latest
 
+      - name: docker login
+        uses: docker/login-action@v1
+        with:
+          username: kshshkim
+          password: ${{ secrets.DHTOKEN }}
+
+      - name: docker push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: kshshkim/kloudfe:latest
+
+  deploy:
+    needs: build
+    name: fe-deploy
+    runs-on: [self-hosted]
+    steps:
       - name: docker run
-        working-directory: ./client
-        run: . deployment/docker-kill.sh && docker run -itd --rm=true --name=kloudFE -p=8080:8080 kloudfe
+        run: |
+          docker kill ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d -p 8080:8080 --name kloudfe --restart always ${{ env.DOCKER_IMAGE }}:latest
+
