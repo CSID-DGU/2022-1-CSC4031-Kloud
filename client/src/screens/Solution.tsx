@@ -4,10 +4,13 @@ import Info from "../components/Info";
 import HorizontalMenu from "../components/HorizontalMenu/index";
 import { useState } from "react";
 import SolutionCompareChart from "../components/SolutionCompareChart";
-import { getCostRatio, getRightSizingRecommendation } from "../api";
+import {
+  getCostRatio,
+  getRightSizingRecommendation,
+  getReservationRecommendation,
+} from "../api";
 import Loader from "../components/Loader";
 import { useQuery } from "react-query";
-import Infra from "./Infra";
 
 const Container = styled.div`
   width: 100%;
