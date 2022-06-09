@@ -15,6 +15,6 @@ jobs:
 #         run: docker build . -t kloudfe:latest
 
       - name: docker run
-          run: docker run -itd --rm=true --name=kloudFE -p=8080:8080 nginx
+        run: docker run -itd --rm=true --name=kloudFE -p=8080:8080 nginx
 #         working-directory: ./client
 #         run: . deployment/docker-kill.sh && docker run -itd --rm=true --name=kloudFE -p=8080:8080 kloudfe
