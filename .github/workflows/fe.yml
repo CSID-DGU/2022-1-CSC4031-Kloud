@@ -10,11 +10,10 @@ jobs:
       - name: Checkout source code.
         uses: actions/checkout@v2
 
-#       - name: docker build
-#         working-directory: ./client
-#         run: docker build . -t kloudfe:latest
+      - name: docker build
+        working-directory: ./client
+        run: docker build . -t kloudfe:latest
 
       - name: docker run
-        run: docker run -itd --rm=true --name=kloudFE -p=8080:8080 nginx
-#         working-directory: ./client
-#         run: . deployment/docker-kill.sh && docker run -itd --rm=true --name=kloudFE -p=8080:8080 kloudfe
+        working-directory: ./client
+        run: . deployment/docker-kill.sh && docker run -itd --rm=true --name=kloudFE -p=8080:8080 kloudfe
