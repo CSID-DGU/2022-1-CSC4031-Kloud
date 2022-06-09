@@ -35,7 +35,7 @@ jobs:
       - name: docker login
         uses: docker/login-action@v1
         with:
-          username: kshshkim
+          username: kshshkim@gmail.com
           password: ${{ secrets.DHTOKEN }}
 
       - name: docker push
