@@ -24,6 +24,9 @@ import { ReactComponent as SubnetSvg } from "../assets/img/subnet.svg";
 import { ReactComponent as InstanceSvg } from "../assets/img/instance.svg";
 import { ReactComponent as RdsSvg } from "../assets/img/database.svg";
 import { ReactComponent as IgwSvg } from "../assets/img/igw.svg";
+import { ReactComponent as EcsSvg } from "../assets/img/ecs.svg";
+import { ReactComponent as ClusterSvg } from "../assets/img/ecs_cluster.svg";
+import { ReactComponent as ELBSvg } from "../assets/img/loadbalancer.svg";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
@@ -215,6 +218,19 @@ export default function Infra({
 
                         return (
                           <Group top={top} left={left} key={key}>
+                            {node.data.resource_type === "ec2" ? (
+                              <InstanceSvg />
+                            ) : node.data.resource_type === "subnet" ? (
+                              <SubnetSvg />
+                            ) : node.data.resource_type === "vpc" ? (
+                              <VpcSvg />
+                            ) : node.data.resource_type === "ecs_service" ? (
+                              <EcsSvg />
+                            ) : node.data.resource_type === "ecs_cluster" ? (
+                              <ClusterSvg />
+                            ) : node.data.resource_type === "elb" ? (
+                              <ELBSvg />
+                            ) : null}
                             {node.depth === 0 && (
                               <>
                                 {/* 트리 시작점 */}
@@ -301,13 +317,6 @@ export default function Infra({
                                 ? "ECS"
                                 : node.data.resource_type}
                             </text>
-                            {node.data.resource_type === "ec2" ? (
-                              <InstanceSvg />
-                            ) : node.data.resource_type === "subnet" ? (
-                              <SubnetSvg />
-                            ) : node.data.resource_type === "vpc" ? (
-                              <VpcSvg />
-                            ) : null}
                           </Group>
                         );
                       })}
