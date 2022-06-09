@@ -52,9 +52,28 @@ class ProPhetPatternFinder:
         return self.forecast
     
     def performance(self):
-        df_cv = cross_validation(self.model,initial="3 days" ,period = "40 days", horizon = '30 days')
-        df_p = performance_metrics(df_cv)
-        performance = 100 - round(df_p["mape"].max(),3)
+        df_c = pd.DataFrame(self.cost)
+        df_e = abs(df_c[1] - self.forecast["yhat"]) / df_c[1]
+        df_e.index = self.forecast["ds"]
+        df_e = df_e.dropna()
+
+        less_1 = 0
+        less_1_cnt = 0
+        over_1 = 0
+        over_1_cnt = 0
+        max_a = df_e.max()
+        for i in range(len(df_e)):
+            if df_e.iloc[i] < 1 and self.forecast.iloc[i]["yhat"] < 1:
+                less_1 += abs(df_e.iloc[i] - self.forecast.iloc[i]["yhat"])
+                less_1_cnt += 1
+            else:
+                over_1 += abs(df_e.iloc[i] - self.forecast.iloc[i]["yhat"]) / max_a
+                over_1_cnt += 1
+
+        less_1_score = less_1 * 100 /less_1_cnt
+        over_1_score = over_1 * 100 / over_1_cnt
+
+        performance = round((less_1_score + over_1_score) / 2,3)
         return performance
     """
     예측에 영향을 준 요소를 출력
@@ -67,6 +86,3 @@ class ProPhetPatternFinder:
     
     def real_data(self):
         return self.data_df
-
-
-
