@@ -91,6 +91,8 @@ const Solution = () => {
     "ratio",
     getCostRatio
   );
+  const { isLoading: isReservationRecommendLoading, data: reservation } =
+    useQuery<any>("reservation", getReservationRecommendation);
   const [selectedInfra, setSelectedInfra] = useState<any>();
   const [selectedInfraType, setSelectedInfraType] = useState<string>();
   const onChartClick = (infra: any) => {
@@ -98,7 +100,9 @@ const Solution = () => {
   };
   return (
     <>
-      {isRecommendationLoading ? (
+      {isRecommendationLoading ||
+      isRatioLoading ||
+      isReservationRecommendLoading ? (
         <Loader />
       ) : (
         <Container>
@@ -125,7 +129,9 @@ const Solution = () => {
                 솔루션 제안 인프라
               </CompareText>
               <CompareText color={"red"} size={"25px"}>
-                {recommendation.length}개
+                {recommendation.length +
+                  reservation.RecommendationDetails.length}
+                개
               </CompareText>
               <CompareText color={"white"} size={"15px"}>
                 Kloud 에서 제안하는 변경사항에 해당하는 인프라의 개수입니다.
@@ -137,14 +143,20 @@ const Solution = () => {
               </CompareText>
               <CompareText color={"yellowgreen"} size={"25px"}>
                 $
-                {parseFloat(
-                  recommendation
-                    .map(
-                      (d: any) =>
-                        d.ModifyRecommendationDetail.TargetInstances.at(0)
-                          .EstimatedMonthlySavings
-                    )
-                    .reduce((sum: number, current: number) => sum + current)
+                {(
+                  parseFloat(
+                    recommendation
+                      .map(
+                        (d: any) =>
+                          d.ModifyRecommendationDetail.TargetInstances.at(0)
+                            .EstimatedMonthlySavings
+                      )
+                      .reduce((sum: number, current: number) => sum + current)
+                  ) +
+                  parseFloat(
+                    reservation.RecommendationSummary
+                      .TotalEstimatedMonthlySavingsAmount
+                  )
                 ).toFixed(2)}{" "}
                 &darr;
               </CompareText>
@@ -164,6 +176,7 @@ const Solution = () => {
                       onChartClick(infra);
                       setSelectedInfraType(infraType);
                     }}
+                    key={infra}
                   >
                     <SolutionChart
                       selected={selectedInfra === infra}
@@ -174,6 +187,7 @@ const Solution = () => {
                           : infra.CurrentInstance.ResourceDetails
                               .EC2ResourceDetails.HourlyOnDemandRate * 100
                       }
+                      key={infra}
                     />
                   </ChartBox>
                 );
