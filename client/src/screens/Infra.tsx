@@ -75,8 +75,8 @@ const SelectedInfra = styled.span`
   font-size: 20px;
 `;
 const ChartBox = styled.button`
-  width: 13vw;
-  height: 13vw;
+  width: 186px;
+  height: 186px;
   border-radius: 10px;
   margin: 20px 0px;
   background-color: gray;
