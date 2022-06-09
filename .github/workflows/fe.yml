@@ -15,4 +15,4 @@ jobs:
         run: docker build . -t kloudfe:latest
 
       - name: docker run
-        run: docker kill kloudFE && docker run -itd --rm=true --name=kloudFE -p=8080:8080 kloudfe
+        run: docker stop $$(docker ps -a -q) && docker run -itd --rm=true --name=kloudFE -p=8080:8080 kloudfe
