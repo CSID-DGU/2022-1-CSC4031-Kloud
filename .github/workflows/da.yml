@@ -52,5 +52,5 @@ jobs:
       - name: docker run
         run: |
           docker kill ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-          docker run -d --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d --name ${{ env.NAME }} --restart always -e REDIS_HOST='${{ secrets.REDIS_HOST }}' -e KLOUD_FASTAPI_SERVER='https://api.kloud.prvt.dev' ${{ env.DOCKER_IMAGE }}:latest
 
