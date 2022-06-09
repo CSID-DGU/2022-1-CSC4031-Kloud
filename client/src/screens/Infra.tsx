@@ -295,7 +295,11 @@ export default function Infra({
                                 setSelectedInstanceCost(Number(sum.toFixed(2)));
                               }}
                             >
-                              {node.data.resource_type}
+                              {node.data.resource_type === "ecs_cluster"
+                                ? "Cluster"
+                                : node.data.resource_type === "ecs_service"
+                                ? "ECS"
+                                : node.data.resource_type}
                             </text>
                             {node.data.resource_type === "ec2" ? (
                               <InstanceSvg />
@@ -371,6 +375,10 @@ export default function Infra({
                   <SelectedInfra>Subnet</SelectedInfra>
                 ) : sidebarItemType === "vpc" ? (
                   <SelectedInfra>VPC</SelectedInfra>
+                ) : sidebarItemType === "ecs_cluster" ? (
+                  <SelectedInfra>ECS Cluster</SelectedInfra>
+                ) : sidebarItemType === "ecs_service" ? (
+                  <SelectedInfra>ECS Service</SelectedInfra>
                 ) : (
                   <SelectedInfra>{sidebarItem}</SelectedInfra>
                 )}
