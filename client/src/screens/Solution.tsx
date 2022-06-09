@@ -91,10 +91,13 @@ const Solution = () => {
     "ratio",
     getCostRatio
   );
-  const { isLoading: isReservationRecommendLoading, data: reservation } =
-    useQuery<any>("reservation", getReservationRecommendation);
+  const { isLoading: isEC2ReservationLoading, data: EC2reservation } =
+    useQuery<any>("EC2reservation", () => getReservationRecommendation("EC2"));
+  const { isLoading: isRDSReservationLoading, data: RDSreservation } =
+    useQuery<any>("RDSreservation", () => getReservationRecommendation("RDS"));
   const [selectedInfra, setSelectedInfra] = useState<any>();
   const [selectedInfraType, setSelectedInfraType] = useState<string>();
+  const [recommendationType, setRecommendationType] = useState<string>();
   const onChartClick = (infra: any) => {
     setSelectedInfra(infra);
   };
@@ -102,7 +105,8 @@ const Solution = () => {
     <>
       {isRecommendationLoading ||
       isRatioLoading ||
-      isReservationRecommendLoading ? (
+      isEC2ReservationLoading ||
+      isRDSReservationLoading ? (
         <Loader />
       ) : (
         <Container>
@@ -130,7 +134,8 @@ const Solution = () => {
               </CompareText>
               <CompareText color={"red"} size={"25px"}>
                 {recommendation.length +
-                  reservation.RecommendationDetails.length}
+                  EC2reservation.RecommendationDetails.length +
+                  RDSreservation.RecommendationDetails.length}
                 개
               </CompareText>
               <CompareText color={"white"} size={"15px"}>
@@ -154,7 +159,11 @@ const Solution = () => {
                       .reduce((sum: number, current: number) => sum + current)
                   ) +
                   parseFloat(
-                    reservation.RecommendationSummary
+                    EC2reservation.RecommendationSummary
+                      .TotalEstimatedMonthlySavingsAmount
+                  ) +
+                  parseFloat(
+                    RDSreservation.RecommendationSummary
                       .TotalEstimatedMonthlySavingsAmount
                   )
                 ).toFixed(2)}{" "}
@@ -167,33 +176,74 @@ const Solution = () => {
           </CompareSection>
           <SolutionBox>
             <HorizontalMenu
-              contents={recommendation.map((infra: any) => {
-                const infraType =
-                  typeof infra.CurrentInstance === "undefined" ? "RDS" : "EC2";
-                return (
-                  <ChartBox
-                    onClick={() => {
-                      onChartClick(infra);
-                      setSelectedInfraType(infraType);
-                    }}
-                    key={infra}
-                  >
-                    <SolutionChart
-                      selected={selectedInfra === infra}
-                      infra={selectedInfraType}
-                      percent={
-                        typeof infra.CurrentInstance === "undefined"
-                          ? 20
-                          : infra.CurrentInstance.ResourceDetails
-                              .EC2ResourceDetails.HourlyOnDemandRate * 100
-                      }
+              contents={[
+                ...recommendation,
+                ...EC2reservation.RecommendationDetails,
+                ...RDSreservation.RecommendationDetails,
+              ].map((infra: any, idx) => {
+                if (idx < recommendation.length) {
+                  return (
+                    <ChartBox
+                      onClick={() => {
+                        onChartClick(infra);
+                        setSelectedInfraType("EC2");
+                        setRecommendationType("rightSizing");
+                      }}
+                    >
+                      <SolutionChart
+                        selected={selectedInfra === infra}
+                        infra={"EC2"}
+                        percent={
+                          infra.CurrentInstance.ResourceDetails
+                            .EC2ResourceDetails.HourlyOnDemandRate * 100
+                        }
+                      />
+                    </ChartBox>
+                  );
+                } else if (
+                  idx <
+                  EC2reservation.RecommendationDetails.length +
+                    recommendation.length
+                ) {
+                  return (
+                    <ChartBox
+                      onClick={() => {
+                        onChartClick(infra);
+                        setSelectedInfraType("EC2");
+                        setRecommendationType("reservation");
+                      }}
+                    >
+                      <SolutionChart
+                        selected={selectedInfra === infra}
+                        infra={"EC2"}
+                        percent={Number(
+                          parseFloat(infra.AverageUtilization).toFixed(2)
+                        )}
+                      />
+                    </ChartBox>
+                  );
+                } else {
+                  return (
+                    <ChartBox
+                      onClick={() => {
+                        onChartClick(infra);
+                        setSelectedInfraType("RDS");
+                        setRecommendationType("reservation");
+                      }}
                       key={infra}
-                    />
-                  </ChartBox>
-                );
+                    >
+                      <SolutionChart
+                        selected={selectedInfra === infra}
+                        infra={"RDS"}
+                        percent={10}
+                        key={infra}
+                      />
+                    </ChartBox>
+                  );
+                }
               })}
             />
-            {selectedInfra ? (
+            {selectedInfra && recommendationType === "rightSizing" ? (
               <SolutionContainer>
                 <Info
                   contents={[

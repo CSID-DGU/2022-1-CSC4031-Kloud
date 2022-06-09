@@ -327,12 +327,17 @@ export async function getRightSizingRecommendation() {
   });
   return data;
 }
-export async function getReservationRecommendation() {
+export async function getReservationRecommendation(service: string) {
+  if (service === "EC2") {
+    service = "Amazon%20Elastic%20Compute%20Cloud%20-%20Compute";
+  } else {
+    service = "Amazon%20Relational%20Database%20Service";
+  }
   const {
     data: { Recommendations: data },
   } = await axios({
     method: "GET",
-    url: `${BASE_URL}/cost/recommendation/reservation?service=Amazon%20Elastic%20Compute%20Cloud%20-%20Compute&look_back_period=SEVEN_DAYS&years=ONE_YEAR&payment_option=NO_UPFRONT`,
+    url: `${BASE_URL}/cost/recommendation/reservation?service=${service}&look_back_period=SEVEN_DAYS&years=ONE_YEAR&payment_option=NO_UPFRONT`,
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${localStorage.getItem("access_token")}`,
