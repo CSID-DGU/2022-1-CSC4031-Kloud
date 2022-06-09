@@ -1,0 +1,18 @@
+name: FE
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code.
+        uses: actions/checkout@v2
+
+      - name: docker build
+        working-directory: ./client
+        run: docker build . -t kloudfe:latest
+
+      - name: docker run
+        run: docker kill kloudFE && docker run -itd --rm=true --name=kloudFE -p=8080:8080 kloudfe
