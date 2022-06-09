@@ -13,6 +13,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: docker login
+        uses: docker/login-action@v1
+        with:
+          username: kshshkim
+          password: ${{ secrets.DHTOKEN }}
+
       - name: Checkout source code.
         uses: actions/checkout@v2
 
@@ -28,20 +34,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: docker build
-        working-directory: ./client
-        run: docker build . -t kshshkim/kloudfe:latest
-
-      - name: docker login
-        uses: docker/login-action@v1
-        with:
-          username: kshshkim@gmail.com
-          password: ${{ secrets.DHTOKEN }}
-
-      - name: docker push
+      - name: docker build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
+          context: client
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: kshshkim/kloudfe:latest
