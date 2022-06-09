@@ -1,6 +1,6 @@
 FROM node:latest as builder
 WORKDIR /app
-COPY *.json /app
+COPY *.json /app/
 RUN npm ci --timeout=1000000
 COPY . .
 RUN npm run build
