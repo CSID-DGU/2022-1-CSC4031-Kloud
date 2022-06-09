@@ -32,9 +32,9 @@ const InfoBox = styled.div`
   flex-direction: column;
   padding: 20px;
 `;
-const InfoTitle = styled.span<{ marginBottom?: string }>`
+const InfoTitle = styled.span<{ marginBottom?: string; size?: string }>`
   font-weight: lighter;
-  font-size: 40px;
+  font-size: ${(props) => (props.size ? props.size : "40px")};
   color: white;
   margin-bottom: ${(props) =>
     props.marginBottom ? props.marginBottom : "10px"};
@@ -146,8 +146,8 @@ const Trend = () => {
                   월별
                 </Unit>
               </UnitBox>
-              <InfoTitle data-tip data-for="performance">
-                예측 SCORE
+              <InfoTitle data-tip data-for="performance" size={"30px"}>
+                mMAPE SCORE
               </InfoTitle>
               <InfoTitle marginBottom={"50px"} data-tip data-for="performance">
                 {prophetTrend.performance.toFixed(2)}
@@ -218,7 +218,7 @@ const Trend = () => {
           </ReactToolTip>
           <ReactToolTip id="performance" type="info">
             예측 SCORE는 최대 절댓값 평균 오분류 Maximum Mean Absolute
-            Percentage Error 를 이용해 도출된 예측 정확도에 대한 평가
+            Percentage Error 를 이용해 도출된 모델 오분류율에 대한 평가
             지표입니다. 0~100 사이의 값을 가지며 0에 가까울수록 정확한
             예측값입니다.
           </ReactToolTip>
