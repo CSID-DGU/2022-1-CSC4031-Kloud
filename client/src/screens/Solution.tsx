@@ -4,6 +4,13 @@ import Info from "../components/Info";
 import HorizontalMenu from "../components/HorizontalMenu/index";
 import { useState } from "react";
 import SolutionCompareChart from "../components/SolutionCompareChart";
+import {
+  getCostRatio,
+  getRightSizingRecommendation,
+  getReservationRecommendation,
+} from "../api";
+import Loader from "../components/Loader";
+import { useQuery } from "react-query";
 
 const Container = styled.div`
   width: 100%;
@@ -63,11 +70,17 @@ const SolutionContainer = styled.div`
   padding: 0 90px;
   margin-bottom: 100px;
 `;
-const SolutionText = styled.span<{ size: string; color: string }>`
+const SolutionText = styled.span<{
+  size: string;
+  color: string;
+  margin?: string;
+}>`
   font-weight: lighter;
   font-size: ${(props) => props.size};
   color: ${(props) => props.color};
   margin-right: 8px;
+  margin-bottom: ${(props) => (props.margin ? props.margin : 0)};
+  display: ${(props) => (props.margin ? "block" : "inline")};
 `;
 
 const ChartContainer = styled.div`
@@ -78,124 +91,317 @@ const ChartContainer = styled.div`
 `;
 
 const Solution = () => {
-  const [selectedInfra, setSelectedInfra] = useState<string>();
-  const onChartClick = (infra: string) => {
+  const { isLoading: isRecommendationLoading, data: recommendation } =
+    useQuery<any>("recommendation", getRightSizingRecommendation);
+  const { isLoading: isRatioLoading, data: costRatio } = useQuery<any>(
+    "ratio",
+    getCostRatio
+  );
+  const { isLoading: isEC2ReservationLoading, data: EC2reservation } =
+    useQuery<any>("EC2reservation", () => getReservationRecommendation("EC2"));
+  const { isLoading: isRDSReservationLoading, data: RDSreservation } =
+    useQuery<any>("RDSreservation", () => getReservationRecommendation("RDS"));
+  const [selectedInfra, setSelectedInfra] = useState<any>();
+  const [selectedInfraType, setSelectedInfraType] = useState<string>();
+  const [recommendationType, setRecommendationType] = useState<string>();
+  const onChartClick = (infra: any) => {
     setSelectedInfra(infra);
   };
   return (
-    <Container>
-      <Info
-        contents={[
-          "비용 솔루션 페이지입니다.",
-          "인프라 사용량에 근거하여 비용 솔루션을 제시합니다.",
-        ]}
-      />
-      <CompareSection>
-        <CompareBox>
-          <CompareText weight={"normal"} color={"white"} size={"25px"}>
-            최근 한달 비용
-          </CompareText>
-          <CompareText color={"yellow"} size={"25px"}>
-            32.3$
-          </CompareText>
-          <CompareText color={"white"} size={"15px"}>
-            최근 한달간의 전체 비용입니다.
-          </CompareText>
-        </CompareBox>
-        <CompareBox>
-          <CompareText weight={"normal"} color={"white"} size={"25px"}>
-            솔루션 제안 인프라
-          </CompareText>
-          <CompareText color={"red"} size={"25px"}>
-            4개
-          </CompareText>
-          <CompareText color={"white"} size={"15px"}>
-            Kloud 에서 제안하는 변경사항에 해당하는 인프라의 개수입니다.
-          </CompareText>
-        </CompareBox>
-        <CompareBox>
-          <CompareText weight={"normal"} color={"white"} size={"25px"}>
-            절감 가능 금액
-          </CompareText>
-          <CompareText color={"yellowgreen"} size={"25px"}>
-            5.03$ &darr;
-          </CompareText>
-          <CompareText color={"white"} size={"15px"}>
-            한달 동안 절감 가능한 최대 금액입니다.
-          </CompareText>
-        </CompareBox>
-      </CompareSection>
-      <SolutionBox>
-        <HorizontalMenu
-          contents={[
-            <ChartBox onClick={() => onChartClick("RDS1")}>
-              <SolutionChart
-                selected={selectedInfra === "RDS1"}
-                infra={"RDS1"}
-                percent={20}
-              />
-            </ChartBox>,
-            <ChartBox onClick={() => onChartClick("EC2-1")}>
-              <SolutionChart
-                selected={selectedInfra === "EC2-1"}
-                infra={"EC2"}
-                percent={34}
-              />
-            </ChartBox>,
-            <ChartBox onClick={() => onChartClick("EC2-2")}>
-              <SolutionChart
-                selected={selectedInfra === "EC2-2"}
-                infra={"EC2"}
-                percent={22}
-              />
-            </ChartBox>,
-            <ChartBox onClick={() => onChartClick("EC2-3")}>
-              <SolutionChart
-                selected={selectedInfra === "EC2-3"}
-                infra={"EC2"}
-                percent={15}
-              />
-            </ChartBox>,
-          ]}
-        />
-        {selectedInfra ? (
-          <SolutionContainer>
-            <Info
-              contents={[`${selectedInfra}`, "i-02f892f88345aad41"]}
-              direction={"left"}
+    <>
+      {isRecommendationLoading ||
+      isRatioLoading ||
+      isEC2ReservationLoading ||
+      isRDSReservationLoading ? (
+        <Loader />
+      ) : (
+        <Container>
+          <Info
+            contents={[
+              "비용 솔루션 페이지입니다.",
+              "인프라 사용량에 근거하여 비용 솔루션을 제시합니다.",
+            ]}
+          />
+          <CompareSection>
+            <CompareBox>
+              <CompareText weight={"normal"} color={"white"} size={"25px"}>
+                최근 한달 비용
+              </CompareText>
+              <CompareText color={"yellow"} size={"25px"}>
+                ${costRatio.at(-1)}
+              </CompareText>
+              <CompareText color={"white"} size={"15px"}>
+                최근 한달간의 전체 비용입니다.
+              </CompareText>
+            </CompareBox>
+            <CompareBox>
+              <CompareText weight={"normal"} color={"white"} size={"25px"}>
+                솔루션 제안 인프라
+              </CompareText>
+              <CompareText color={"red"} size={"25px"}>
+                {recommendation.length +
+                  EC2reservation.RecommendationDetails.length +
+                  RDSreservation.RecommendationDetails.length}
+                개
+              </CompareText>
+              <CompareText color={"white"} size={"15px"}>
+                Kloud 에서 제안하는 변경사항에 해당하는 인프라의 개수입니다.
+              </CompareText>
+            </CompareBox>
+            <CompareBox>
+              <CompareText weight={"normal"} color={"white"} size={"25px"}>
+                절감 가능 금액
+              </CompareText>
+              <CompareText color={"yellowgreen"} size={"25px"}>
+                $
+                {(
+                  parseFloat(
+                    recommendation
+                      .map(
+                        (d: any) =>
+                          d.ModifyRecommendationDetail.TargetInstances.at(0)
+                            .EstimatedMonthlySavings
+                      )
+                      .reduce((sum: number, current: number) => sum + current)
+                  ) +
+                  parseFloat(
+                    EC2reservation.RecommendationSummary
+                      .TotalEstimatedMonthlySavingsAmount
+                  ) +
+                  parseFloat(
+                    RDSreservation.RecommendationSummary
+                      .TotalEstimatedMonthlySavingsAmount
+                  )
+                ).toFixed(2)}{" "}
+                &darr;
+              </CompareText>
+              <CompareText color={"white"} size={"15px"}>
+                한달 동안 절감 가능한 최대 금액입니다.
+              </CompareText>
+            </CompareBox>
+          </CompareSection>
+          <SolutionBox>
+            <HorizontalMenu
+              contents={[
+                ...recommendation,
+                ...EC2reservation.RecommendationDetails,
+                ...RDSreservation.RecommendationDetails,
+              ].map((infra: any, idx) => {
+                if (idx < recommendation.length) {
+                  return (
+                    <ChartBox
+                      onClick={() => {
+                        onChartClick(infra);
+                        setSelectedInfraType("EC2");
+                        setRecommendationType("rightSizing");
+                      }}
+                    >
+                      <SolutionChart
+                        selected={selectedInfra === infra}
+                        infra={"EC2"}
+                        percent={
+                          infra.CurrentInstance.ResourceDetails
+                            .EC2ResourceDetails.HourlyOnDemandRate * 100
+                        }
+                      />
+                    </ChartBox>
+                  );
+                } else if (
+                  idx <
+                  EC2reservation.RecommendationDetails.length +
+                    recommendation.length
+                ) {
+                  return (
+                    <ChartBox
+                      onClick={() => {
+                        onChartClick(infra);
+                        setSelectedInfraType("EC2");
+                        setRecommendationType("reservation");
+                      }}
+                    >
+                      <SolutionChart
+                        selected={selectedInfra === infra}
+                        infra={"EC2"}
+                        percent={Number(
+                          parseFloat(infra.AverageUtilization).toFixed(2)
+                        )}
+                      />
+                    </ChartBox>
+                  );
+                } else {
+                  return (
+                    <ChartBox
+                      onClick={() => {
+                        onChartClick(infra);
+                        setSelectedInfraType("RDS");
+                        setRecommendationType("reservation");
+                      }}
+                      key={infra}
+                    >
+                      <SolutionChart
+                        selected={selectedInfra === infra}
+                        infra={"RDS"}
+                        percent={10}
+                        key={infra}
+                      />
+                    </ChartBox>
+                  );
+                }
+              })}
             />
-            <div>
-              <SolutionText color={"white"} size={"25px"}>
-                t2.micro 인스턴스로 최근 한 달간 비용은
-              </SolutionText>
-              <SolutionText color={"yellow"} size={"30px"}>
-                16.4$
-              </SolutionText>
-              <SolutionText color={"white"} size={"25px"}>
-                입니다.
-              </SolutionText>
-            </div>
-            <ChartContainer>
-              <SolutionCompareChart />
-            </ChartContainer>
-            <div>
-              <SolutionText color={"yellow"} size={"25px"}>
-                t2.nano
-              </SolutionText>
-              <SolutionText color={"white"} size={"25px"}>
-                로 사이즈 변경시 예상 절감 금액은
-              </SolutionText>
-              <SolutionText color={"yellowgreen"} size={"30px"}>
-                +4.3$
-              </SolutionText>
-              <SolutionText color={"white"} size={"25px"}>
-                입니다.
-              </SolutionText>
-            </div>
-          </SolutionContainer>
-        ) : null}
-      </SolutionBox>
-    </Container>
+            {selectedInfra && recommendationType === "rightSizing" ? (
+              <SolutionContainer>
+                <Info
+                  contents={[
+                    `${selectedInfraType}`,
+                    selectedInfra.CurrentInstance.ResourceId,
+                  ]}
+                  direction={"left"}
+                />
+                <div>
+                  <SolutionText color={"white"} size={"25px"}>
+                    {
+                      selectedInfra.CurrentInstance.ResourceDetails
+                        .EC2ResourceDetails.InstanceType
+                    }{" "}
+                    인스턴스로 최근 한 달간 비용은
+                  </SolutionText>
+                  <SolutionText color={"yellow"} size={"30px"}>
+                    $
+                    {parseFloat(
+                      selectedInfra.CurrentInstance.MonthlyCost
+                    ).toFixed(2)}
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    입니다.
+                  </SolutionText>
+                </div>
+                <div>
+                  <SolutionText color={"white"} size={"25px"}>
+                    시간 당 평균 인프라 가동률은
+                  </SolutionText>
+                  <SolutionText color={"orange"} size={"30px"}>
+                    {(
+                      parseFloat(
+                        selectedInfra.CurrentInstance.ResourceDetails
+                          .EC2ResourceDetails.HourlyOnDemandRate
+                      ) * 100
+                    ).toFixed(2)}
+                    %,
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    최대 메모리 사용량은
+                  </SolutionText>
+                  <SolutionText color={"orange"} size={"30px"}>
+                    {parseFloat(
+                      selectedInfra.CurrentInstance.ResourceUtilization
+                        .EC2ResourceUtilization.MaxCpuUtilizationPercentage
+                    ).toFixed(2)}
+                    %
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    입니다.
+                  </SolutionText>
+                </div>
+                <ChartContainer>
+                  <SolutionCompareChart />
+                </ChartContainer>
+                <div>
+                  <SolutionText color={"yellow"} size={"25px"}>
+                    {
+                      selectedInfra.ModifyRecommendationDetail.TargetInstances.at(
+                        0
+                      ).ResourceDetails.EC2ResourceDetails.InstanceType
+                    }
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    로 사이즈 변경시 예상 절감 금액은
+                  </SolutionText>
+                  <SolutionText color={"yellowgreen"} size={"30px"}>
+                    +
+                    {parseFloat(
+                      selectedInfra.ModifyRecommendationDetail.TargetInstances.at(
+                        0
+                      ).EstimatedMonthlySavings
+                    ).toFixed(2)}
+                    $
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    입니다.
+                  </SolutionText>
+                </div>
+              </SolutionContainer>
+            ) : recommendationType === "reservation" ? (
+              <SolutionContainer>
+                <div>
+                  <SolutionText color={"yellow"} size={"40px"}>
+                    예약 인스턴스 제안
+                  </SolutionText>
+                </div>
+                <div>
+                  <SolutionText color={"white"} size={"25px"}>
+                    이용중인 온디맨드 서비스를 예약 인스턴스로 변경 시 절감
+                    가능한 금액 및 플랜을 제안합니다.
+                  </SolutionText>
+                </div>
+                <Info
+                  contents={[
+                    `${selectedInfraType}`,
+                    selectedInfraType === "EC2"
+                      ? selectedInfra.InstanceDetails.EC2InstanceDetails
+                          .InstanceType
+                      : selectedInfra.InstanceDetails.RDSInstanceDetails
+                          .InstanceType,
+                  ]}
+                  direction={"left"}
+                />
+
+                <div>
+                  <SolutionText color={"white"} size={"25px"}>
+                    {selectedInfraType === "EC2"
+                      ? selectedInfra.InstanceDetails.EC2InstanceDetails
+                          .InstanceType
+                      : selectedInfra.InstanceDetails.RDSInstanceDetails
+                          .InstanceType}{" "}
+                    인스턴스로 최근 한 달간 비용은
+                  </SolutionText>
+                  <SolutionText color={"yellow"} size={"30px"}>
+                    $
+                    {parseFloat(
+                      selectedInfra.EstimatedMonthlyOnDemandCost
+                    ).toFixed(2)}
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    입니다.
+                  </SolutionText>
+                </div>
+                <ChartContainer>
+                  <SolutionCompareChart />
+                </ChartContainer>
+                <div>
+                  <SolutionText color={"yellow"} size={"25px"}>
+                    1년 예약 인스턴스
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    구매시 월별 예상 절감 금액은
+                  </SolutionText>
+                  <SolutionText color={"yellowgreen"} size={"30px"}>
+                    +
+                    {parseFloat(
+                      selectedInfra.EstimatedMonthlySavingsAmount
+                    ).toFixed(2)}
+                    $
+                  </SolutionText>
+                  <SolutionText color={"white"} size={"25px"}>
+                    입니다.
+                  </SolutionText>
+                </div>
+              </SolutionContainer>
+            ) : null}
+          </SolutionBox>
+        </Container>
+      )}
+    </>
   );
 };
 export default Solution;

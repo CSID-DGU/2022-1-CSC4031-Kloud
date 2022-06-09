@@ -3,10 +3,7 @@ import ApexChart from "react-apexcharts";
 interface ISolutionCompareChart {}
 
 function SolutionCompareChart() {
-  const test = [
-    28, 29, 33, 36, 32, 32, 33, 28, 29, 33, 36, 32, 32, 33, 28, 29, 33, 36, 32,
-    32, 33,
-  ];
+  const test = [8, 9, 3, 6, 5, 4, 3, 8, 9, 3, 6, 5, 5, 3, 8, 9, 3, 6, 2, 2, 3];
   return (
     <>
       <ApexChart
@@ -20,7 +17,7 @@ function SolutionCompareChart() {
           {
             name: "Solution",
             type: "line",
-            data: test.map((d) => d - Math.random() * 3),
+            data: test.map((d) => d - Math.random() * 2),
             color: "yellow",
           },
         ]}

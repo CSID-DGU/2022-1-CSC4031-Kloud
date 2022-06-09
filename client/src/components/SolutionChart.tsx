@@ -1,7 +1,7 @@
 import ApexChart from "react-apexcharts";
 
 interface ISolutionChart {
-  infra: string;
+  infra: any;
   percent: number;
   selected: boolean;
 }

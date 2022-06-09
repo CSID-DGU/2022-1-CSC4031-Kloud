@@ -24,6 +24,9 @@ import { ReactComponent as SubnetSvg } from "../assets/img/subnet.svg";
 import { ReactComponent as InstanceSvg } from "../assets/img/instance.svg";
 import { ReactComponent as RdsSvg } from "../assets/img/database.svg";
 import { ReactComponent as IgwSvg } from "../assets/img/igw.svg";
+import { ReactComponent as EcsSvg } from "../assets/img/ecs.svg";
+import { ReactComponent as ClusterSvg } from "../assets/img/ecs_cluster.svg";
+import { ReactComponent as ELBSvg } from "../assets/img/loadbalancer.svg";
 
 const defaultMargin = { top: 30, left: 30, right: 30, bottom: 70 };
 
@@ -58,8 +61,8 @@ const InfraSidebarContainer = styled.div`
 `;
 
 const Sidebar = styled.div`
-  width: 20%;
-  height: 80vh;
+  width: 236px;
+  height: 700px;
   background-color: gainsboro;
   border-radius: 14px;
   padding: 25px 5px;
@@ -87,11 +90,11 @@ const SelectedInfraInfo = styled.span`
   font-weight: lighter;
 `;
 const SidebarButton = styled.button<{ buttonType: string }>`
-  width: 13vw;
-  height: 2.5vw;
+  width: 200px;
+  height: 45px;
   border-radius: 10px;
   border: none;
-  margin-bottom: 13px;
+  margin-bottom: 15px;
   font-size: 15px;
   background-color: ${(props) =>
     props.buttonType === "stop" ? "tomato" : props.theme.bgColor};
@@ -106,7 +109,7 @@ const SidebarButtonBox = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 30px;
+  margin-top: 140px;
 `;
 const InfraInfoBox = styled.div`
   width: auto;
@@ -179,9 +182,9 @@ export default function Infra({
       <Container>
         <InfraSidebarContainer>
           <div>
-            <svg width="60vw" height="80vh">
+            <svg width="865px" height="700px">
               <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
-              <rect width="100%" height="80vh" rx={14} fill={"gainsboro"} />
+              <rect width="100%" height="700px" rx={14} fill={"gainsboro"} />
               {/* 전체 배경 */}
               <Group top={margin.top} left={margin.left}>
                 <Tree
@@ -189,9 +192,7 @@ export default function Infra({
                     d.isExpanded ? null : d.children
                   )}
                   size={[innerHeight, innerWidth]}
-                  separation={(a, b) =>
-                    (a.parent === b.parent ? 1 : 0.5) / a.depth
-                  }
+                  separation={(a, b) => 10} // Node 사이의 간격
                 >
                   {(tree) => (
                     <Group top={origin.y} left={origin.x}>
@@ -217,6 +218,19 @@ export default function Infra({
 
                         return (
                           <Group top={top} left={left} key={key}>
+                            {node.data.resource_type === "ec2" ? (
+                              <InstanceSvg />
+                            ) : node.data.resource_type === "subnet" ? (
+                              <SubnetSvg />
+                            ) : node.data.resource_type === "vpc" ? (
+                              <VpcSvg />
+                            ) : node.data.resource_type === "ecs_service" ? (
+                              <EcsSvg />
+                            ) : node.data.resource_type === "ecs_cluster" ? (
+                              <ClusterSvg />
+                            ) : node.data.resource_type === "elb" ? (
+                              <ELBSvg />
+                            ) : null}
                             {node.depth === 0 && (
                               <>
                                 {/* 트리 시작점 */}
@@ -297,106 +311,65 @@ export default function Infra({
                                 setSelectedInstanceCost(Number(sum.toFixed(2)));
                               }}
                             >
-                              {node.data.resource_type}
+                              {node.data.resource_type === "ecs_cluster"
+                                ? "Cluster"
+                                : node.data.resource_type === "ecs_service"
+                                ? "ECS"
+                                : node.data.resource_type}
                             </text>
-                            {node.data.resource_type === "ec2" ? (
-                              <InstanceSvg />
-                            ) : node.data.resource_type === "subnet" ? (
-                              <SubnetSvg />
-                            ) : node.data.resource_type === "vpc" ? (
-                              <VpcSvg />
-                            ) : null}
                           </Group>
                         );
                       })}
                       {orphan?.map((d, key) => {
-                        var orphan_top = 500;
+                        var orphan_top = 580;
                         var orphan_left = 30;
-                        if (d.resource_type === "network_interface") {
-                          return (
-                            <Group
-                              top={orphan_top}
-                              left={orphan_left + key * 50}
-                              key={d.resource_id}
+                        return (
+                          <Group
+                            top={orphan_top}
+                            left={orphan_left + key * 50}
+                            key={d.resource_id}
+                          >
+                            <rect
+                              height={25}
+                              width={45}
+                              y={-40 / 2}
+                              x={-40 / 2}
+                              fill="#272b4d"
+                              stroke="#26deb0"
+                              strokeWidth={1}
+                              strokeOpacity="1"
+                            />
+                            <text
+                              dy="-.33em"
+                              dx=".3em"
+                              fontSize={10}
+                              fontFamily="Arial"
+                              textAnchor="middle"
+                              style={{ cursor: "default" }}
+                              fill="white"
+                              onMouseOver={(e) => {
+                                const { resource_id, resource_type } = d;
+                                setSidebarItem(resource_id);
+                                setSidebarItemType(resource_type);
+                                costHistoryByResource?.data.map((d) => {
+                                  const hit = d.Groups.filter(
+                                    (g) => g.Keys[0] === resource_id
+                                  );
+                                  return hit.length === 0
+                                    ? 0
+                                    : hit[0].Metrics.UnblendedCost.Amount;
+                                });
+                              }}
                             >
-                              <rect
-                                height={25}
-                                width={45}
-                                y={-40 / 2}
-                                x={-40 / 2}
-                                fill="#272b4d"
-                                stroke="#26deb0"
-                                strokeWidth={1}
-                                strokeOpacity="1"
-                              />
-                              <text
-                                dy="-.33em"
-                                dx=".3em"
-                                fontSize={10}
-                                fontFamily="Arial"
-                                textAnchor="middle"
-                                style={{ cursor: "default" }}
-                                fill="white"
-                                onMouseOver={(e) => {
-                                  const { resource_id, resource_type } = d;
-                                  setSidebarItem(resource_id);
-                                  setSidebarItemType(resource_type);
-                                }}
-                              >
-                                NI
-                              </text>
-                            </Group>
-                          );
-                        } else {
-                          return (
-                            <Group
-                              top={orphan_top}
-                              left={orphan_left + key * 50}
-                              key={d.resource_id}
-                            >
-                              <rect
-                                height={25}
-                                width={45}
-                                y={-40 / 2}
-                                x={-40 / 2}
-                                fill="#272b4d"
-                                stroke="#26deb0"
-                                strokeWidth={1}
-                                strokeOpacity="1"
-                              />
-                              <text
-                                dy="-.33em"
-                                dx=".3em"
-                                fontSize={10}
-                                fontFamily="Arial"
-                                textAnchor="middle"
-                                style={{ cursor: "default" }}
-                                fill="white"
-                                onMouseOver={(e) => {
-                                  const { resource_id, resource_type } = d;
-                                  setSidebarItem(resource_id);
-                                  setSidebarItemType(resource_type);
-                                  costHistoryByResource?.data.map((d) => {
-                                    const hit = d.Groups.filter(
-                                      (g) => g.Keys[0] === resource_id
-                                    );
-                                    console.log(hit);
-                                    return hit.length === 0
-                                      ? 0
-                                      : hit[0].Metrics.UnblendedCost.Amount;
-                                  });
-                                }}
-                              >
-                                {d.resource_type}
-                              </text>
-                              {d.resource_type === "rds" ? (
-                                <RdsSvg />
-                              ) : d.resource_type === "igw" ? (
-                                <IgwSvg />
-                              ) : null}
-                            </Group>
-                          );
-                        }
+                              {d.resource_type}
+                            </text>
+                            {d.resource_type === "rds" ? (
+                              <RdsSvg />
+                            ) : d.resource_type === "igw" ? (
+                              <IgwSvg />
+                            ) : null}
+                          </Group>
+                        );
                       })}
                     </Group>
                   )}
@@ -411,6 +384,10 @@ export default function Infra({
                   <SelectedInfra>Subnet</SelectedInfra>
                 ) : sidebarItemType === "vpc" ? (
                   <SelectedInfra>VPC</SelectedInfra>
+                ) : sidebarItemType === "ecs_cluster" ? (
+                  <SelectedInfra>ECS Cluster</SelectedInfra>
+                ) : sidebarItemType === "ecs_service" ? (
+                  <SelectedInfra>ECS Service</SelectedInfra>
                 ) : (
                   <SelectedInfra>{sidebarItem}</SelectedInfra>
                 )}
