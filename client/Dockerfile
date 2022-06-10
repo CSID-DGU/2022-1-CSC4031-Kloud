@@ -1,4 +1,5 @@
 FROM node:latest as builder
+ENV REACT_APP_API_SERVER="https://api.kloud.prvt.dev"
 WORKDIR /app
 COPY *.json /app/
 RUN npm ci --timeout=1000000
