@@ -1,7 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { INestedInfra } from "./types";
-
-const BASE_URL = "http://localhost:8000";
+import BASE_URL from "./api_server";
 
 export async function login(
   access_key_public: string,
