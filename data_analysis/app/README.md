@@ -2,6 +2,9 @@
 시계열 Data-Analysis 애플리케이션 경로입니다.
 
 ## models
+- 시계열 데이터 분석을 위한 모델정보가 있습니다
+- Cosine-Similarity 기반 모델
+- Prophet 기반 모델
 [README](/data_analysis/app/models/README.md)
 
 ## conf
