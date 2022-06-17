@@ -13,7 +13,8 @@
   - 계절성을 띄는 시계열 데이터를 위해 Meta(구 Facebook)에서 공개한 시계열 예측 라이브러리 채택.
   - Prophet 모델의 주요 구성요소로는 Trend, Seasonality, Holiday이다. 이 세가지를 결합하면 아래와 같이 나타낼 수 있다.
   
-      *y(t)=g(t)+s(t)+h(t)+ε*
+     ![image](https://user-images.githubusercontent.com/73048180/174269058-35af9414-0d51-416a-bad6-22eec2eb603c.png)
+
 
   - Trend를 구성하는 g(t)함수는 주기적이지 않은 변화인 트렌드를 나타낸다.
   - Seasonality인 s(t)함수는 weekly, yearly 등 주기적으로 나타나는 패턴들을 포함한다.
@@ -26,13 +27,19 @@
 - Prophet 모델 성능 평가
   -  모델 성능평가를 위해 “최대 절댓값 기반 시계열 데이터 예측 모델 평가 기법” mMAPE 적용
     - MAPE
+        ![image](https://user-images.githubusercontent.com/73048180/174269011-3005dc6e-4ff8-4f92-a22a-96cd3a149669.png)
+
         - 예측 관측값이 클수록 100에 가까운수가 측정, 차이가 적을수록 0에 가까운 값 측정
         - ⇒ 값이 작아지면 과대하게 평가 값이 측정됨
     - sMAPE
+        ![image](https://user-images.githubusercontent.com/73048180/174268749-6398622e-79be-4b86-8693-efac3529b6c7.png)
+  
         - MAPE와 달리 관측 값과 예측 값이 절대 값의 평균으로 대체
         - 관측 값과 예측 값이 부호가 다를 경우에는 실제 차이 정도와 상관없이 항상 최대 에러 값을 보임
         - ⇒ 전체 모델 평가의 의미를 훼손하는 결과를 가져오게 된다.
     - mMAPE
+        ![image](https://user-images.githubusercontent.com/73048180/174268920-5f6f160a-20b3-4462-adc4-b02b0720c7eb.png)
+
         - 평가 값은 계산할 때 분모에 〖|A|〗_max 값을 사용함으로써 평가 값이 0과 100사이의 숫자로 계산.
         - 특정 시점에 예측 데이터가 터무니 없이 커서 최댓값보다 클 경우는 100 이상의 값이 부여되게 되어 모델 평가 값에 다른 경우보다 더 큰 영향을 미치게 됨
         - ⇒ 이 경우 상당히 잘못된 예측을 한 경우로 판단될 수 있음.
