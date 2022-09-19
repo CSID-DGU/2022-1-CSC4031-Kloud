@@ -47,10 +47,7 @@ async def cost_history_by_resource(user_id=Depends(get_user_id),
                                    q: CostHistoryByResource = Depends()
                                    ):
     """
-    :param user_id:
-    :param specific: true|false, default false, usage type and quantity 나누어 세부적으로 출력
-    :param granularity: MONTHLY|DAILY|HOURLY
-    :return: dict
+    specific: true|false, default false, usage type and quantity 나누어 세부적으로 출력
     """
     user_client = await get_user_client(user_id)
     return await user_client.get_cost_history_by_instances(show_usage_type_and_quantity=q.specific,
@@ -63,12 +60,10 @@ async def cost_history_by_service(user_client: KloudClient = Depends(get_user_cl
     return await user_client.get_cost_history_by_service(days=q.days)
 
 
-
 @router.get("/recommendation/reservation")
 async def reservation_recommendation(user_client: KloudClient = Depends(get_user_client),
                                      q: ReservationRecommendation = Depends()
                                      ) -> dict:
-
     return await user_client.async_get_reservation_recommendation(q.service,
                                                                   q.look_back_period,
                                                                   q.years,
