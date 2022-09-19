@@ -1,7 +1,6 @@
 import asyncio
 
-from typing import Optional
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 
 from ..auth import security
 from ..boto3_wrappers.kloud_client import KloudClient
@@ -9,6 +8,8 @@ from ..config.cellery_app import da_app
 from ..dependencies import get_user_id, get_user_client
 from ..redis_req import get_cost_cache, set_cost_cache
 from ..response_exceptions import CeleryTimeOutError
+from .scheme import CostHistory, CostHistoryByResource, CostHistoryByService, ReservationRecommendation, \
+    RightSizingRecommendation, TrendProphet
 
 router = APIRouter(prefix="/cost",
                    tags=["cost"])
@@ -16,21 +17,16 @@ router = APIRouter(prefix="/cost",
 
 @router.get("/history/param")
 async def cost_history_param(user_id=Depends(get_user_id),
-                             granularity: Optional[str] = 'DAILY',
-                             days: Optional[int] = 90) -> dict:
+                             q: CostHistory = Depends()
+                             ) -> dict:
     """
-    :param user_id:
-    :param granularity: HOURLY|DAILY|MONTHLY
-    :param days: maximum 180
-    :return: dict
-
     HOURLY 일시 최대 14일 가능
     """
-    key = f'{user_id}_{granularity}_{days}'
+    key = f'{user_id}_{q.granularity}_{q.days}'
     cost_history = await get_cost_cache(key)
     if cost_history is None:
         user_client = await get_user_client(user_id)
-        cost_history: dict = await user_client.get_cost_history(days=days, granularity=granularity)
+        cost_history: dict = await user_client.get_cost_history(days=q.days, granularity=q.granularity)
         asyncio.create_task(set_cost_cache(key, cost_history))
     else:
         print(f'cache hit {user_id=}')
@@ -48,59 +44,38 @@ async def cost_history_default(user_id=Depends(get_user_id)):
 
 @router.get("/history/by-resource")
 async def cost_history_by_resource(user_id=Depends(get_user_id),
-                                   specific: Optional[bool] = False,
-                                   granularity: Optional[str] = 'MONTHLY'
+                                   q: CostHistoryByResource = Depends()
                                    ):
     """
-    :param user_id:
-    :param specific: true|false, default false, usage type and quantity 나누어 세부적으로 출력
-    :param granularity: MONTHLY|DAILY|HOURLY
-    :return: dict
+    specific: true|false, default false, usage type and quantity 나누어 세부적으로 출력
     """
     user_client = await get_user_client(user_id)
-    return await user_client.get_cost_history_by_instances(show_usage_type_and_quantity=specific,
-                                                           granularity=granularity)
+    return await user_client.get_cost_history_by_instances(show_usage_type_and_quantity=q.specific,
+                                                           granularity=q.granularity)
 
 
 @router.get("/history/by-service")
-async def cost_history_by_service(user_client: KloudClient = Depends(get_user_client), days: Optional[int] = 90):
-    return await user_client.get_cost_history_by_service(days=days)
-
-
-AVAILABLE_RESERVATION = ['Amazon Elastic Compute Cloud - Compute',
-                         'Amazon Relational Database Service',
-                         'Amazon Redshift',
-                         'Amazon ElastiCache',
-                         'Amazon Elasticsearch Service',
-                         'Amazon OpenSearch Service']
-AVAILABLE_LOOK_BACK_PERIOD = ['SEVEN_DAYS', 'THIRTY_DAYS', 'SIXTY_DAYS']
-PAYMENT_OPTIONS = ['NO_UPFRONT', 'PARTIAL_UPFRONT', 'ALL_UPFRONT', 'LIGHT_UTILIZATION', 'MEDIUM_UTILIZATION',
-                   'HEAVY_UTILIZATION']
-TERM_IN_YEARS = ['ONE_YEAR', 'THREE_YEARS']
+async def cost_history_by_service(user_client: KloudClient = Depends(get_user_client),
+                                  q: CostHistoryByService = Depends()):
+    return await user_client.get_cost_history_by_service(days=q.days)
 
 
 @router.get("/recommendation/reservation")
 async def reservation_recommendation(user_client: KloudClient = Depends(get_user_client),
-                                     service: str = Query(default=AVAILABLE_RESERVATION[0],
-                                                          description=str(AVAILABLE_RESERVATION)),
-                                     look_back_period: str = Query(default=AVAILABLE_LOOK_BACK_PERIOD[0],
-                                                                   description=str(AVAILABLE_LOOK_BACK_PERIOD)),
-                                     years: str = Query(default=TERM_IN_YEARS[0],
-                                                        description=str(TERM_IN_YEARS)),
-                                     payment_option: str = Query(default=PAYMENT_OPTIONS[0],
-                                                                 description=str(PAYMENT_OPTIONS))
+                                     q: ReservationRecommendation = Depends()
                                      ) -> dict:
-
-    return await user_client.async_get_reservation_recommendation(service, look_back_period, years, payment_option)
+    return await user_client.async_get_reservation_recommendation(q.service,
+                                                                  q.look_back_period,
+                                                                  q.years,
+                                                                  q.payment_option)
 
 
 @router.get("/recommendation/rightsizing")
 async def rightsizing_recommendation(user_client: KloudClient = Depends(get_user_client),
-                                     within_same_instance_family: bool = True,
-                                     benefits_considered: bool = True):
+                                     q: RightSizingRecommendation = Depends()):
     return await user_client.async_get_rightsizing_recommendation(
-        within_same_instance_family=within_same_instance_family,
-        benefits_considered=benefits_considered)
+        within_same_instance_family=q.within_same_instance_family,
+        benefits_considered=q.benefits_considered)
 
 
 LOOP_BREAKING_STATE = {'SUCCESS', 'REVOKED', 'FAILURE'}
@@ -135,11 +110,8 @@ async def pattern_finder(user_client=Depends(get_user_id), token=Depends(securit
 
 @router.get("/trend/prophet")
 async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(security),
-                          yearly_seasonality: Optional[bool] = False,
-                          weekly_seasonality: Optional[bool] = True,
-                          daily_seasonality: Optional[bool] = True,
-                          n_changepoints: Optional[int] = 7,
-                          period: Optional[int] = 5):
+                          q: TrendProphet = Depends()
+                          ):
     """
     yearly_seasonality : 연 계절성
     weekly_seasonality : 주 계절성
@@ -149,6 +121,6 @@ async def pattern_finder2(user_client=Depends(get_user_id), token=Depends(securi
     period : 예측 일수
     """
     task = da_app.send_task("/cost/trend/prophet",
-                            [token.credentials, yearly_seasonality, weekly_seasonality, daily_seasonality,
-                             n_changepoints, period])
+                            [token.credentials, q.yearly_seasonality, q.weekly_seasonality, q.daily_seasonality,
+                             q.n_changepoints, q.period])
     return await wait_until_done(task, timeout=1000)  # 비동기 실행, 결과값 체크 예시
