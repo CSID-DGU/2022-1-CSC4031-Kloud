@@ -1,14 +1,34 @@
 from pydantic import BaseModel, conlist, conint, constr, validator
-from typing import Any, Union, Sequence, Optional
-
+from enum import Enum
 
 MAXIMUM_DAYS = 180
 MAXIMUM_DAYS_HOURLY = 14
-GRANULARITY = constr(regex=r'DAILY|MONTHLY|HOURLY')
+GRANULARITY = ['HOURLY', 'DAILY', 'Monthly']
+AVAILABLE_RESERVATION = ['Amazon Elastic Compute Cloud - Compute',
+                         'Amazon Relational Database Service',
+                         'Amazon Redshift',
+                         'Amazon ElastiCache',
+                         'Amazon Elasticsearch Service',
+                         'Amazon OpenSearch Service']
+AVAILABLE_LOOK_BACK_PERIOD = ['SEVEN_DAYS', 'THIRTY_DAYS', 'SIXTY_DAYS']
+PAYMENT_OPTIONS = ['NO_UPFRONT', 'PARTIAL_UPFRONT', 'ALL_UPFRONT', 'LIGHT_UTILIZATION', 'MEDIUM_UTILIZATION',
+                   'HEAVY_UTILIZATION']
+TERM_IN_YEARS = ['ONE_YEAR', 'THREE_YEARS']
+
+
+def gen_enum(lst: list) -> Enum:
+    return Enum('enum', {lst[i]: lst[i] for i in range(len(lst))})
+
+
+Granularity: Enum = gen_enum(GRANULARITY)
+AvailableReservation: Enum = gen_enum(AVAILABLE_RESERVATION)
+AvailableLookBackPeriod: Enum = gen_enum(AVAILABLE_LOOK_BACK_PERIOD)
+PaymentOptions: Enum = gen_enum(PAYMENT_OPTIONS)
+TermInYears: Enum = gen_enum(TERM_IN_YEARS)
 
 
 class CostHistory(BaseModel):
-    granularity: GRANULARITY
+    granularity: Granularity
     days: conint(ge=1, le=MAXIMUM_DAYS)
 
     @validator('days')
@@ -23,35 +43,18 @@ class CostHistory(BaseModel):
 
 class CostHistoryByResource(BaseModel):
     specific: bool
-    granularity: GRANULARITY
+    granularity: Granularity
 
 
 class CostHistoryByService(BaseModel):
     days: conint(ge=1, le=MAXIMUM_DAYS)
 
 
-AVAILABLE_RESERVATION = ['Amazon Elastic Compute Cloud - Compute',
-                         'Amazon Relational Database Service',
-                         'Amazon Redshift',
-                         'Amazon ElastiCache',
-                         'Amazon Elasticsearch Service',
-                         'Amazon OpenSearch Service']
-AVAILABLE_LOOK_BACK_PERIOD = ['SEVEN_DAYS', 'THIRTY_DAYS', 'SIXTY_DAYS']
-PAYMENT_OPTIONS = ['NO_UPFRONT', 'PARTIAL_UPFRONT', 'ALL_UPFRONT', 'LIGHT_UTILIZATION', 'MEDIUM_UTILIZATION',
-                   'HEAVY_UTILIZATION']
-TERM_IN_YEARS = ['ONE_YEAR', 'THREE_YEARS']
-
-REGEX_AR = '|'.join(AVAILABLE_RESERVATION)
-REGEX_ALBP = '|'.join(AVAILABLE_LOOK_BACK_PERIOD)
-REGEX_PO = '|'.join(PAYMENT_OPTIONS)
-REGEX_TIY = '|'.join(TERM_IN_YEARS)
-
-
 class ReservationRecommendation(BaseModel):
-    service: constr(regex=REGEX_AR)
-    look_back_period: constr(regex=REGEX_ALBP)
-    years: constr(regex=REGEX_TIY)
-    payment_option: constr(regex=REGEX_PO)
+    service: AvailableReservation
+    look_back_period: AvailableLookBackPeriod
+    years: TermInYears
+    payment_option: PaymentOptions
 
 
 class RightSizingRecommendation(BaseModel):
@@ -65,4 +68,3 @@ class TrendProphet(BaseModel):
     daily_seasonality: bool
     n_changepoints: int
     period: int
-
