@@ -3,7 +3,7 @@ from enum import Enum
 
 MAXIMUM_DAYS = 180
 MAXIMUM_DAYS_HOURLY = 14
-GRANULARITY = ['HOURLY', 'DAILY', 'Monthly']
+GRANULARITY = ['HOURLY', 'DAILY', 'MONTHLY']
 AVAILABLE_RESERVATION = ['Amazon Elastic Compute Cloud - Compute',
                          'Amazon Relational Database Service',
                          'Amazon Redshift',
@@ -16,8 +16,8 @@ PAYMENT_OPTIONS = ['NO_UPFRONT', 'PARTIAL_UPFRONT', 'ALL_UPFRONT', 'LIGHT_UTILIZ
 TERM_IN_YEARS = ['ONE_YEAR', 'THREE_YEARS']
 
 
-def gen_enum(lst: list) -> Enum:
-    return Enum('enum', {lst[i]: lst[i] for i in range(len(lst))})
+def gen_enum(lst: list) -> Enum:  # Enum class 생성
+    return Enum(lst[0], {lst[i]: lst[i] for i in range(len(lst))})
 
 
 Granularity: Enum = gen_enum(GRANULARITY)
@@ -28,8 +28,8 @@ TermInYears: Enum = gen_enum(TERM_IN_YEARS)
 
 
 class CostHistory(BaseModel):
-    granularity: Granularity
-    days: conint(ge=1, le=MAXIMUM_DAYS)
+    granularity: Granularity = 'DAILY'
+    days: conint(ge=1, le=MAXIMUM_DAYS) = 90
 
     @validator('days')
     def validate_days(cls, v, values) -> int:
@@ -37,17 +37,17 @@ class CostHistory(BaseModel):
         if values.get('granularity') == 'HOURLY':
             maximum_days_available = MAXIMUM_DAYS_HOURLY
         if v > maximum_days_available:
-            raise ValueError(f"ValueError: days cannot exceed {maximum_days_available}")
+            raise ValueError(f"ValueError: days cannot exceed {maximum_days_available} with granularity {values.get('granularity')}")
         return v
 
 
 class CostHistoryByResource(BaseModel):
-    specific: bool
-    granularity: Granularity
+    specific: bool = False
+    granularity: Granularity = 'MONTHLY'
 
 
 class CostHistoryByService(BaseModel):
-    days: conint(ge=1, le=MAXIMUM_DAYS)
+    days: conint(ge=1, le=MAXIMUM_DAYS) = 90
 
 
 class ReservationRecommendation(BaseModel):
@@ -58,13 +58,14 @@ class ReservationRecommendation(BaseModel):
 
 
 class RightSizingRecommendation(BaseModel):
-    within_same_instance_family: bool
-    benefits_considered: bool
+    within_same_instance_family: bool = True
+    benefits_considered: bool = True
 
 
 class TrendProphet(BaseModel):
-    yearly_seasonality: bool
-    weekly_seasonality: bool
-    daily_seasonality: bool
-    n_changepoints: int
-    period: int
+    yearly_seasonality: bool = False
+    weekly_seasonality: bool = True
+    daily_seasonality: bool = True
+    n_changepoints: int = 7
+    period: int = 5
+
