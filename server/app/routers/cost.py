@@ -39,7 +39,8 @@ async def cost_history_default(user_id=Depends(get_user_id)):
     deprecated
     cost_history_param 사용할것.
     """
-    return await cost_history_param(user_id=user_id)
+    c: CostHistory = CostHistory(granularity='DAILY', days=90)
+    return await cost_history_param(user_id=user_id, q=c)
 
 
 @router.get("/history/by-resource")
