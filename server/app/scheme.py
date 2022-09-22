@@ -1,5 +1,6 @@
-from pydantic import BaseModel, conlist, conint, constr, validator
 from enum import Enum
+
+from pydantic import BaseModel, conint, validator
 
 MAXIMUM_DAYS = 180
 MAXIMUM_DAYS_HOURLY = 14
@@ -37,13 +38,20 @@ class CostHistory(BaseModel):
         if values.get('granularity') == 'HOURLY':
             maximum_days_available = MAXIMUM_DAYS_HOURLY
         if v > maximum_days_available:
-            raise ValueError(f"ValueError: days cannot exceed {maximum_days_available} with granularity {values.get('granularity')}")
+            raise ValueError(
+                f"ValueError: days cannot exceed {maximum_days_available} with granularity {values.get('granularity')}")
         return v
+
+    class Config:
+        use_enum_values = True
 
 
 class CostHistoryByResource(BaseModel):
     specific: bool = False
     granularity: Granularity = 'MONTHLY'
+
+    class Config:
+        use_enum_values = True
 
 
 class CostHistoryByService(BaseModel):
@@ -55,6 +63,9 @@ class ReservationRecommendation(BaseModel):
     look_back_period: AvailableLookBackPeriod
     years: TermInYears
     payment_option: PaymentOptions
+
+    class Config:
+        use_enum_values = True
 
 
 class RightSizingRecommendation(BaseModel):
@@ -68,4 +79,3 @@ class TrendProphet(BaseModel):
     daily_seasonality: bool = True
     n_changepoints: int = 7
     period: int = 5
-

@@ -8,7 +8,7 @@ from ..config.cellery_app import da_app
 from ..dependencies import get_user_id, get_user_client
 from ..redis_req import get_cost_cache, set_cost_cache
 from ..response_exceptions import CeleryTimeOutError
-from .scheme import CostHistory, CostHistoryByResource, CostHistoryByService, ReservationRecommendation, \
+from ..scheme import CostHistory, CostHistoryByResource, CostHistoryByService, ReservationRecommendation, \
     RightSizingRecommendation, TrendProphet
 
 router = APIRouter(prefix="/cost",
